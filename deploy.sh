@@ -4,11 +4,26 @@
 KEY_PATH="/c/today-sentence/mykey.pem"  # EC2 접속에 사용할 .pem 키 파일 경로
 EC2_USER="ubuntu"                      # EC2 사용자 이름
 EC2_IP="ec2-13-209-47-32.ap-northeast-2.compute.amazonaws.com"  # EC2 퍼블릭 DNS
-JAR_FILE="/c/today-sentence/today-sentence-backend/build/libs/today-sentence-0.0.1-SNAPSHOT.jar"  # JAR 파일 경로 수정
+PROJECT_PATH="/c/today-sentence/today-sentence-backend"  # 프로젝트 경로
+JAR_FILE="$PROJECT_PATH/build/libs/today-sentence-0.0.1-SNAPSHOT.jar"  # 빌드 후 생성될 JAR 파일 경로
 REMOTE_PATH="/home/ubuntu"  # EC2에서 파일을 저장할 경로
 APP_NAME="today-sentence-0.0.1-SNAPSHOT.jar"  # EC2에 저장될 파일 이름
 
-# 1. JAR 파일 업로드
+# 0. Gradle로 JAR 파일 빌드
+echo "Building JAR file with Gradle..."
+cd "$PROJECT_PATH" || { echo "Project path not found: $PROJECT_PATH"; exit 1; }
+./gradlew clean build
+if [ $? -ne 0 ]; then
+  echo "Gradle build failed. Please check your project configuration or Gradle installation."
+  exit 1
+fi
+echo "Gradle build completed successfully."
+
+# 1. JAR 파일 확인 후 업로드
+if [ ! -f "$JAR_FILE" ]; then
+  echo "JAR file not found: $JAR_FILE"
+  exit 1
+fi
 echo "Uploading $JAR_FILE to $EC2_USER@$EC2_IP:$REMOTE_PATH"
 scp -i "$KEY_PATH" "$JAR_FILE" "$EC2_USER@$EC2_IP:$REMOTE_PATH/$APP_NAME"
 if [ $? -ne 0 ]; then
@@ -19,7 +34,7 @@ fi
 # 2. EC2 접속 및 애플리케이션 종료
 echo "Connecting to EC2 and stopping existing application..."
 ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << EOF
-  pkill -f "$APP_NAME" || echo "No running application to stop."
+  sudo pkill -f "$APP_NAME" || echo "No application running"
 EOF
 if [ $? -ne 0 ]; then
   echo "Failed to stop existing application. Please check the EC2 connection."
@@ -43,5 +58,3 @@ if [ $? -ne 0 ]; then
   echo "Failed to retrieve logs. Please check the EC2 connection or log file path."
   exit 1
 fi
-
-# 5.끝
