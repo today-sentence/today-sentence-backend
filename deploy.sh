@@ -43,3 +43,5 @@ if [ $? -ne 0 ]; then
   echo "Failed to retrieve logs. Please check the EC2 connection or log file path."
   exit 1
 fi
+
+# 5.끝
