@@ -28,7 +28,7 @@ jobs:
 
       # 3. Gradle 캐시
       - name: Cache Gradle packages
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -47,7 +47,7 @@ jobs:
 
       # 6. 빌드 결과물 저장
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-output-dev
           path: build/libs/*.jar
