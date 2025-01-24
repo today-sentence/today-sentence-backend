@@ -29,6 +29,12 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.TOKEN_GITHUB_ACTIONS }}
 
+      # 디버깅: 다운로드된 아티팩트의 실제 경로 확인
+      - name: Debug Downloaded Artifacts
+        run: |
+          echo "Listing all files in current directory after artifact download:"
+          find . -type f
+
       # JAR 파일 확인
       - name: Verify JAR File in build/libs
         run: |
@@ -50,7 +56,7 @@ jobs:
       # EC2에 JAR 파일 업로드
       - name: Upload jar file
         run: |
-          scp -i key.pem $JAR_FILE_PATH $EC2_USER@$EC2_IP:/home/ubuntu/
+          scp -i key.pem "$JAR_FILE" $EC2_USER@$EC2_IP:/home/ubuntu/
 
       # EC2에 deploy.sh 업로드
       - name: Upload deploy script
