@@ -17,8 +17,8 @@ KEY_PATH=$4
 # fi
 
 # 1. PEM 키 경로 확인
-if [ ! -f "$PEM_KEY" ]; then
-  echo "PEM key not found: $PEM_KEY"
+if [ ! -f "$KEY_PATH" ]; then
+  echo "PEM key not found: $KEY_PATH"
   exit 1
 fi
 
