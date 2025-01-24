@@ -67,5 +67,5 @@ jobs:
           $REMOTE_PATH/$JAR_FILE \
           $EC2_USER \
           $EC2_IP \
-          key.pem \
+          key.pem
           EOF
