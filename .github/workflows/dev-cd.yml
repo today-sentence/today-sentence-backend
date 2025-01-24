@@ -1,0 +1,56 @@
+# dev 브랜치에 대한 CD 파이프라인 설정 파일
+
+name: dev-branch-cd
+
+on:
+  workflow_run:
+    workflows:
+      - dev-branch-ci
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      EC2_USER: ubuntu
+      EC2_IP: ec2-13-209-47-32.ap-northeast-2.compute.amazonaws.com
+      JAR_FILE: build/libs/today-sentence-0.0.1-SNAPSHOT.jar
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 빌드 결과물(Jar) 다운로드 from CI
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output-dev
+
+      # 3. Create key.pem file
+      - name: Create key.pem file
+        run: |
+          echo "${{ secrets.EC2_KEY_PEM_DEV }}" > key.pem
+          chmod 600 key.pem
+
+      # EC2에 JAR 파일 업로드
+      - name: Upload jar file
+        run: |
+          scp -i key.pem "$JAR_FILE_PATH" $EC2_USER@$EC2_IP:/home/ubuntu/
+
+      # EC2에 deploy.sh 업로드
+      - name: Upload deploy script
+        run: |
+          scp -i key.pem ./deploy.sh $EC2_USER@$EC2_IP:/home/ubuntu
+
+      # EC2에서 deploy.sh 실행
+      - name: Deploy Application
+        run: |
+          ssh -i key.pem ubuntu@$EC2_IP << EOF
+          chmod +x /home/ubuntu/deploy.sh
+          /home/ubuntu/deploy.sh \
+          $REMOTE_PATH/$JAR_FILE \
+          $EC2_USER \
+          $EC2_IP \
+          key.pem \
+          EOF
