@@ -40,6 +40,9 @@ jobs:
       # 4. 프로젝트 빌드
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       # 5. 테스트 실행
       - name: Run tests
