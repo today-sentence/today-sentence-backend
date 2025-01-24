@@ -41,6 +41,13 @@ jobs:
           echo "${{ secrets.EC2_KEY_PEM_DEV }}" > key.pem
           chmod 600 key.pem
 
+      # EC2 접속을 위한 호스트 키 생성
+      - name: Add SSH key to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+
+
       # EC2에 JAR 파일 업로드
       - name: Upload jar file
         run: |
