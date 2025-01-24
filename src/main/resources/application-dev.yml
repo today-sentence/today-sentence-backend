@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://todaysentence.ch6iqok0yerv.ap-northeast-2.rds.amazonaws.com:3306/todaysentence
+    username: todaysentence
+    password: todaysentence
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 5
+      connection-timeout: 5000
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MariaDB103Dialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080

@@ -9,16 +9,6 @@ JAR_FILE="$PROJECT_PATH/build/libs/today-sentence-0.0.1-SNAPSHOT.jar"  # 빌드 
 REMOTE_PATH="/home/ubuntu"  # EC2에서 파일을 저장할 경로
 APP_NAME="today-sentence-0.0.1-SNAPSHOT.jar"  # EC2에 저장될 파일 이름
 
-# 0. Gradle로 JAR 파일 빌드
-echo "Building JAR file with Gradle..."
-cd "$PROJECT_PATH" || { echo "Project path not found: $PROJECT_PATH"; exit 1; }
-./gradlew clean build
-if [ $? -ne 0 ]; then
-  echo "Gradle build failed. Please check your project configuration or Gradle installation."
-  exit 1
-fi
-echo "Gradle build completed successfully."
-
 # 1. JAR 파일 확인 후 업로드
 if [ ! -f "$JAR_FILE" ]; then
   echo "JAR file not found: $JAR_FILE"
@@ -42,9 +32,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # 3. 새 애플리케이션 실행
-echo "Starting new application..."
+echo "Starting new application with profile: $SPRING_PROFILE..."
 ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << EOF
-  nohup java -jar "$REMOTE_PATH/$APP_NAME" > "$REMOTE_PATH/app.log" 2>&1 &
+  nohup java -jar "$REMOTE_PATH/$APP_NAME" --spring.profiles.active=$SPRING_PROFILE > "$REMOTE_PATH/app.log" 2>&1 &
 EOF
 if [ $? -ne 0 ]; then
   echo "Failed to start the new application. Please check the JAR file or Java environment on EC2."
