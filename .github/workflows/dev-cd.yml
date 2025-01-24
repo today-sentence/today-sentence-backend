@@ -15,7 +15,7 @@ jobs:
     env:
       EC2_USER: ubuntu
       EC2_IP: ec2-13-209-47-32.ap-northeast-2.compute.amazonaws.com
-      JAR_FILE: build/libs/today-sentence-0.0.1-SNAPSHOT.jar
+      JAR_FILE: today-sentence-0.0.1-SNAPSHOT.jar
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     steps:
       - name: Checkout code
@@ -34,18 +34,6 @@ jobs:
         run: |
           echo "Listing all files in current directory after artifact download:"
           find . -type f
-
-      # JAR 파일 확인
-      - name: Verify JAR File in build/libs
-        run: |
-          echo "Checking if JAR file exists in build/libs..."
-          ls -al build/libs/ || echo "Directory 'build/libs/' does not exist!"
-          if [ -f build/libs/*.jar ]; then
-            echo "JAR file(s) found in build/libs/:"
-            ls build/libs/*.jar
-          else
-            echo "No JAR files found in build/libs/"
-          fi
 
       # 3. Create key.pem file
       - name: Create key.pem file
