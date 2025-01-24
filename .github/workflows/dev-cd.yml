@@ -29,6 +29,18 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.TOKEN_GITHUB_ACTIONS }}
 
+      # JAR 파일 확인
+      - name: Verify JAR File in build/libs
+        run: |
+          echo "Checking if JAR file exists in build/libs..."
+          ls -al build/libs/ || echo "Directory 'build/libs/' does not exist!"
+          if [ -f build/libs/*.jar ]; then
+            echo "JAR file(s) found in build/libs/:"
+            ls build/libs/*.jar
+          else
+            echo "No JAR files found in build/libs/"
+          fi
+
       # 3. Create key.pem file
       - name: Create key.pem file
         run: |
