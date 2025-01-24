@@ -38,7 +38,7 @@ jobs:
       # EC2에 JAR 파일 업로드
       - name: Upload jar file
         run: |
-          scp -i key.pem "$JAR_FILE_PATH" $EC2_USER@$EC2_IP:/home/ubuntu/
+          scp -i key.pem $JAR_FILE_PATH $EC2_USER@$EC2_IP:/home/ubuntu/
 
       # EC2에 deploy.sh 업로드
       - name: Upload deploy script
