@@ -1,0 +1,35 @@
+server:
+  port: 8080  # 로컬 서버 포트 설정
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 5
+      connection-timeout: 5000
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # DB 스키마 자동 생성 (개발 환경에서만 사용)
+    show-sql: true  # SQL 쿼리 출력
+    properties:
+      hibernate:
+        format_sql: true  # SQL 포맷팅
+        use_sql_comments: true
+
+  h2:
+    console:
+      enabled: true  # H2 콘솔 활성화
+      path: /h2-console  # H2 콘솔 접속 경로
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG  # Hibernate SQL 로깅 활성화
+    org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅 활성화
