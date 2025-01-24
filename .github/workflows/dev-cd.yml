@@ -26,6 +26,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output-dev
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.TOKEN_GITHUB_ACTIONS }}
 
       # 3. Create key.pem file
       - name: Create key.pem file
