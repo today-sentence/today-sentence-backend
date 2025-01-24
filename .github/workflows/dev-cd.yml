@@ -16,7 +16,7 @@ jobs:
       EC2_USER: ubuntu
       EC2_IP: ec2-13-209-47-32.ap-northeast-2.compute.amazonaws.com
       JAR_FILE: build/libs/today-sentence-0.0.1-SNAPSHOT.jar
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
