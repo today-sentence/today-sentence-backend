@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://todaysentence.ch6iqok0yerv.ap-northeast-2.rds.amazonaws.com:3306/todaysentence
+    url: ${DB_URL}
     username: todaysentence
-    password: todaysentence
+    password: ${DB_PASSWORD}
     hikari:
       minimum-idle: 2
       maximum-pool-size: 5

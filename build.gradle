@@ -36,6 +36,8 @@ dependencies {
 
     implementation 'com.h2database:h2'
 
+    implementation 'io.github.cdimascio:spring-dotenv:3.0.1'//env
+
 }
 
 tasks.named('test') {
