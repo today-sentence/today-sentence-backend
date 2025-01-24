@@ -36,8 +36,12 @@ dependencies {
 
     implementation 'com.h2database:h2'
 
-    implementation 'io.github.cdimascio:spring-dotenv:3.0.1'//env
-
+    repositories {
+        mavenCentral() // Maven Central 저장소를 추가
+    }
+    dependencies {
+        implementation 'io.github.cdimascio:dotenv-java:2.2.4' // dotenv-java 라이브러리
+    }
 }
 
 tasks.named('test') {
