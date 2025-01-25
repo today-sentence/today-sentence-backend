@@ -15,7 +15,7 @@ jobs:
     env:
       EC2_USER: ubuntu
       EC2_IP: ec2-13-209-47-32.ap-northeast-2.compute.amazonaws.com
-      JAR_FILE: build/libs/today-sentence-0.0.1-SNAPSHOT.jar
+      JAR_FILE: today-sentence-0.0.1-SNAPSHOT.jar
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     steps:
       - name: Checkout code
@@ -26,6 +26,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output-dev
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.TOKEN_GITHUB_ACTIONS }}
+
+      # 디버깅: 다운로드된 아티팩트의 실제 경로 확인
+      - name: Debug Downloaded Artifacts
+        run: |
+          echo "Listing all files in current directory after artifact download:"
+          find . -type f
 
       # 3. Create key.pem file
       - name: Create key.pem file
@@ -33,10 +41,17 @@ jobs:
           echo "${{ secrets.EC2_KEY_PEM_DEV }}" > key.pem
           chmod 600 key.pem
 
+      # EC2 접속을 위한 호스트 키 생성
+      - name: Add SSH key to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+
+
       # EC2에 JAR 파일 업로드
       - name: Upload jar file
         run: |
-          scp -i key.pem "$JAR_FILE_PATH" $EC2_USER@$EC2_IP:/home/ubuntu/
+          scp -i key.pem "$JAR_FILE" $EC2_USER@$EC2_IP:/home/ubuntu/
 
       # EC2에 deploy.sh 업로드
       - name: Upload deploy script
@@ -52,5 +67,5 @@ jobs:
           $REMOTE_PATH/$JAR_FILE \
           $EC2_USER \
           $EC2_IP \
-          key.pem \
+          key.pem
           EOF
