@@ -29,7 +29,4 @@ spring:
       enabled: true  # H2 콘솔 활성화
       path: /h2-console  # H2 콘솔 접속 경로
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG  # Hibernate SQL 로깅 활성화
-    org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅 활성화
+
