@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # 사용자 입력
+
 JAR_FILE=$1   # JAR 파일 이름
 EC2_USER=$2                      # EC2 사용자 이름
 EC2_IP=$3    # EC2 퍼블릭 DNS
@@ -26,18 +27,19 @@ fi
 # 3. 새 애플리케이션 실행
 echo "Starting new application..."
 nohup java -jar "$REMOTE_PATH/$JAR_FILE" > "$REMOTE_PATH/app.log" 2>&1 &
+
 if [ $? -ne 0 ]; then
   echo "Failed to start the new application. Please check the JAR file or Java environment on EC2."
   exit 1
 fi
 
-# 4. 로그 출력
+# 3. 로그 출력
 echo "Deployment completed. Showing logs:"
-tail -n 20 $REMOTE_PATH/app.log
-# ssh -i "$KEY_PEM" "$EC2_USER@$EC2_IP" "tail -n 20 $REMOTE_PATH/app.log"
-# if [ $? -ne 0 ]; then
-#  echo "Failed to retrieve logs. Please check the EC2 connection or log file path."
-#  exit 1
-# fi
+ssh -i "$KEY_PEM" "$EC2_USER@$EC2_IP" "tail -n 20 $REMOTE_PATH/app.log"
+if [ $? -ne 0 ]; then
+  echo "Failed to retrieve logs. Please check the EC2 connection or log file path."
+  exit 1
+fi
 
-# 5.끝
+# 끝
+echo "Deployment finished successfully."
