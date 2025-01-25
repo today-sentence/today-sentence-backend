@@ -5,3 +5,10 @@ spring:
     active: dev # 기본 활성 프로필을 'dev'로 설정
 server:
   port: 8080
+
+logging:
+  level:
+    root: info
+    com.example: trace # 특정 패키지 또는 클래스의 TRACE 로그 활성화
+  file:
+    name: /var/log/application-trace.log # 로그 파일 경로
