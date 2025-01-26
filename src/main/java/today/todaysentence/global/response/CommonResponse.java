@@ -1,4 +1,4 @@
-package today.todaysentence.global.dto;
+package today.todaysentence.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

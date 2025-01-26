@@ -13,4 +13,10 @@ public class UserRequest {
 
     public record CheckPassword(@NotBlank String password) {
     }
+
+    public record Join(
+            @NotBlank @Email String email,
+            @NotBlank String nickname,
+            @NotBlank String password) {
+    }
 }

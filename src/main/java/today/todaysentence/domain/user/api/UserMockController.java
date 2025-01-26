@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.user.dto.UserRequest;
-import today.todaysentence.global.dto.CommonResponse;
+import today.todaysentence.domain.user.dto.UserResponse;
+import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.swagger.UserApiSpec;
 
 @RestController
@@ -24,5 +25,10 @@ public class UserMockController implements UserApiSpec {
     @PostMapping("/users/check-password")
     public CommonResponse<?> checkPassword(@RequestBody @Valid UserRequest.CheckPassword request) {
         return CommonResponse.success();
+    }
+
+    @PostMapping("/users/join")
+    public CommonResponse<UserResponse.Join> join(@RequestBody @Valid UserRequest.Join request) {
+        return CommonResponse.ok(new UserResponse.Join(1L, request.email(), request.nickname()));
     }
 }
