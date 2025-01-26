@@ -64,7 +64,7 @@ jobs:
           ssh -i key.pem ubuntu@$EC2_IP << EOF
           chmod +x /home/ubuntu/deploy.sh
           /home/ubuntu/deploy.sh \
-          $REMOTE_PATH/$JAR_FILE \
+          $JAR_FILE \
           $EC2_USER \
           $EC2_IP \
           key.pem
