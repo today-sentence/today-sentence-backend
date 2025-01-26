@@ -20,7 +20,7 @@ configurations {
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral()  // Maven Central 저장소 추가
 }
 
 dependencies {
@@ -33,29 +33,23 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
-
-    implementation 'com.h2database:h2'
-
-    repositories {
-        mavenCentral() // Maven Central 저장소를 추가
-    }
-    dependencies {
-        implementation 'io.github.cdimascio:dotenv-java:2.2.4' // dotenv-java 라이브러리
-    }
-    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
-
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.hibernate:hibernate-core:6.1.0.Final'  // Hibernate 최신 버전 확인 후 수정
+    implementation 'org.mariadb.jdbc:mariadb-java-client'  // 최신 MariaDB JDBC 드라이버
+
+    // .env 파일 로딩을 위한 라이브러리
+    implementation 'io.github.cdimascio:dotenv-java:2.2.4'
+
+    // JWT 관련 라이브러리
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    testImplementation 'org.springframework.security:spring-security-test'
 
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    runtimeOnly 'com.h2database:h2' // H2 사용 시 추가
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform()  // JUnit 5 설정
 }

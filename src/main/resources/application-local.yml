@@ -1,12 +1,9 @@
-server:
-  port: 8080  # 로컬 서버 포트 설정
-
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:13306/todaysentence
+    username: todaysentence
+    password: todaysentence
     hikari:
       minimum-idle: 2
       maximum-pool-size: 5
@@ -17,16 +14,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # DB 스키마 자동 생성 (개발 환경에서만 사용)
-    show-sql: true  # SQL 쿼리 출력
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MariaDB103Dialect
+    show-sql: true
     properties:
       hibernate:
-        format_sql: true  # SQL 포맷팅
-        use_sql_comments: true
+        format_sql: true
 
-  h2:
-    console:
-      enabled: true  # H2 콘솔 활성화
-      path: /h2-console  # H2 콘솔 접속 경로
+logging:
+  level:
+    org.hibernate.SQL: DEBUG  # Hibernate SQL 로깅 활성화
+    org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅 활성화
 
-
+server:
+  port: 8080

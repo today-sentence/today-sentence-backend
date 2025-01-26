@@ -1,8 +1,7 @@
 spring:
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
     url: ${DB_URL}
-    username: todaysentence
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
       minimum-idle: 2

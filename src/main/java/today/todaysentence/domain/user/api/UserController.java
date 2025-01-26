@@ -33,4 +33,6 @@ public class UserController {
         String token = jwtUtil.generateToken(userEmail);
         return ResponseEntity.ok(token);
     }
+
+
 }
