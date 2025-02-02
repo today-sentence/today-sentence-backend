@@ -1,8 +1,10 @@
 package today.todaysentence.domain.user.api;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.user.dto.UserRequest;
 import today.todaysentence.domain.user.dto.UserResponse;
@@ -18,6 +20,7 @@ public class UserMockController implements UserApiSpec {
     }
 
     @PostMapping("/users/check-nickname")
+    @ResponseStatus(HttpStatus.OK)
     public CommonResponse<?> checkNickname(@RequestBody @Valid UserRequest.CheckNickname request) {
         return CommonResponse.success();
     }
@@ -28,6 +31,7 @@ public class UserMockController implements UserApiSpec {
     }
 
     @PostMapping("/users/join")
+    @ResponseStatus(HttpStatus.CREATED)
     public CommonResponse<UserResponse.Join> join(@RequestBody @Valid UserRequest.Join request) {
         return CommonResponse.ok(new UserResponse.Join(1L, request.email(), request.nickname()));
     }
