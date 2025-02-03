@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import today.todaysentence.domain.dailyquote.DailyQuote;
-import today.todaysentence.domain.user.User;
+import today.todaysentence.domain.member.Member;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ import java.util.List;
 public interface DailyQuoteRepository extends JpaRepository<DailyQuote, Long> {
 
     @Query("SELECT d.id FROM DailyQuote d WHERE d.recipient = :recipient")
-    List<Long> findAllIdsByUser(@Param("recipient") User recipient);
+    List<Long> findAllIdsByUser(@Param("recipient") Member recipient);
 }

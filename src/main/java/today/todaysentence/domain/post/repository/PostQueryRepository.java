@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.QPost;
-import today.todaysentence.domain.user.User;
+import today.todaysentence.domain.member.Member;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,11 +27,11 @@ public class PostQueryRepository {
      * 모든 시도가 실패하면, 조건에 맞는 게시글 중 랜덤하게 하나를 조회하는 백업 로직 수행.
      * 여기서 ORDER BY RAND()를 사용하는 이유는 마지막 수단으로서 데이터 정확성을 보장하기 위함.
      *
-     * @param user
+     * @param member
      * @param recommendedPostIds 이미 추천된 명언 게시글들의 id 리스트
      * @return
      */
-    public Optional<Post> findOneNotInRecommended(User user, List<Long> recommendedPostIds) {
+    public Optional<Post> findOneNotInRecommended(Member member, List<Long> recommendedPostIds) {
         QPost post = QPost.post;
 
         Long minId = queryFactory.select(post.id.min()).from(post).fetchOne();
@@ -48,7 +48,7 @@ public class PostQueryRepository {
                     .selectFrom(post)
                     .where(
                             post.id.goe(randomId),
-                            post.writer.ne(user),
+                            post.writer.ne(member),
                             post.id.notIn(recommendedPostIds)
                     )
                     .fetchFirst();
@@ -61,7 +61,7 @@ public class PostQueryRepository {
         Post fallbackPost = queryFactory
                 .selectFrom(post)
                 .where(
-                        post.writer.ne(user),
+                        post.writer.ne(member),
                         post.id.notIn(recommendedPostIds)
                 )
                 .orderBy(Expressions.numberTemplate(Double.class, "RAND()").asc()) // "RAND()" 는 데이터베이스 문법에 종속적임. 인터페이스화 필요

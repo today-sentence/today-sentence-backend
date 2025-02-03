@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import today.todaysentence.domain.post.Post;
-import today.todaysentence.domain.user.User;
+import today.todaysentence.domain.member.Member;
 
 import java.time.LocalDate;
 
@@ -24,7 +24,7 @@ public class DailyQuote {
 
     @JoinColumn(name = "recipient_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    User recipient;
+    Member recipient;
 
     @JoinColumn(name = "post_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,13 +32,13 @@ public class DailyQuote {
 
     LocalDate createdAt;
 
-    private DailyQuote(User recipient, Post post) {
+    private DailyQuote(Member recipient, Post post) {
         this.recipient = recipient;
         this.post = post;
         this.createdAt = LocalDate.now();
     }
 
-    public static DailyQuote create(User recipient, Post post) {
+    public static DailyQuote create(Member recipient, Post post) {
         return new DailyQuote(recipient, post);
     }
 }

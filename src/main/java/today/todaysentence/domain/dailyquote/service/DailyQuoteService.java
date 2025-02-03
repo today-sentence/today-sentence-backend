@@ -7,29 +7,29 @@ import today.todaysentence.domain.dailyquote.DailyQuote;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.service.PostService;
 import today.todaysentence.domain.dailyquote.repository.DailyQuoteRepository;
-import today.todaysentence.domain.user.User;
-import today.todaysentence.domain.user.service.UserService;
+import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.member.service.MemberService;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class DailyQuoteService {
-    private final UserService userService;
+    private final MemberService memberService;
     private final PostService postService;
     private final DailyQuoteRepository dailyQuoteRepository;
 
     // TODO. 대규모 데이터 처리 시 -> Batch 처리 or 비동기 처리 고려
     @Transactional
     public void createDailyQuoteForAllUsers() {
-        List<User> users = userService.findAll();
+        List<Member> members = memberService.findAll();
 
-        for (User recipient : users) {
+        for (Member recipient : members) {
             createDailyQuote(recipient);
         }
     }
 
-    private void createDailyQuote(User recipient) {
+    private void createDailyQuote(Member recipient) {
         List<Long> alreadyProvidedPostIds = dailyQuoteRepository.findAllIdsByUser(recipient);
 
         Post randomPost = postService.findRandomPostNotInProvided(recipient, alreadyProvidedPostIds);

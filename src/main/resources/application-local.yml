@@ -3,17 +3,17 @@ server:
 
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    hikari:
-      minimum-idle: 2
-      maximum-pool-size: 5
-      connection-timeout: 5000
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-test-query: SELECT 1
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/today
+    username: root
+    password: "0000"
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
 
   jpa:
     hibernate:
@@ -21,12 +21,25 @@ spring:
     show-sql: true  # SQL 쿼리 출력
     properties:
       hibernate:
-        format_sql: true  # SQL 포맷팅
-        use_sql_comments: true
+        format_sql: false  # SQL 포맷팅
+#        use_sql_comments: true
 
   h2:
     console:
       enabled: true  # H2 콘솔 활성화
       path: /h2-console  # H2 콘솔 접속 경로
+
+jwt:
+  secret:
+    key: "7Jik64qY7J2Y66qF7Ja4Snd07YKk6rCS7J2E7KCV7ZW067O07J6Q"
+
+logging:
+  level:
+    root: info
+
+
+
+
+
 
 
