@@ -14,7 +14,6 @@ import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 import today.todaysentence.global.swagger.MemberApiSpec;
 
-@Tag(name = "유저")
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
@@ -29,32 +28,32 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
-    @PostMapping("/signUp")
+    @PostMapping("/sign-up")
     public CommonResponse<?> signUp(@RequestBody @Valid MemberRequest.SignUp signUp) {
         return memberService.signUp(signUp);
     }
 
     @Override
-    @PostMapping("/signIn")
+    @PostMapping("/sign-in")
     public CommonResponse<?> signIn(@RequestBody @Valid  MemberRequest.SignIn signIn, HttpServletRequest request,HttpServletResponse response) {
         return memberService.signIn(signIn,request,response);
     }
 
     @Override
-    @DeleteMapping("/signOut")
+    @DeleteMapping("/sign-out")
     public CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
         return memberService.signOut(userDetails,request);
     }
 
     @Override
-    @PostMapping("/checkEmail")
+    @PostMapping("/check-email")
     public CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request) {
         memberService.checkEmail(request.email());
         return CommonResponse.success();
     }
 
     @Override
-    @PostMapping("/checkNickname")
+    @PostMapping("/check-nickname")
     public CommonResponse<?> checkNickname(MemberRequest.CheckNickname request) {
         memberService.checkNickname(request.nickname());
         return CommonResponse.success();
