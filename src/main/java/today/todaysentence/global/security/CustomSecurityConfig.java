@@ -28,8 +28,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
     private final static String[] PERMIT_ALL_URI = {
-            "/api/member/signUp",
-            "/api/member/signIn",
+            "/api/member/sign-up",
+            "/api/member/sign-in",
+            "/api/member/check-email",
+            "/api/member/check-nickname",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+
     };
 
     private final JwtAuthFilter jwtAuthFilter;
