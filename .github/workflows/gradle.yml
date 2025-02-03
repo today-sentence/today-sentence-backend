@@ -40,7 +40,9 @@ jobs:
             ${{ runner.os }}-gradle
 
       - name: yml 추가
-        run: sed -i '1s/^/${{ secrets.DATASOURCE }}\n/' ./src/main/resources/application-dev.yml
+        run: |
+          echo -e "${{ secrets.DATASOURCE }}" | cat - ./src/main/resources/application-dev.yml > temp.yml && mv temp.yml ./src/main/resources/application-dev.yml
+
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test
