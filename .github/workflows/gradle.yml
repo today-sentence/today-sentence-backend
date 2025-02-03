@@ -1,0 +1,104 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+
+      - name: JDK 설치
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
+
+
+      - name: 테스트 없는 Build
+        run: ./gradlew build -x test
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
+
+
+      - name: Upload Artifacts
+        if: github.ref == 'refs/heads/dev'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output-dev
+          path: build/libs/*.jar
+
+  deploy:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output-dev
+
+      - name: Debug Downloaded Artifacts
+        run: |
+          find . -type f
+
+      - name: Create app-artifact directory
+        run: |
+          mkdir -p app-artifact  
+
+      - name: Move JAR file to app-artifact
+        run: |
+          mv *.jar app-artifact/  
+
+      - name: Docker 이미지 빌드
+        run: |
+          docker build -f Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }} .
+
+
+      - name: DockerHub 푸쉬
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }}
+
+      - name: Run Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu
+            echo "Current directory: $(pwd)"
+            ls -l
+            if [ -f "docker-compose.yml" ]; then
+              echo "docker-compose.yml found. Proceeding..."
+              sudo docker compose down 
+              sudo docker rmi ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }}
+              sudo docker compose pull
+              sudo docker compose up -d
+            else
+              echo "docker-compose.yml not found."
+              exit 1
+            fi
