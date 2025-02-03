@@ -39,9 +39,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      - name: properties 생성
-        run: echo "${{ secrets.DATASOURCE }}" >> ./src/main/resources/application-dev.yml
-
+      - name: yml 추가
+        run: sed -i '1s/^/${{ secrets.DATASOURCE }}\n/' ./src/main/resources/application-dev.yml
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test
