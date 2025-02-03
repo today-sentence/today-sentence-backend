@@ -43,6 +43,9 @@ jobs:
         run: |
           echo -e "${{ secrets.DATASOURCE }}" | cat - ./src/main/resources/application-dev.yml > temp.yml && mv temp.yml ./src/main/resources/application-dev.yml
 
+      - name: jwtsecretKey 추가
+        run: |
+           echo -e "\njwt:\n  secret:\n    key: ${{ secrets.JWT_SECRET }}" >> ./src/main/resources/application-dev.yml
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test
