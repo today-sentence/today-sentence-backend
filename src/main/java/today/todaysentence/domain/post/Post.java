@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import today.todaysentence.domain.user.User;
+import today.todaysentence.domain.member.Member;
 
 @Entity
 public class Post {
@@ -18,7 +18,7 @@ public class Post {
 
     @JoinColumn(name = "writer_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private Member writer;
 
     private String content;
 }
