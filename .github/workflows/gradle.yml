@@ -45,7 +45,8 @@ jobs:
 
       - name: jwtsecretKey 추가
         run: |
-           echo -e "\njwt:\n  secret:\n    key: ${{ secrets.JWT_SECRET }}" >> ./src/main/resources/application-dev.yml
+          echo -e "\njwt:\n  secret:\n    key: \"${{ secrets.JWT_SECRET_KEY }}\"" >> ./src/main/resources/application-dev.yml
+
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test
