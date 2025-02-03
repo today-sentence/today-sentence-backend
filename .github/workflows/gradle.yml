@@ -39,6 +39,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
+      - name: properties 생성
+        run: echo "${{ secrets.DATASOURCE }}" >> ./src/main/resources/application-dev.yml
+
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test

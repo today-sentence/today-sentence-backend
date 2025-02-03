@@ -1,16 +1,3 @@
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    hikari:
-      minimum-idle: 2
-      maximum-pool-size: 5
-      connection-timeout: 5000
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-test-query: SELECT 1
 
   data:
     redis:
