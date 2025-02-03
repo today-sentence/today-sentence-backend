@@ -43,6 +43,7 @@ jobs:
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
 
       # 5. 테스트 실행
       - name: Run tests
