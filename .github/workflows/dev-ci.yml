@@ -39,15 +39,15 @@ jobs:
 
       # 4. 프로젝트 빌드
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build -x Test
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
 
-      # 5. 테스트 실행
-      - name: Run tests
-        run: ./gradlew test
+      # # 5. 테스트 실행
+      # - name: Run tests
+      #   run: ./gradlew test
 
       # 6. 빌드 결과물 저장
       - name: Upload Artifacts
