@@ -40,6 +40,7 @@ jobs:
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
 
 
