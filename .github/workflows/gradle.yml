@@ -11,6 +11,11 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
     steps:
 
       - name: Checkout repository
@@ -37,17 +42,13 @@ jobs:
 
       - name: 테스트 없는 Build
         run: ./gradlew build -x test
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET_KEY }}
+       
 
       - name: 환경변수 확인  
         run: |
           echo "DB_URL: $DB_URL"
           echo "DB_USERNAME: $DB_USERNAME"
-          echo "DB_PASSWORD: $DB_PASSWORD"
+          echo "DB_PASSWORD: $DB_PASSWORD [HIDDEN]"
 
       - name: Upload Artifacts
         if: github.ref == 'refs/heads/dev'
