@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
 @Tag(name = "명언 글 API")
 public interface PostApiSpec {
@@ -32,7 +33,7 @@ public interface PostApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> recordPost(
+    CommonResponse<?> recordPost(CustomUserDetails userDetails,
             @RequestBody(
                     description = "명언 글 작성 요청 - isbn 값은 항상 isbn13으로 사용(13자리 isbn); 10자리 isbn XX",
                     required = true,

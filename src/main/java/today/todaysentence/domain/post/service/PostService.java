@@ -14,7 +14,6 @@ import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.repository.PostQueryRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
-import today.todaysentence.domain.user.User;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.exception.exception.PostException;
 
@@ -35,11 +34,11 @@ public class PostService {
     }
 
     @Transactional
-    public void record(PostRequest.Record dto) {
+    public void record(PostRequest.Record dto, Member member) {
         Book book = bookService.findOrCreate(PostMapper.toBook(dto));
         List<Hashtag> hashtags = hashtagService.findOrCreate(dto.hashtags());
         Category category = categoryService.toCategory(dto.category());
 
-        postRepository.save(PostMapper.toEntity(new User("email"), book, category, hashtags, dto));
+        postRepository.save(PostMapper.toEntity(member, book, category, hashtags, dto));
     }
 }
