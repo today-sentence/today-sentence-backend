@@ -5,9 +5,9 @@ import lombok.NoArgsConstructor;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
+import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
-import today.todaysentence.domain.user.User;
 
 import java.util.List;
 
@@ -25,9 +25,9 @@ public class PostMapper {
         );
     }
 
-    static Post toEntity(User user, Book book, Category category, List<Hashtag> hashtags, PostRequest.Record dto) {
+    static Post toEntity(Member member, Book book, Category category, List<Hashtag> hashtags, PostRequest.Record dto) {
         return new Post(
-                user,
+                member,
                 book,
                 category,
                 hashtags,

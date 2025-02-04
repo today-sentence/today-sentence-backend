@@ -9,14 +9,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
-import today.todaysentence.domain.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Post {
 
@@ -26,7 +29,7 @@ public class Post {
 
     @JoinColumn(name = "writer_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private User writer;
+    private Member writer;
 
     @JoinColumn(name = "book_isbn")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,7 +50,7 @@ public class Post {
 
     private String content;
 
-    public Post(User writer, Book book, Category category, List<Hashtag> hashtags, String content) {
+    public Post(Member writer, Book book, Category category, List<Hashtag> hashtags, String content) {
 
     }
 

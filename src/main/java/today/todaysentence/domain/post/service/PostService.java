@@ -2,6 +2,7 @@ package today.todaysentence.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import today.todaysentence.domain.member.Member;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.book.service.BookService;
@@ -28,8 +29,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
 
-    public Post findRandomPostNotInProvided(User user, List<Long> recommendedPostIds) {
-        return postQueryRepository.findOneNotInRecommended(user, recommendedPostIds)
+    public Post findRandomPostNotInProvided(Member member, List<Long> recommendedPostIds) {
+        return postQueryRepository.findOneNotInRecommended(member, recommendedPostIds)
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 

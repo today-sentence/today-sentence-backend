@@ -1,16 +1,8 @@
-spring:
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: ${DB_URL}
-    username: todaysentence
-    password: ${DB_PASSWORD}
-    hikari:
-      minimum-idle: 2
-      maximum-pool-size: 5
-      connection-timeout: 5000
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-test-query: SELECT 1
+
+  data:
+    redis:
+      host: redis
+      port: 6379
 
   jpa:
     hibernate:
@@ -25,6 +17,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG  # Hibernate SQL 로깅 활성화
     org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅 활성화
+
 
 server:
   port: 8080

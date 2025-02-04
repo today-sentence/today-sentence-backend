@@ -6,13 +6,17 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
-import today.todaysentence.domain.user.dto.UserRequest;
+import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
 @Tag(name = "유저 API")
-public interface UserApiSpec {
+public interface MemberApiSpec {
 
     @Operation(summary = "회원가입 - 이메일 중복 검증")
     @ApiResponses({
@@ -38,7 +42,7 @@ public interface UserApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkEmail(@RequestBody @Valid UserRequest.CheckEmail request);
+    CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request);
 
     @Operation(summary = "회원가입 - 닉네임 중복 검증")
     @ApiResponses({
@@ -50,7 +54,7 @@ public interface UserApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkNickname(@RequestBody UserRequest.CheckNickname request);
+    CommonResponse<?> checkNickname(@RequestBody MemberRequest.CheckNickname request);
 
     @Operation(summary = "회원가입 - 비밀번호 규칙 확인")
     @ApiResponses({
@@ -69,7 +73,7 @@ public interface UserApiSpec {
                             """)
             })),
     })
-    CommonResponse<?> checkPassword(@RequestBody UserRequest.CheckPassword request);
+    CommonResponse<?> checkPassword(@RequestBody MemberRequest.CheckPassword request);
 
     @Operation(summary = "회원가입 - 회원가입 요청")
     @ApiResponses({
@@ -85,5 +89,34 @@ public interface UserApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> join(@RequestBody UserRequest.Join request);
+    CommonResponse<?> signUp(@RequestBody MemberRequest.SignUp request);
+
+    @Operation(summary = "로그인 - 로그인 요청")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "로그인 성공", value = """
+                            {
+                                "data" : {
+                                    "id" : Long,
+                                    "email" : String,
+                                    "nickname" : String
+                                }
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> signIn(@RequestBody MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);
+
+    @Operation(summary = "로그아웃 - 로그아웃 요청")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "로그아웃 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails,
+                              HttpServletRequest httpServletRequest);
 }

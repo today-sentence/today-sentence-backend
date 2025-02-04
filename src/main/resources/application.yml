@@ -2,7 +2,7 @@ spring:
   application:
     name: today-sentence
   profiles:
-    active: local # 기본 활성 프로필을 'dev'로 설정
+    active: dev # 기본 활성 프로필을 'dev'로 설정
 server:
   port: 8080
 
