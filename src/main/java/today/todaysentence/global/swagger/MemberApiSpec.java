@@ -119,4 +119,17 @@ public interface MemberApiSpec {
     })
     CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails,
                               HttpServletRequest httpServletRequest);
+
+    @Operation(summary = "회원탈퇴 - 회원탈퇴 요청")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "회원탈퇴 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails,
+                              HttpServletRequest httpServletRequest);
 }
