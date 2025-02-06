@@ -12,6 +12,7 @@ import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.service.HashtagService;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
+import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.repository.PostQueryRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -40,5 +41,15 @@ public class PostService {
         Category category = categoryService.toCategory(dto.category());
 
         postRepository.save(PostMapper.toEntity(member, book, category, hashtags, dto));
+    }
+
+    public List<PostResponse.Summary> getMyPostsByDate(Member member, int month, int year) {
+        List<Post> posts = postRepository.findMyPostsByDate(member, month, year);
+        return posts.stream()
+                .map(post -> new PostResponse.Summary(
+                        post.getId(),
+                        bookService.getBookInfo(post.getBook())
+                ))
+                .toList();
     }
 }

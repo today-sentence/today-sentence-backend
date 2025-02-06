@@ -3,6 +3,7 @@ package today.todaysentence.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import today.todaysentence.domain.book.Book;
+import today.todaysentence.domain.book.dto.BookInfo;
 import today.todaysentence.domain.book.repository.BookRepository;
 
 @RequiredArgsConstructor
@@ -13,5 +14,9 @@ public class BookService {
     public Book findOrCreate(Book book) {
         return bookRepository.findByIsbn(book.getIsbn())
                 .orElseGet(() -> bookRepository.save(book));
+    }
+
+    public BookInfo getBookInfo(Book book) {
+        return BookMapper.toBookInfo(book);
     }
 }
