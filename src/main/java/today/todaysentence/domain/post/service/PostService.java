@@ -45,11 +45,19 @@ public class PostService {
 
     public List<PostResponse.Summary> getMyPostsByDate(Member member, int month, int year) {
         List<Post> posts = postRepository.findMyPostsByDate(member, month, year);
+
         return posts.stream()
-                .map(post -> new PostResponse.Summary(
+                .map(post -> PostMapper.toSummary(
                         post.getId(),
                         bookService.getBookInfo(post.getBook())
                 ))
                 .toList();
+    }
+
+    public PostResponse.Summary toSummary(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
+
+        return PostMapper.toSummary(postId, bookService.getBookInfo(post.getBook()));
     }
 }
