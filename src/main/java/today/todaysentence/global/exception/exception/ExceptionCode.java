@@ -23,12 +23,12 @@ public enum ExceptionCode {
     //
     PARAMETER_VALIDATION_FAIL("파라미터가 올바르지 않습니다.", BAD_REQUEST),
 
-    INVALID_TOKEN( "유효하지 않은 토큰입니다.",UNAUTHORIZED),
-    EXPIRED_TOKEN( "만료된 토큰입니다.",UNAUTHORIZED),
-    UNSUPPORTED_TOKEN( "지원되지 않는 토큰입니다.",UNAUTHORIZED),
-    WRONG_TOKEN(  "잘못된 토큰입니다.",UNAUTHORIZED),
-    NOT_ACCORDANCE_DEVICE_ID("기존접속과 정보가 다릅니다.",BAD_REQUEST)
-    ;
+    INVALID_TOKEN("유효하지 않은 토큰입니다.",UNAUTHORIZED),
+    EXPIRED_TOKEN("만료된 토큰입니다.",UNAUTHORIZED),
+    UNSUPPORTED_TOKEN("지원되지 않는 토큰입니다.",UNAUTHORIZED),
+    WRONG_TOKEN("잘못된 토큰입니다.",UNAUTHORIZED),
+    NOT_ACCORDANCE_DEVICE_ID("기존접속과 정보가 다릅니다.",BAD_REQUEST),
+    MEMBER_ALREADY_WITHDRAWN("이미 탈퇴한 회원입니다.",BAD_REQUEST );
 
     private final String message;
     private final HttpStatus status;
