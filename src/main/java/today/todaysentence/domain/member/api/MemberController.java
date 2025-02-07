@@ -46,6 +46,12 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
+    @GetMapping("/withdraw")
+    public CommonResponse<?> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
+        return memberService.withdraw(userDetails,request);
+    }
+
+    @Override
     @PostMapping("/check-email")
     public CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request) {
         memberService.checkEmail(request.email());

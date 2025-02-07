@@ -6,10 +6,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableJpaAuditing
 @EnableScheduling
 @SpringBootApplication
 @EnableAspectJAutoProxy
+@EnableJpaAuditing
 public class TodaySentenceApplication {
 
     public static void main(String[] args) {

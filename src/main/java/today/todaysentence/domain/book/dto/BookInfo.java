@@ -5,6 +5,6 @@ public record BookInfo(
         String author,
         String cover,
         String publisher,
-        int publishingYear
+        Integer publishingYear
 ) {
 }

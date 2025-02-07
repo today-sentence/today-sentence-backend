@@ -23,5 +23,5 @@ public class Book {
 
     private String publisher;
 
-    private int publishingYear;
+    private Integer publishingYear;
 }

@@ -12,7 +12,7 @@ public class PostResponse {
             String bookTitle,
             String bookAuthor,
             String bookPublisher,
-            int bookPublishingYear,
+            Integer bookPublishingYear,
             String bookCover
     ) {
     }
