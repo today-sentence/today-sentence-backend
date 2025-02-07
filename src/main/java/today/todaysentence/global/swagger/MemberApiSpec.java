@@ -145,7 +145,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,String password);
+    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,MemberRequest.VerificationPassword password);
 
     @Operation(summary = "회원정보 변경 - 닉네임 변경")
     @ApiResponses({
