@@ -83,9 +83,10 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "회원가입 성공", value = """
                             {
                                 "data" : {
-                                    "id" : Long,
                                     "email" : String,
-                                    "nickname" : String
+                                    "nickname" : String,
+                                    "statusMessage": String,
+                                    "profileImg" : String
                                 }
                             }
                             """)
@@ -99,9 +100,10 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "로그인 성공", value = """
                             {
                                 "data" : {
-                                    "id" : Long,
                                     "email" : String,
-                                    "nickname" : String
+                                    "nickname" : String,
+                                    "statusMessage": String,
+                                    "profileImg" : String
                                 }
                             }
                             """)
@@ -143,6 +145,13 @@ public interface MemberApiSpec {
                                 "success" : true
                             }
                             """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 비밀번호 불일치", value = """
+                            {
+                                "message" : "회원 정보가 일치하지 않습니다."
+                            }
+                            """)
             }))
     })
     CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,MemberRequest.VerificationPassword password);
@@ -153,6 +162,23 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "닉네임 변경 성공", value = """
                             {
                                 "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 유효성 검사 실패", value = """
+                            {
+                                "message" : "닉네임은  한글, 특수문자, 영문 으로 가능하며 1자이상 8자 이하여야합니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 변경시간 제한", value = """
+                            {
+                                "data": {
+                                          "message": "String",
+                                          "time": "Date"
+                                      }
                             }
                             """)
             }))
@@ -178,6 +204,23 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "상태메시지 변경 성공", value = """
                             {
                                 "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 유효성 검사 실패", value = """
+                            {
+                                "message" : "상태메시지는 1자이상 50자 이하여야합니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 변경시간 제한", value = """
+                            {
+                                "data": {
+                                          "message": "String",
+                                          "time": "Date"
+                                      }
                             }
                             """)
             }))
