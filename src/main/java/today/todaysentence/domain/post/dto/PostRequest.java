@@ -15,8 +15,8 @@ public class PostRequest {
             String bookAuthor,
             @NotBlank
             String bookPublisher,
-            @NotNull
-            int bookPublishingYear,
+            @NotBlank
+            Integer bookPublishingYear,
             @NotBlank
             String bookCover,
             @NotNull
