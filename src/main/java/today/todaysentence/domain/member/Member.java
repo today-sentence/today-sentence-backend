@@ -21,19 +21,25 @@ public class Member extends Timestamped {
     private Long id;
 
     @Column(nullable = false,unique = true)
-    @Setter
     private String email;
 
     @Column(nullable = false)
+    @Setter
     private String password;
+    @Column(name = "password_updated_at")
+    private LocalDateTime passwordUpdatedAt;
 
     @Column(nullable = false,unique = true)
     @Setter
     private String nickname;
+    @Column(name = "nickname_updated_at")
+    private LocalDateTime nicknameUpdatedAt;
 
     @Setter
     @Builder.Default
     private String statusMessage = "상태메시지를 입력해주세요.";
+    @Column(name = "message_updated_at")
+    private LocalDateTime messageUpdatedAt;
 
     @Setter
     @Builder.Default
@@ -42,6 +48,10 @@ public class Member extends Timestamped {
     @Column
     @Builder.Default
     private Boolean isDeleted = false;
+
+
+
+
 
 
     public void withdraw(){
