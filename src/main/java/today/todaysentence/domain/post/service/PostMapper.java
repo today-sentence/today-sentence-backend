@@ -27,11 +27,11 @@ public class PostMapper {
         );
     }
 
-    public static Post toEntity(Member member, Book book, Category category, List<Hashtag> hashtags, PostRequest.Record dto) {
+    public static Post toEntity(Member member, Book book, List<Hashtag> hashtags, PostRequest.Record dto) {
         return new Post(
                 member,
                 book,
-                category,
+                dto.category(),
                 hashtags,
                 dto.content()
         );
@@ -56,7 +56,7 @@ public class PostMapper {
                 .bookPublisher(bookInfo.publisher())
                 .bookPublishingYear(bookInfo.publishingYear())
                 .bookCover(bookInfo.cover())
-                .category(post.getCategory().valueOf())
+                .category(post.getCategory().name())
                 .hashtags(post.getHashtagNames())
                 .build();
     }

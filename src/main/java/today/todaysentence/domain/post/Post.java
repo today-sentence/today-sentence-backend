@@ -38,8 +38,6 @@ public class Post extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
 
-    @JoinColumn(name = "category_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     @JoinTable(
