@@ -22,11 +22,6 @@ public class MemberController implements MemberApiSpec {
 
     private final MemberService memberService;
 
-    @GetMapping("/auth")
-    public void testMe(@AuthenticationPrincipal CustomUserDetails userDetails){
-      log.info("userDetails : {}",userDetails);
-    }
-
     @Override
     @PostMapping("/sign-up")
     public CommonResponse<?> signUp(@RequestBody @Valid MemberRequest.SignUp signUp) {
@@ -52,6 +47,33 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
+    @PostMapping("/verify-password")
+    public CommonResponse<?> checkVerificationPassword(@AuthenticationPrincipal CustomUserDetails userDetails,@RequestBody MemberRequest.VerificationPassword password) {
+        return memberService.checkVerificationPassword(userDetails,password.password());
+    }
+
+    @Override
+    @PutMapping("/change-nickname")
+    public CommonResponse<?> changeNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                            @RequestBody @Valid MemberRequest.CheckNickname nickname) {
+        return memberService.changeNickname(userDetails, nickname);
+    }
+
+    @Override
+    @PutMapping("/change-password")
+    public CommonResponse<?> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                            @RequestBody @Valid MemberRequest.CheckPassword password) {
+        return memberService.changePassword(userDetails,password);
+    }
+
+    @Override
+    @PutMapping("/change-message")
+    public CommonResponse<?> changeMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                           @RequestBody @Valid MemberRequest.CheckMessage message) {
+        return memberService.changeMessage(userDetails,message);
+    }
+
+    @Override
     @PostMapping("/check-email")
     public CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request) {
         memberService.checkEmail(request.email());
@@ -60,13 +82,13 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @PostMapping("/check-nickname")
-    public CommonResponse<?> checkNickname(MemberRequest.CheckNickname request) {
+    public CommonResponse<?> checkNickname(@RequestBody @Valid MemberRequest.CheckNickname request) {
         memberService.checkNickname(request.nickname());
         return CommonResponse.success();
     }
 
     @Override
-    @PostMapping("/checkPassword")
+    @PostMapping("/check-password")
     public CommonResponse<?> checkPassword(@RequestBody @Valid MemberRequest.CheckPassword request) {
         return CommonResponse.success();
     }

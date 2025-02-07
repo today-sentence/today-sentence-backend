@@ -26,20 +26,26 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     @Setter
     private String password;
-    @Column(name = "password_updated_at")
-    private LocalDateTime passwordUpdatedAt;
 
     @Column(nullable = false,unique = true)
     @Setter
     private String nickname;
-    @Column(name = "nickname_updated_at")
-    private LocalDateTime nicknameUpdatedAt;
 
     @Setter
     @Builder.Default
     private String statusMessage = "상태메시지를 입력해주세요.";
+
+    @Column(name = "nickname_updated_at")
+    @Builder.Default
+    private LocalDateTime nicknameUpdatedAt = LocalDateTime.now();
+
+    @Column(name = "password_updated_at")
+    @Builder.Default
+    private LocalDateTime passwordUpdatedAt = LocalDateTime.now();
+
     @Column(name = "message_updated_at")
-    private LocalDateTime messageUpdatedAt;
+    @Builder.Default
+    private LocalDateTime messageUpdatedAt = LocalDateTime.now();
 
     @Setter
     @Builder.Default
