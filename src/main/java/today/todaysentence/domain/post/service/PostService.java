@@ -2,12 +2,11 @@ package today.todaysentence.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import today.todaysentence.domain.book.dto.BookInfo;
 import today.todaysentence.domain.member.Member;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.book.service.BookService;
-import today.todaysentence.domain.category.Category;
-import today.todaysentence.domain.category.service.CategoryService;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.service.HashtagService;
 import today.todaysentence.domain.post.Post;
@@ -25,7 +24,6 @@ import java.util.List;
 public class PostService {
     private final BookService bookService;
     private final HashtagService hashtagService;
-    private final CategoryService categoryService;
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
 
@@ -38,18 +36,36 @@ public class PostService {
     public void record(PostRequest.Record dto, Member member) {
         Book book = bookService.findOrCreate(PostMapper.toBook(dto));
         List<Hashtag> hashtags = hashtagService.findOrCreate(dto.hashtags());
-        Category category = categoryService.toCategory(dto.category());
 
-        postRepository.save(PostMapper.toEntity(member, book, category, hashtags, dto));
+        postRepository.save(PostMapper.toEntity(member, book, hashtags, dto));
     }
 
     public List<PostResponse.Summary> getMyPostsByDate(Member member, int month, int year) {
         List<Post> posts = postRepository.findMyPostsByDate(member, month, year);
+
         return posts.stream()
-                .map(post -> new PostResponse.Summary(
+                .map(post -> PostMapper.toSummary(
                         post.getId(),
                         bookService.getBookInfo(post.getBook())
                 ))
                 .toList();
+    }
+
+    public PostResponse.Summary toSummary(Long postId) {
+        Post post = findPost(postId);
+
+        return PostMapper.toSummary(postId, bookService.getBookInfo(post.getBook()));
+    }
+
+    public PostResponse.Detail getPostDetail(Long postId) {
+        Post post = findPost(postId);
+        BookInfo bookInfo = bookService.getBookInfo(post.getBook());
+
+        return PostMapper.toDetail(post, bookInfo);
+    }
+
+    private Post findPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 }
