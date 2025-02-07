@@ -2,7 +2,7 @@ package today.todaysentence.domain.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import today.todaysentence.global.annotation.ValidCategory;
+import today.todaysentence.domain.category.Category;
 
 import java.util.List;
 
@@ -21,8 +21,7 @@ public class PostRequest {
             String bookCover,
             @NotNull
             String isbn,
-            @ValidCategory
-            String category,
+            Category category,
             List<String> hashtags,
             @NotBlank
             String content

@@ -1,9 +1,12 @@
 package today.todaysentence.domain.post.dto;
 
-import today.todaysentence.domain.book.dto.BookInfo;
+import lombok.Builder;
+
+import java.util.List;
 
 public class PostResponse {
 
+    @Builder
     public record Summary(
             Long postId,
             String bookTitle,
@@ -12,18 +15,19 @@ public class PostResponse {
             Integer bookPublishingYear,
             String bookCover
     ) {
-        public Summary(Long postId, BookInfo bookInfo) {
-            this(postId,
-                    bookInfo.title(),
-                    bookInfo.author(),
-                    bookInfo.publisher(),
-                    bookInfo.publishingYear(),
-                    bookInfo.cover());
-        }
     }
 
+    @Builder
     public record Detail(
-
+            Long postId,
+            String bookTitle,
+            String bookAuthor,
+            String bookPublisher,
+            Integer bookPublishingYear,
+            String bookCover,
+            String category,
+            List<String> hashtags
+            // 추후 공감, 댓글, 저장 필드도 추가해야합니다!
     ) {
     }
 }
