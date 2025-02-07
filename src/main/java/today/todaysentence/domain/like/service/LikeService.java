@@ -22,22 +22,26 @@ public class LikeService {
 
     @Transactional
     public CommonResponse<?> toggleLikes(Member member, Long postId) {
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BaseException(ExceptionCode.POST_NOT_FOUND));
 
         Likes like = likeRepository.findByMemberAndPost(member, post)
-                .orElseGet(() -> likeRepository.save(
-                        Likes.builder()
-                                .member(member)
-                                .post(post)
-                                .build()
-                ));
+                .orElseGet(() -> createLike(member, post));
 
-        like.setIsLiked(!like.getIsLiked());
-        likeRepository.save(like);
+        like.toggle();
 
         return CommonResponse.ok(like.getIsLiked());
     }
+
+    private Likes createLike(Member member, Post post) {
+        return likeRepository.save(
+                Likes.builder()
+                        .member(member)
+                        .post(post)
+                        .isLiked(true)
+                        .build()
+        );
+    }
+
 
 }
