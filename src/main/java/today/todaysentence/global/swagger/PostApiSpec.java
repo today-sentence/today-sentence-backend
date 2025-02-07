@@ -92,11 +92,43 @@ public interface PostApiSpec {
                             """)
             })),
             @ApiResponse(responseCode = "204", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "조건에 맞는 기록한 글이 없음", value = """
-                            """)
+                    @ExampleObject(name = "조건에 맞는 기록한 글이 없음")
             }))
     })
     ResponseEntity<CommonResponse<List<PostResponse.Summary>>> getMyPostsByDate(CustomUserDetails userDetails,
                                                                                 int month,
                                                                                 int year);
+
+
+    @Operation(summary = "명언 글 상세조회하기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "명언 글 상세조회 성공", value = """
+                            {
+                                "data":
+                                    {
+                                        "postId":1,
+                                        "bookTitle":"해리포터1",
+                                        "bookAuthor":"롤링",
+                                        "bookPublisher":"출판사1",
+                                        "bookPublishingYear":2013,
+                                        "bookCover":"cover.url.com",
+                                        "category":"POEM_NOVEL_ESSAY",
+                                        "hashtags":
+                                            [
+                                                "소설","명언"
+                                            ]
+                                        }
+                                    }
+                            """)
+            })),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "id에 해당하는 게시글 없음", value = """
+                            {
+                                "message": "게시된 명언 글을 찾을 수 없습니다."
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<PostResponse.Detail> getPostDetail(Long post_id);
 }
