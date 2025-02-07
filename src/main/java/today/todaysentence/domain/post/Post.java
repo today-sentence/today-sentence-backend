@@ -10,18 +10,21 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
+import today.todaysentence.global.timeStamped.Timestamped;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Post {
+public class Post extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +54,10 @@ public class Post {
     private String content;
 
     public Post(Member writer, Book book, Category category, List<Hashtag> hashtags, String content) {
-
+        this.writer = writer;
+        this.book = book;
+        this.category = category;
+        this.hashtags = hashtags;
+        this.content = content;
     }
-
 }

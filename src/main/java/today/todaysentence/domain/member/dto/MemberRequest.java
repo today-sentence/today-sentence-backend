@@ -2,8 +2,7 @@ package today.todaysentence.domain.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import today.todaysentence.global.anotation.ValidPassword;
+import today.todaysentence.global.annotation.ValidPassword;
 
 public class MemberRequest {
 

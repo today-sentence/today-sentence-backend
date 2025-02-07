@@ -8,8 +8,7 @@ import today.todaysentence.domain.member.Member;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    @Query("select m from Member m where m.email=:email")
-    Optional<Member> findByCustomEmail(@Param("email") String email);
+    Optional<Member> findByEmail(@Param("email") String email);
 
     boolean existsByEmail(String email);
 
