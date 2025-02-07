@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
+import today.todaysentence.domain.like.dto.LikeRequest;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
@@ -24,6 +25,6 @@ public interface LikeApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> likesToPost(CustomUserDetails userDetails,Long postId);
+    CommonResponse<?> likesToPost(CustomUserDetails userDetails, LikeRequest.LikePostRequest postId);
 
 }
