@@ -27,7 +27,11 @@ public class Likes extends Timestamped {
     private Post post;
 
     @Builder.Default
-    @Setter
     @Column(nullable = false)
     private Boolean isLiked =false;
+
+
+    public void toggle() {
+        this.isLiked = !this.isLiked;
+    }
 }
