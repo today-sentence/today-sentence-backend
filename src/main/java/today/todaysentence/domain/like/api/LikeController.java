@@ -1,6 +1,7 @@
 package today.todaysentence.domain.like.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import today.todaysentence.global.swagger.LikeApiSpec;
 @RestController
 @RequestMapping("/api/likes")
 @RequiredArgsConstructor
+@ResponseStatus(HttpStatus.OK)    
 public class LikeController implements LikeApiSpec {
 
     private final LikeService likeService;
