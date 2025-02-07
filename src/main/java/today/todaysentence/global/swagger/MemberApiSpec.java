@@ -42,7 +42,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request);
+    CommonResponse<?> checkEmail(MemberRequest.CheckEmail request);
 
     @Operation(summary = "회원가입 - 닉네임 중복 검증")
     @ApiResponses({
@@ -54,7 +54,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkNickname(@RequestBody MemberRequest.CheckNickname request);
+    CommonResponse<?> checkNickname(MemberRequest.CheckNickname request);
 
     @Operation(summary = "회원가입 - 비밀번호 규칙 확인")
     @ApiResponses({
@@ -73,7 +73,9 @@ public interface MemberApiSpec {
                             """)
             })),
     })
-    CommonResponse<?> checkPassword(@RequestBody MemberRequest.CheckPassword request);
+    CommonResponse<?> checkPassword(MemberRequest.CheckPassword request);
+
+
 
     @Operation(summary = "회원가입 - 회원가입 요청")
     @ApiResponses({
@@ -89,7 +91,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> signUp(@RequestBody MemberRequest.SignUp request);
+    CommonResponse<?> signUp(MemberRequest.SignUp request);
 
     @Operation(summary = "로그인 - 로그인 요청")
     @ApiResponses({
@@ -105,7 +107,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> signIn(@RequestBody MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);
+    CommonResponse<?> signIn(MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);
 
     @Operation(summary = "로그아웃 - 로그아웃 요청")
     @ApiResponses({
@@ -117,7 +119,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails,
+    CommonResponse<?> signOut(CustomUserDetails userDetails,
                               HttpServletRequest httpServletRequest);
 
     @Operation(summary = "회원탈퇴 - 회원탈퇴 요청")
@@ -130,6 +132,57 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails,
+    CommonResponse<?> withdraw(CustomUserDetails userDetails,
                               HttpServletRequest httpServletRequest);
+
+    @Operation(summary = "회원정보 변경 - 비밀번호 일치확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "비밀번호 확인 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,String password);
+
+    @Operation(summary = "회원정보 변경 - 닉네임 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "닉네임 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeNickname(CustomUserDetails userDetails,MemberRequest.CheckNickname nickname);
+
+
+    @Operation(summary = "회원정보 변경 - 비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "비밀번호 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changePassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password);
+
+    @Operation(summary = "회원정보 변경 - 상태메시지 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "상태메시지 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeMessage(CustomUserDetails userDetails,MemberRequest.CheckMessage message);
+
+
 }
