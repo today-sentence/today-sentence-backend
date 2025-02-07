@@ -19,4 +19,8 @@ public class Category {
 
     @Enumerated(EnumType.STRING)
     private CategoryName categoryName;
+
+    public String valueOf() {
+        return categoryName.getKoreanName();
+    }
 }

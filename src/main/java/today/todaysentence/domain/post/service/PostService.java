@@ -2,6 +2,7 @@ package today.todaysentence.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import today.todaysentence.domain.book.dto.BookInfo;
 import today.todaysentence.domain.member.Member;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.Book;
@@ -55,9 +56,20 @@ public class PostService {
     }
 
     public PostResponse.Summary toSummary(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
+        Post post = findPost(postId);
 
         return PostMapper.toSummary(postId, bookService.getBookInfo(post.getBook()));
+    }
+
+    public PostResponse.Detail getPostDetail(Long postId) {
+        Post post = findPost(postId);
+        BookInfo bookInfo = bookService.getBookInfo(post.getBook());
+
+        return PostMapper.toDetail(post, bookInfo);
+    }
+
+    private Post findPost(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 }

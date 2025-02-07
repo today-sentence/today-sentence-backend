@@ -60,4 +60,10 @@ public class Post extends Timestamped {
         this.hashtags = hashtags;
         this.content = content;
     }
+
+    public List<String> getHashtagNames() {
+        return hashtags.stream()
+                .map(Hashtag::getName)
+                .toList();
+    }
 }

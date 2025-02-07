@@ -38,13 +38,26 @@ public class PostMapper {
     }
 
     public static PostResponse.Summary toSummary(Long postId, BookInfo bookInfo) {
-        return new PostResponse.Summary(
-                postId,
-                bookInfo.title(),
-                bookInfo.author(),
-                bookInfo.publisher(),
-                bookInfo.publishingYear(),
-                bookInfo.cover()
-        );
+        return PostResponse.Summary.builder()
+                .postId(postId)
+                .bookTitle(bookInfo.title())
+                .bookAuthor(bookInfo.author())
+                .bookPublisher(bookInfo.publisher())
+                .bookPublishingYear(bookInfo.publishingYear())
+                .bookCover(bookInfo.cover())
+                .build();
+    }
+
+    public static PostResponse.Detail toDetail(Post post, BookInfo bookInfo) {
+        return PostResponse.Detail.builder()
+                .postId(post.getId())
+                .bookTitle(bookInfo.title())
+                .bookAuthor(bookInfo.author())
+                .bookPublisher(bookInfo.publisher())
+                .bookPublishingYear(bookInfo.publishingYear())
+                .bookCover(bookInfo.cover())
+                .category(post.getCategory().valueOf())
+                .hashtags(post.getHashtagNames())
+                .build();
     }
 }
