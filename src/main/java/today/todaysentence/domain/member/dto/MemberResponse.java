@@ -10,19 +10,24 @@ public class MemberResponse {
     }
 
     public record MemberInfo(
-            Long id,
             String email,
-            String nickname
+            String nickname,
+            String statusMessage,
+            String profileImg
     ) {
         public MemberInfo(Member member) {
-            this(member.getId(), member.getEmail(), member.getNickname());
+            this( member.getEmail(), member.getNickname() , member.getStatusMessage(), member.getProfileImg());
         }
     }
 
-    public record WithdrawResponse(
+    public record ActionStatusResponse(
             String message,
             LocalDateTime time
     ) {
+        public ActionStatusResponse(String message, LocalDateTime time) {
+            this.message = message;
+            this.time = time.withSecond(0).withNano(0);
+        }
 
     }
 }

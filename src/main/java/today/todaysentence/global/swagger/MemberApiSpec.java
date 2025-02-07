@@ -42,7 +42,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkEmail(@RequestBody @Valid MemberRequest.CheckEmail request);
+    CommonResponse<?> checkEmail(MemberRequest.CheckEmail request);
 
     @Operation(summary = "회원가입 - 닉네임 중복 검증")
     @ApiResponses({
@@ -54,7 +54,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkNickname(@RequestBody MemberRequest.CheckNickname request);
+    CommonResponse<?> checkNickname(MemberRequest.CheckNickname request);
 
     @Operation(summary = "회원가입 - 비밀번호 규칙 확인")
     @ApiResponses({
@@ -73,7 +73,9 @@ public interface MemberApiSpec {
                             """)
             })),
     })
-    CommonResponse<?> checkPassword(@RequestBody MemberRequest.CheckPassword request);
+    CommonResponse<?> checkPassword(MemberRequest.CheckPassword request);
+
+
 
     @Operation(summary = "회원가입 - 회원가입 요청")
     @ApiResponses({
@@ -81,15 +83,16 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "회원가입 성공", value = """
                             {
                                 "data" : {
-                                    "id" : Long,
                                     "email" : String,
-                                    "nickname" : String
+                                    "nickname" : String,
+                                    "statusMessage": String,
+                                    "profileImg" : String
                                 }
                             }
                             """)
             }))
     })
-    CommonResponse<?> signUp(@RequestBody MemberRequest.SignUp request);
+    CommonResponse<?> signUp(MemberRequest.SignUp request);
 
     @Operation(summary = "로그인 - 로그인 요청")
     @ApiResponses({
@@ -97,15 +100,16 @@ public interface MemberApiSpec {
                     @ExampleObject(name = "로그인 성공", value = """
                             {
                                 "data" : {
-                                    "id" : Long,
                                     "email" : String,
-                                    "nickname" : String
+                                    "nickname" : String,
+                                    "statusMessage": String,
+                                    "profileImg" : String
                                 }
                             }
                             """)
             }))
     })
-    CommonResponse<?> signIn(@RequestBody MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);
+    CommonResponse<?> signIn(MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);
 
     @Operation(summary = "로그아웃 - 로그아웃 요청")
     @ApiResponses({
@@ -117,7 +121,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails,
+    CommonResponse<?> signOut(CustomUserDetails userDetails,
                               HttpServletRequest httpServletRequest);
 
     @Operation(summary = "회원탈퇴 - 회원탈퇴 요청")
@@ -130,6 +134,98 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails,
+    CommonResponse<?> withdraw(CustomUserDetails userDetails,
                               HttpServletRequest httpServletRequest);
+
+    @Operation(summary = "회원정보 변경 - 비밀번호 일치확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "비밀번호 확인 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 비밀번호 불일치", value = """
+                            {
+                                "message" : "회원 정보가 일치하지 않습니다."
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,MemberRequest.VerificationPassword password);
+
+    @Operation(summary = "회원정보 변경 - 닉네임 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "닉네임 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 유효성 검사 실패", value = """
+                            {
+                                "message" : "닉네임은  한글, 특수문자, 영문 으로 가능하며 1자이상 8자 이하여야합니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 변경시간 제한", value = """
+                            {
+                                "data": {
+                                          "message": "String",
+                                          "time": "Date"
+                                      }
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeNickname(CustomUserDetails userDetails,MemberRequest.CheckNickname nickname);
+
+
+    @Operation(summary = "회원정보 변경 - 비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "비밀번호 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changePassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password);
+
+    @Operation(summary = "회원정보 변경 - 상태메시지 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "상태메시지 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 유효성 검사 실패", value = """
+                            {
+                                "message" : "상태메시지는 1자이상 50자 이하여야합니다."
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "변경 실패 - 변경시간 제한", value = """
+                            {
+                                "data": {
+                                          "message": "String",
+                                          "time": "Date"
+                                      }
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeMessage(CustomUserDetails userDetails,MemberRequest.CheckMessage message);
+
+
 }

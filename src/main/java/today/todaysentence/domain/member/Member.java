@@ -21,10 +21,10 @@ public class Member extends Timestamped {
     private Long id;
 
     @Column(nullable = false,unique = true)
-    @Setter
     private String email;
 
     @Column(nullable = false)
+    @Setter
     private String password;
 
     @Column(nullable = false,unique = true)
@@ -35,6 +35,18 @@ public class Member extends Timestamped {
     @Builder.Default
     private String statusMessage = "상태메시지를 입력해주세요.";
 
+    @Column(name = "nickname_updated_at")
+    @Builder.Default
+    private LocalDateTime nicknameUpdatedAt = LocalDateTime.now();
+
+    @Column(name = "password_updated_at")
+    @Builder.Default
+    private LocalDateTime passwordUpdatedAt = LocalDateTime.now();
+
+    @Column(name = "message_updated_at")
+    @Builder.Default
+    private LocalDateTime messageUpdatedAt = LocalDateTime.now();
+
     @Setter
     @Builder.Default
     private String profileImg = "basicProfileUrl";
@@ -42,6 +54,10 @@ public class Member extends Timestamped {
     @Column
     @Builder.Default
     private Boolean isDeleted = false;
+
+
+
+
 
 
     public void withdraw(){
