@@ -17,6 +17,7 @@ import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.exception.exception.PostException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -41,7 +42,10 @@ public class PostService {
     }
 
     public List<PostResponse.Summary> getMyPostsByDate(Member member, int month, int year) {
-        List<Post> posts = postRepository.findMyPostsByDate(member, month, year);
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+
+        List<Post> posts = postRepository.findMyPostsByDate(member, startDate, endDate);
 
         return posts.stream()
                 .map(post -> PostMapper.toSummary(
