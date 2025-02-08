@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
-    @Query("SELECT b FROM Bookmark b WHERE b.member = :member AND MONTH(b.createAt) = :month AND YEAR(b.createAt) = :year")
+    @Query("SELECT b FROM Bookmark b WHERE b.member = :member AND MONTH(b.modifiedAt) = :month AND YEAR(b.modifiedAt) = :year")
     List<Bookmark> findMyBookmarksByDate(@Param("member") Member member,
                                  @Param("month") int month,
                                  @Param("year") int year);
