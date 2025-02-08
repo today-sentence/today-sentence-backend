@@ -68,4 +68,12 @@ public class PostService {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
+
+    public void isValidPost(Long postId) {
+        if (postRepository.existsById(postId)) {
+            return;
+        }
+
+        throw new PostException(ExceptionCode.POST_NOT_FOUND);
+    }
 }

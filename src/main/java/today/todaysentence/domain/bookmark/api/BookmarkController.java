@@ -24,13 +24,11 @@ import java.util.List;
 public class BookmarkController implements BookmarkApiSpec {
     private final BookmarkService bookmarkService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/posts/bookmarks")
     public CommonResponse<?> bookmarkPost(@AuthenticationPrincipal CustomUserDetails userDetails, BookmarkRequest.Save request) {
         Member member = userDetails.member();
 
-        bookmarkService.bookmark(request.postId(), member);
-        return CommonResponse.success();
+        return CommonResponse.ok(bookmarkService.bookmark(request.postId(), member));
     }
 
     @GetMapping("/api/posts/bookmarks")

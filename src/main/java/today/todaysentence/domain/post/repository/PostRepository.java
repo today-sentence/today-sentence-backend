@@ -18,4 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                  @Param("year") int year);
 
     Optional<Post> findById(@NonNull Long id);
+
+    boolean existsById(@NonNull Long id);
 }

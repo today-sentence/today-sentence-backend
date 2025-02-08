@@ -8,6 +8,7 @@ import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
@@ -15,4 +16,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findMyBookmarksByDate(@Param("member") Member member,
                                  @Param("month") int month,
                                  @Param("year") int year);
+
+    Optional<Bookmark> findByMemberAndPostId(Member member, Long postId);
 }
