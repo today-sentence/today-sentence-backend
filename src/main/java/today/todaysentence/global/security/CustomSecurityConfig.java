@@ -20,21 +20,31 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import today.todaysentence.global.jwt.JwtAuthFilter;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
-    private final static String[] PERMIT_ALL_URI = {
+
+    private final static String[] PERMIT_ALL_URI_MEMBER = {
             "/api/member/sign-up",
             "/api/member/sign-in",
             "/api/member/check-email",
             "/api/member/check-nickname",
+    };
+    private final static String[] PERMIT_ALL_URI_UTIL = {
             "/swagger-ui/**",
-            "/v3/api-docs/**"
-
+            "/v3/api-docs/**",
+    };
+    private final static String[] PERMIT_ALL_URI_SEARCH = {
+            "/api/search/**"
     };
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -60,10 +70,19 @@ public class CustomSecurityConfig {
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
-                .authorizeHttpRequests(request->request
-                        .requestMatchers(PERMIT_ALL_URI).permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(request->{
 
+                    String[] permitAllUri = Stream.of(
+                                    PERMIT_ALL_URI_MEMBER,
+                                    PERMIT_ALL_URI_UTIL,
+                                    PERMIT_ALL_URI_SEARCH
+                            )
+                            .flatMap(Arrays::stream)
+                            .toArray(String[]::new);
+
+                    request.requestMatchers(permitAllUri).permitAll()
+                            .anyRequest().authenticated();
+                })
 
                 ;
         return http.build();
