@@ -29,7 +29,6 @@ public class MemberRequest {
     }
     public record VerificationPassword(
             @NotBlank
-            @NotNull
             String password) {
     }
     public record CheckMessage(
@@ -40,26 +39,21 @@ public class MemberRequest {
 
     public record SignUp(
             @NotBlank
-            @NotNull
             @Email
             String email,
             @NotBlank
-            @NotNull
             String nickname,
             @NotBlank
             @ValidPassword
-            @NotNull
             String password) {
     }
 
     public record SignIn(
             @NotBlank
             @Email
-            @NotNull
             String email,
             @NotBlank
             @ValidPassword
-            @NotNull
             String password) {
     }
 }
