@@ -38,9 +38,9 @@ public class BookmarkService {
         List<Bookmark> bookmarks = bookmarkRepository.findMyBookmarksByDate(member, month, year);
 
         return bookmarks.stream()
+                .filter(Bookmark::getIsSaved)
                 .map(Bookmark::getPostId)
                 .map(postService::toSummary)
                 .toList();
-
     }
 }
