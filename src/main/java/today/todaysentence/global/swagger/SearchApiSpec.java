@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import today.todaysentence.global.response.CommonResponse;
 
 @Tag(name = "검색 API")
 public interface SearchApiSpec {
@@ -58,7 +59,7 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    ResponseEntity<?> findBooks(String type, String search, Pageable pageable);
+    CommonResponse<?>findBooks(String type, String search, Pageable pageable);
 
 
 }

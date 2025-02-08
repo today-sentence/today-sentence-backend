@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.search.service.SearchService;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.swagger.SearchApiSpec;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/search")
-public class SearchController {
+public class SearchController implements SearchApiSpec {
 
     private final SearchService searchService;
 
