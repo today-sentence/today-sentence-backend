@@ -39,20 +39,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      - name: yml 추가
+      - name: .yml 추가
         run: |
-          echo -e "${{ secrets.DATASOURCE }}" | cat - ./src/main/resources/application-dev.yml > temp.yml && mv temp.yml ./src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application-dev.yml
 
-      - name: jwtsecretKey 추가
-        run: |
-          echo -e "\njwt:\n  secret:\n    key: \"${{ secrets.JWT_SECRET_KEY }}\"" >> ./src/main/resources/application-dev.yml
-
-
-      - name: 테스트 없는 Build
+      - name: Build
         run: ./gradlew build -x test
-       
 
-      - name: 환경변수 확인  
+      - name: 환경변수 확인
         run: |
           echo "DB_URL: $DB_URL"
           echo "DB_USERNAME: $DB_USERNAME"
