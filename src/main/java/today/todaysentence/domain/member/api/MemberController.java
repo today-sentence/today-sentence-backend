@@ -110,7 +110,7 @@ public class MemberController implements MemberApiSpec {
     @Override
     @PostMapping("/verify-code")
     public CommonResponse<?> sendVerifyCode(@RequestBody @Valid MemberRequest.CheckEmail email) throws MessagingException {
-        return memberService.certifyEmail(email.email());
+        return memberService.sendEmail(email.email());
     }
 
     @Override

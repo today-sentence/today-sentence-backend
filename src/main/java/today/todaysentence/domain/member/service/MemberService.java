@@ -184,7 +184,7 @@ public class MemberService {
         return CommonResponse.success();
     }
 
-    public CommonResponse<?> certifyEmail(String email) throws MessagingException {
+    public CommonResponse<?> sendEmail(String email) throws MessagingException {
 
         checkEmail(email);
 
