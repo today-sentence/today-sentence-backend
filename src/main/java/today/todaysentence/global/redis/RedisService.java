@@ -1,6 +1,8 @@
 package today.todaysentence.global.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -78,6 +80,26 @@ public class RedisService {
     }
 
 
+    public void saveCode(String email, String code,long duration) {
+        String Key = email;
+        String value = code;
+        redisTemplate.opsForValue().set(Key, value, duration, TimeUnit.MILLISECONDS);
 
+    }
+
+    public boolean getVerifyCode(String email, String code) {
+        String key = email;
+        String value = (String) redisTemplate.opsForValue().get(key);
+
+        if (value == null) {
+            throw new RuntimeException("키를 찾을 수 없습니다. : " + key);
+        }
+        return  value.equals(code);
+
+    }
+    public void deleteVerifyCode(String email) {
+        String key = email;
+        redisTemplate.delete(key);
+    }
 
 }

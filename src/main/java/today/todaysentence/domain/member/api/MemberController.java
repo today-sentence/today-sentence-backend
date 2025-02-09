@@ -1,6 +1,7 @@
 package today.todaysentence.domain.member.api;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -60,6 +61,12 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
+    @PostMapping("/find-password")
+    public CommonResponse<?> findPassword(@RequestBody @Valid MemberRequest.CheckEmail email) throws MessagingException {
+        return memberService.findPassword(email.email());
+    }
+
+    @Override
     @PutMapping("/change-password")
     public CommonResponse<?> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                             @RequestBody @Valid MemberRequest.CheckPassword password) {
@@ -71,6 +78,13 @@ public class MemberController implements MemberApiSpec {
     public CommonResponse<?> changeMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @RequestBody @Valid MemberRequest.CheckMessage message) {
         return memberService.changeMessage(userDetails,message);
+    }
+
+    @Override
+    @PostMapping("/find-email")
+    public CommonResponse<?> findEmail(@RequestBody MemberRequest.FindEmail nickname) {
+        return memberService.findEmail(nickname.nickname());
+
     }
 
     @Override
@@ -92,6 +106,19 @@ public class MemberController implements MemberApiSpec {
     public CommonResponse<?> checkPassword(@RequestBody @Valid MemberRequest.CheckPassword request) {
         return CommonResponse.success();
     }
+
+    @Override
+    @PostMapping("/verify-code")
+    public CommonResponse<?> sendVerifyCode(@RequestBody @Valid MemberRequest.CheckEmail email) throws MessagingException {
+        return memberService.certifyEmail(email.email());
+    }
+
+    @Override
+    @PostMapping("/check-code")
+    public CommonResponse<?> checkVerifyCode(@RequestBody @Valid MemberRequest.VerifyCodeCheck request)  {
+        return memberService.checkVerifyCode(request.email(),request.code());
+    }
+
 
 
 

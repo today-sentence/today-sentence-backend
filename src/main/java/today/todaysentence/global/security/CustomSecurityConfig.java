@@ -38,6 +38,11 @@ public class CustomSecurityConfig {
             "/api/member/sign-in",
             "/api/member/check-email",
             "/api/member/check-nickname",
+            "/api/member/find-email",
+            "/api/member/check-code",
+            "/api/member/verify-code",
+            "/api/member/find-password"
+
     };
     private final static String[] PERMIT_ALL_URI_UTIL = {
             "/swagger-ui/**",
