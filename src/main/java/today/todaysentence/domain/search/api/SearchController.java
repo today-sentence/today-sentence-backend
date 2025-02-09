@@ -25,6 +25,13 @@ public class SearchController implements SearchApiSpec {
 
     }
 
+    @GetMapping("/posts")
+    public CommonResponse<?> findPosts(@RequestParam("type")String type, @RequestParam("search")String search, Pageable pageable){
+
+        return searchService.findPosts(type,search,pageable);
+
+    }
+
 
 
 }
