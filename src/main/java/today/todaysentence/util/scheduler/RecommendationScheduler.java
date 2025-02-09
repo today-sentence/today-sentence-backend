@@ -1,4 +1,4 @@
-package today.todaysentence.global.scheduler;
+package today.todaysentence.util.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

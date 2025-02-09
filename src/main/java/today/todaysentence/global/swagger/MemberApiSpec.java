@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -93,6 +94,38 @@ public interface MemberApiSpec {
             }))
     })
     CommonResponse<?> signUp(MemberRequest.SignUp request);
+
+    @Operation(summary = " 회원가입  - 인증코드 발송")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "이메일 발송 성공", value = """
+                            {
+                                "data" : 입력하신 메일로 인증번호 전송 완료
+                            }
+                            """)
+            })),
+
+    })
+    CommonResponse<?> sendVerifyCode(MemberRequest.CheckEmail email) throws MessagingException;
+
+    @Operation(summary = "회원가입 - 코드인증")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "코드 인증 성공", value = """
+                            {
+                                "data" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 비밀번호 불일치", value = """
+                            {
+                                "data" : "false"
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> checkVerifyCode(MemberRequest.VerifyCodeCheck request) throws MessagingException;
 
     @Operation(summary = "로그인 - 로그인 요청")
     @ApiResponses({
@@ -226,6 +259,49 @@ public interface MemberApiSpec {
             }))
     })
     CommonResponse<?> changeMessage(CustomUserDetails userDetails,MemberRequest.CheckMessage message);
+
+    @Operation(summary = "회원정보 검색 - 아이디찾기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "아이디 확인 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 비밀번호 불일치", value = """
+                            {
+                                "message" : "일치하는 정보가 없습니다."
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> findEmail(MemberRequest.FindEmail nickname);
+
+    @Operation(summary = "회원정보 검색 - 비밀번호찾기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "이메일 전송 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "검증 실패 - 비밀번호 불일치", value = """
+                            {
+                                "message" : "일치하는 정보가 없습니다."
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> findPassword(MemberRequest.CheckEmail email) throws MessagingException;
+
+
+
+
+
 
 
 }

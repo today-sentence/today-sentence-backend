@@ -1,4 +1,4 @@
-package today.todaysentence.global.annotation;
+package today.todaysentence.util.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
@@ -27,7 +27,8 @@ public @interface ValidPassword {
                 return false;
             }
 
-            return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,16}$");
+            return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^a-zA-Z0-9])[A-Za-z\\d[^a-zA-Z0-9]]{10,16}$");
+
         }
     }
 }
