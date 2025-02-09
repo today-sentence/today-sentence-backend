@@ -24,6 +24,7 @@ public class EmailSenderService {
                     border: 1px solid #ddd; border-radius: 10px; 
                     font-family: Arial, sans-serif; background-color: #f9f9f9; text-align: center;">
             <h2 style="color: #333;">📧 오늘의 명언 이메일 인증</h2>
+            <p style="font-size: 12px; padding: 6px; color: #999;">안녕하세요. 오늘의 명언을 이용해주셔서 감사합니다.😄</p>
             <p style="font-size: 16px; color: #555;">아래 인증 코드를 입력하여 이메일 인증을 완료하세요.</p>
             <div style="margin: 20px 0; padding: 15px; font-size: 24px; 
                         font-weight: bold; color: #ffffff; background-color: #007bff; 
@@ -55,6 +56,7 @@ public class EmailSenderService {
                     border: 1px solid #ddd; border-radius: 10px; 
                     font-family: Arial, sans-serif; background-color: #f9f9f9; text-align: center;">
             <h2 style="color: #333;">📧 오늘의 명언 임시 비밀번호 발급해 드립니다.</h2>
+            <p style="font-size: 12px; padding: 6px; color: #999;">안녕하세요. 오늘의 명언을 이용해주셔서 감사합니다.😄</p>
             <div style="margin: 20px 0; padding: 15px; font-size: 24px; 
                         font-weight: bold; color: #ffffff; background-color: #007bff; 
                         display: inline-block; border-radius: 5px;">
