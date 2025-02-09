@@ -1,4 +1,4 @@
-package today.todaysentence.global.annotation;
+package today.todaysentence.util.annotation;
 
 
 import jakarta.validation.Constraint;
