@@ -24,7 +24,6 @@ public class Member extends Timestamped {
     private String email;
 
     @Column(nullable = false)
-    @Setter
     private String password;
 
     @Column(nullable = false,unique = true)
@@ -55,10 +54,9 @@ public class Member extends Timestamped {
     @Builder.Default
     private Boolean isDeleted = false;
 
-
-
-
-
+    public void passwordChange(String newPassword){
+        this.password = newPassword;
+    }
 
     public void withdraw(){
         this.isDeleted =true;
