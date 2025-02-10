@@ -21,13 +21,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-
       - name: JDK 설치
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
 
       - name: Gradle 캐싱
         uses: actions/cache@v3
@@ -39,57 +37,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      - name: yml 추가
+      - name: .yml 추가
         run: |
-          echo -e "${{ secrets.DATASOURCE }}" | cat - ./src/main/resources/application-dev.yml > temp.yml && mv temp.yml ./src/main/resources/application-dev.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application-dev.yml
 
-      - name: jwtsecretKey 추가
-        run: |
-          echo -e "\njwt:\n  secret:\n    key: \"${{ secrets.JWT_SECRET_KEY }}\"" >> ./src/main/resources/application-dev.yml
-
-
-      - name: 테스트 없는 Build
+      - name: Build
         run: ./gradlew build -x test
-       
-
-      - name: 환경변수 확인  
-        run: |
-          echo "DB_URL: $DB_URL"
-          echo "DB_USERNAME: $DB_USERNAME"
-          echo "DB_PASSWORD: $DB_PASSWORD [HIDDEN]"
-
-      - name: Upload Artifacts
-        if: github.ref == 'refs/heads/dev'
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output-dev
-          path: build/libs/*.jar
-
-  deploy:
-    if: github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
-    needs: ci
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-output-dev
-
-      - name: Debug Downloaded Artifacts
-        run: |
-          find . -type f
-
-      - name: Create app-artifact directory
-        run: |
-          mkdir -p app-artifact  
-
-      - name: Move JAR file to app-artifact
-        run: |
-          mv *.jar app-artifact/  
 
       - name: Docker 로그인
         uses: docker/login-action@v2
@@ -97,14 +50,17 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-      - name: Docker 이미지 빌드
+      - name: Docker 이미지 빌드 및 푸시
         run: |
           docker build -f Dockerfile.prod -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }} .
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }}
 
+  deploy:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    needs: ci
 
-      - name: DockerHub 푸쉬
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PROJECT_NAME }}
-
+    steps:
       - name: Run Docker Compose
         uses: appleboy/ssh-action@master
         with:

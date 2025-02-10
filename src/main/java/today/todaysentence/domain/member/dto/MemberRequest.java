@@ -2,10 +2,9 @@ package today.todaysentence.domain.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import today.todaysentence.global.annotation.ValidMessage;
-import today.todaysentence.global.annotation.ValidNickname;
-import today.todaysentence.global.annotation.ValidPassword;
+import today.todaysentence.util.annotation.ValidMessage;
+import today.todaysentence.util.annotation.ValidNickname;
+import today.todaysentence.util.annotation.ValidPassword;
 
 public class MemberRequest {
 
@@ -55,5 +54,23 @@ public class MemberRequest {
             @NotBlank
             @ValidPassword
             String password) {
+    }
+    public record FindEmail(
+            @NotBlank
+            String nickname ){
+    }
+    public record FindPassword(
+            @NotBlank
+            @Email
+            String email ){
+    }
+
+    public record VerifyCodeCheck(
+            @NotBlank
+            @Email
+            String email,
+            @NotBlank
+            String code
+    ){
     }
 }
