@@ -25,13 +25,29 @@ public class Bookmark extends Timestamped {
 
     @JoinColumn(name = "member_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    Member member;
+    private Member member;
 
     @Column(name = "post_id")
-    Long postId;
+    private Long postId;
+
+    @Column(nullable = false)
+    private Boolean isSaved;
 
     public Bookmark(Member member, Long postId) {
         this.member = member;
         this.postId = postId;
+        isSaved = false;
+    }
+
+    public Integer getBookmarkedYear() {
+        return this.getModifiedAt().getYear();
+    }
+
+    public Integer getBookmarkedMonth() {
+        return this.getModifiedAt().getMonthValue();
+    }
+
+    public void toggle() {
+        this.isSaved = !this.isSaved;
     }
 }

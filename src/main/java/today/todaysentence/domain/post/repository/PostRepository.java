@@ -10,18 +10,18 @@ import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.search.dto.SearchResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("SELECT p FROM Post p WHERE p.writer = :member AND MONTH(p.createAt) = :month AND YEAR(p.createAt) = :year")
+    @Query("SELECT p FROM Post p WHERE p.writer = :member AND p.createAt BETWEEN :startDate AND :endDate")
     List<Post> findMyPostsByDate(@Param("member")Member member,
-                                 @Param("month") int month,
-                                 @Param("year") int year);
+                                 @Param("startDate") LocalDateTime startDate,
+                                 @Param("endDate") LocalDateTime endDate);
 
     Optional<Post> findById(@NonNull Long id);
-
 
     @Query(value = "SELECT " +
             "b.title , b.author , b.cover, b.publisher, b.publishing_year, " +
@@ -98,6 +98,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //            "WHERE b.title = :search",
 //             nativeQuery = true)
 //    Long countPostsByCategory(@Param("search") String search);
+
+  boolean existsById(@NonNull Long id);
 }
 
 

@@ -1,15 +1,18 @@
 package today.todaysentence.domain.bookmark.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.bookmark.dto.BookmarkRequest;
+import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
 import today.todaysentence.domain.bookmark.service.BookmarkService;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.dto.PostResponse;
@@ -24,13 +27,11 @@ import java.util.List;
 public class BookmarkController implements BookmarkApiSpec {
     private final BookmarkService bookmarkService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/posts/bookmarks")
-    public CommonResponse<?> bookmarkPost(@AuthenticationPrincipal CustomUserDetails userDetails, BookmarkRequest.Save request) {
+    public CommonResponse<BookmarkResponse.SavedStatus> bookmarkPost(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody BookmarkRequest.Save request) {
         Member member = userDetails.member();
 
-        bookmarkService.bookmark(request.postId(), member);
-        return CommonResponse.success();
+        return CommonResponse.ok(bookmarkService.bookmark(request.postId(), member));
     }
 
     @GetMapping("/api/posts/bookmarks")
