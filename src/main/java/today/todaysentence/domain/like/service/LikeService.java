@@ -38,7 +38,7 @@ public class LikeService {
                 Likes.builder()
                         .member(member)
                         .post(post)
-                        .isLiked(true)
+                        .isLiked(false)
                         .build()
         );
     }
