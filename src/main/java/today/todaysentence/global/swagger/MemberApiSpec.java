@@ -231,6 +231,18 @@ public interface MemberApiSpec {
     })
     CommonResponse<?> changePassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password);
 
+    @Operation(summary = "회원정보 변경 - 이메일 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "이메일 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeEmail(CustomUserDetails userDetails, MemberRequest.CheckEmail email);
+
     @Operation(summary = "회원정보 변경 - 상태메시지 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
