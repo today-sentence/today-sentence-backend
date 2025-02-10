@@ -66,11 +66,16 @@ public class Member extends Timestamped {
         this.nickname+="_W_"+UUID.randomUUID().toString();
         this.setDeletedAt(LocalDateTime.now());
     }
+
     public void changeEmail(String email){
         this.email = email;
-    }public void changeNickname(String nickname){
+    }
+
+    public void changeNickname(String nickname){
         this.nickname = nickname;
-    }public void changeMessage(String message){
+    }
+
+    public void changeMessage(String message){
         this.statusMessage = message;
     }
 

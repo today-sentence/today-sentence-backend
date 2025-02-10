@@ -227,6 +227,7 @@ public class MemberService {
 
 
 
+    @Transactional
     private CommonResponse<?> changeField(Member member, String type, String field){
 
         LocalDateTime changedTime = switch (type) {
@@ -235,9 +236,6 @@ public class MemberService {
             case EMAIL_TYPE -> member.getEmailUpdatedAt();
             default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
         };
-        if (changedTime == null) {
-            changedTime = member.getCreateAt(); // 기본값을 설정
-        }
 
         long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
 
@@ -248,6 +246,7 @@ public class MemberService {
                 case EMAIL_TYPE -> member.changeEmail(field);
             }
             memberRepository.save(member);
+
             return CommonResponse.ok(new MemberResponse.MemberInfo(member));
         } else {
 
@@ -261,6 +260,7 @@ public class MemberService {
     private long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate) {
         return Duration.between(startDate.withSecond(0).withNano(0), endDate.withSecond(0).withNano(0)).toDays();
     }
+
     @Transactional(readOnly = true)
     public void checkEmail(String email) {
 
@@ -286,7 +286,6 @@ public class MemberService {
         }
 
     }
-
 
     private CommonResponse<?> registerNewMember(MemberRequest.SignUp signUpRequest) {
 
