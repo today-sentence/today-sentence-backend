@@ -18,13 +18,22 @@ import java.util.List;
 @Tag(name = "저장 API")
 public interface BookmarkApiSpec {
 
-    @Operation(summary = "명언 글 저장하기")
+    @Operation(summary = "명언 글 저장/취소하기")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", content = @Content(mediaType = "application/json", examples = {
+            @ApiResponse(responseCode = "200", description = "저장 성공 시에는 현재 연도와 월을 기준으로 저장됨, 취소 시에는 false로 반환", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "명언 글 저장 성공", value = """
                             {
                                 "data": {
-                                    "success" : true
+                                    "saved":true,
+                                    "year":2024,
+                                    "month":11
+                                }
+                            }
+                            """),
+                    @ExampleObject(name = "명언 글 저장취소 성공", value = """
+                            {
+                                "data": {
+                                    "saved":false
                                 }
                             }
                             """)
