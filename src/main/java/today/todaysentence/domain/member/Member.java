@@ -27,16 +27,18 @@ public class Member extends Timestamped {
     private String password;
 
     @Column(nullable = false,unique = true)
-    @Setter
     private String nickname;
 
-    @Setter
     @Builder.Default
     private String statusMessage = "상태메시지를 입력해주세요.";
 
     @Column(name = "nickname_updated_at")
     @Builder.Default
     private LocalDateTime nicknameUpdatedAt = LocalDateTime.now();
+
+    @Column(name = "email_updated_at")
+    @Builder.Default
+    private LocalDateTime emailUpdatedAt = LocalDateTime.now();
 
     @Column(name = "password_updated_at")
     @Builder.Default
@@ -64,5 +66,13 @@ public class Member extends Timestamped {
         this.nickname+="_W_"+UUID.randomUUID().toString();
         this.setDeletedAt(LocalDateTime.now());
     }
+    public void changeEmail(String email){
+        this.email = email;
+    }public void changeNickname(String nickname){
+        this.nickname = nickname;
+    }public void changeMessage(String message){
+        this.statusMessage = message;
+    }
+
 
 }
