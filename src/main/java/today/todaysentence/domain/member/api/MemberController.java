@@ -74,11 +74,19 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
+    @PutMapping("/change-email")
+    public CommonResponse<?> changeEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody MemberRequest.CheckEmail email) {
+        return memberService.changeEmail(userDetails, email.email());
+    }
+
+    @Override
     @PutMapping("/change-message")
     public CommonResponse<?> changeMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @RequestBody @Valid MemberRequest.CheckMessage message) {
         return memberService.changeMessage(userDetails,message);
     }
+
 
     @Override
     @PostMapping("/find-email")

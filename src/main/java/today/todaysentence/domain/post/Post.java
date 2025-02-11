@@ -10,6 +10,7 @@ import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.global.timeStamped.Timestamped;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,5 +57,9 @@ public class Post extends Timestamped {
         return hashtags.stream()
                 .map(Hashtag::getName)
                 .toList();
+    }
+
+    public void deleted(){
+        this.deletedAt= LocalDateTime.now();
     }
 }
