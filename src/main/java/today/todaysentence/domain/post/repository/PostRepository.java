@@ -3,6 +3,7 @@ package today.todaysentence.domain.post.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
@@ -10,6 +11,7 @@ import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.search.dto.SearchResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,6 +88,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<SearchResponse.PostSearchResult> findPostsCategory(@Param("search") String search,
                                                            @Param("limit") int limit,
                                                            @Param("offset") int offset);
+
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.deletedAt < :thirtyDays")
+    int deletePostsDeletedBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
+
+    List<Post> findByWriter(Member member);
+
+    @Query("SELECT p.id FROM Post p WHERE p.deletedAt < :oneMinuteAgo")
+    List<Long> findPostIdsDeletedBefore(@Param("oneMinuteAgo") LocalDateTime oneMinuteAgo);
+
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.id IN :ids")
+    void deleteByPostIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT p.id FROM Post p WHERE p.writer.id IN :memberIds" )
+    List<Long> findPostIdsDeleteToMemberIds(@Param("memberIds") List<Long> memberIds);
+
 
 //    검색결과의 총 개수 혹시나 추후사용 가능성이 있어서 만들어만놓았어요
 //    @Query(value = "SELECT COUNT(DISTINCT p.id) " +
