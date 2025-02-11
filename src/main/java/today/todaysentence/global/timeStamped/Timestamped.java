@@ -26,7 +26,6 @@ public class Timestamped {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
-    @Setter
-    private LocalDateTime deletedAt;
+    protected LocalDateTime deletedAt;
 }
 
