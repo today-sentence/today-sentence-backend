@@ -1,0 +1,30 @@
+package today.todaysentence.domain.comment.api;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import today.todaysentence.domain.comment.dto.CommentRequest;
+import today.todaysentence.domain.comment.service.CommentService;
+import today.todaysentence.domain.member.Member;
+import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.CustomUserDetails;
+
+@RequiredArgsConstructor
+@RestController
+public class CommentController {
+    private final CommentService commentService;
+
+    @PostMapping("/posts/{post_id}/comments")
+    public CommonResponse<?> createComment(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                           @PathVariable(name = "post_id") Long postId,
+                                           @Valid @RequestBody CommentRequest.Create request) {
+        Member member = userDetails.member();
+        commentService.create(member, postId, request);
+
+        return CommonResponse.success();
+    }
+}
