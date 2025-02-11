@@ -194,7 +194,7 @@ public class MemberService {
 
         redisService.saveCode(email,code,CODE_TIME);
 
-        return CommonResponse.ok("입력하신 메일로 인증번호 전송 완료.");
+        return CommonResponse.ok(true);
     }
 
     public CommonResponse<?> checkVerifyCode(String email, String code) {
