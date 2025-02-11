@@ -187,6 +187,7 @@ public class MemberService {
     }
 
     public CommonResponse<?> sendEmail(String email) throws MessagingException {
+        log.info("debuging email : {}",email);
 
         checkEmail(email);
 
