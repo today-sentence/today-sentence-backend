@@ -19,6 +19,8 @@ import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.member.repository.WithdrawRepository;
+import today.todaysentence.domain.post.Post;
+import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -39,6 +41,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final WithdrawRepository withdrawRepository;
+    private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -134,6 +137,9 @@ public class MemberService {
         Member member = userDetails.member();
 
         String originEmail = member.getEmail();
+
+        postRepository.findByWriter(member)
+                .forEach(Post::deleted);
 
         member.withdraw();
         WithdrawMember wMember = WithdrawMember
