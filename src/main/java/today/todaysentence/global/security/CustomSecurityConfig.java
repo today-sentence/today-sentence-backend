@@ -1,6 +1,7 @@
 package today.todaysentence.global.security;
 
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,7 @@ import today.todaysentence.global.jwt.JwtAuthFilter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 @Configuration
 @EnableWebSecurity
@@ -54,6 +52,8 @@ public class CustomSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    private final EndpointHandler endpointHandler;
+
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -74,6 +74,7 @@ public class CustomSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
 
                 .authorizeHttpRequests(request->{
 
@@ -86,8 +87,17 @@ public class CustomSecurityConfig {
                             .toArray(String[]::new);
 
                     request.requestMatchers(permitAllUri).permitAll()
+                            .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                             .anyRequest().authenticated();
                 })
+                .exceptionHandling(configure -> {
+                    configure
+                            .authenticationEntryPoint(endpointHandler)
+                            .accessDeniedHandler(endpointHandler);
+                });
+
+
+
 
                 ;
         return http.build();

@@ -2,9 +2,7 @@ package today.todaysentence.domain.member.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import today.todaysentence.util.annotation.ValidMessage;
-import today.todaysentence.util.annotation.ValidNickname;
-import today.todaysentence.util.annotation.ValidPassword;
+import today.todaysentence.util.annotation.*;
 
 public class MemberRequest {
 
@@ -25,11 +23,14 @@ public class MemberRequest {
             @NotBlank
             @ValidPassword
             String password) {
+            @Override
+            public String toString() {
+                return "CheckPassword {" +
+                        "password='[PROTECTED]'" +
+                        '}';
+            }
     }
-    public record VerificationPassword(
-            @NotBlank
-            String password) {
-    }
+
     public record CheckMessage(
             @NotBlank
             @ValidMessage
@@ -45,6 +46,14 @@ public class MemberRequest {
             @NotBlank
             @ValidPassword
             String password) {
+        @Override
+        public String toString() {
+            return "SignUp {" +
+                    "email='" + email + '\'' +
+                    "nickname='" + nickname + '\'' +
+                    ", password='[PROTECTED]'" +
+                    '}';
+        }
     }
 
     public record SignIn(
@@ -54,15 +63,13 @@ public class MemberRequest {
             @NotBlank
             @ValidPassword
             String password) {
-    }
-    public record FindEmail(
-            @NotBlank
-            String nickname ){
-    }
-    public record FindPassword(
-            @NotBlank
-            @Email
-            String email ){
+        @Override
+        public String toString() {
+            return "SignIn {" +
+                    "email='" + email + '\'' +
+                    ", password='[PROTECTED]'" +
+                    '}';
+        }
     }
 
     public record VerifyCodeCheck(
