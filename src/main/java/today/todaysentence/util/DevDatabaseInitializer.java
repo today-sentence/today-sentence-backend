@@ -42,8 +42,8 @@ public class DevDatabaseInitializer implements CommandLineRunner {
         for (int i = 1; i <= 10; i++) {
             Member member = Member
                     .builder()
-                    .nickname("testt" + i)
-                    .email("test" + i + "@test.com")
+                    .nickname("testT" + i)
+                    .email("testT" + i + "@test.com")
                     .password(passwordEncoder.encode("!123456789a"))
                     .build();
             members.add(member);
