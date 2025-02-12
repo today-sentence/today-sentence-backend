@@ -12,8 +12,6 @@ import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.service.PostService;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
 public class CommentService {
@@ -27,17 +25,23 @@ public class CommentService {
         commentRepository.save(new Comment(member, postId, request.content()));
     }
 
-    public List<CommentResponse.CommentInfo> getComments(Long postId, Pageable pageable) {
+    public CommentResponse.CommentInfos getComments(Long postId, Pageable pageable) {
         postService.validatePost(postId);
 
         Slice<Comment> comments = commentRepository.findByPostId(postId, pageable);
 
-        return comments.stream()
-                .map(comment -> new CommentResponse.CommentInfo(
-                        comment.getMember().getNickname(),
-                        comment.getContent(),
-                        comment.getCreateAt()
-                ))
-                .toList();
+        return new CommentResponse.CommentInfos(
+                comments.stream()
+                        .map(comment -> new CommentResponse.CommentInfo(
+                                comment.getMember().getNickname(),
+                                comment.getContent(),
+                                comment.getCreateAt()
+                        ))
+                        .toList(),
+                comments.getNumber(),
+                comments.getNumberOfElements(),
+                comments.hasNext()
+        );
+
     }
 }

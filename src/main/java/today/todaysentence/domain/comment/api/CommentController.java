@@ -19,12 +19,11 @@ import today.todaysentence.domain.comment.service.CommentService;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
-
-import java.util.List;
+import today.todaysentence.global.swagger.CommentApiSpec;
 
 @RequiredArgsConstructor
 @RestController
-public class CommentController {
+public class CommentController implements CommentApiSpec {
     private final CommentService commentService;
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -39,8 +38,8 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{post_id}/comments")
-    public CommonResponse<List<CommentResponse.CommentInfo>> getComments(@PathVariable(name = "post_id") Long postId,
-                                                                         @PageableDefault(sort = "createAt", direction = Sort.Direction.ASC) Pageable pageable) {
+    public CommonResponse<CommentResponse.CommentInfos> getComments(@PathVariable(name = "post_id") Long postId,
+                                                                    @PageableDefault(sort = "createAt", direction = Sort.Direction.ASC) Pageable pageable) {
         return CommonResponse.ok(commentService.getComments(postId, pageable));
     }
 }
