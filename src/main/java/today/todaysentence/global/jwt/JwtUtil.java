@@ -1,12 +1,11 @@
 package today.todaysentence.global.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,14 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.redis.RedisService;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 import today.todaysentence.global.security.userDetails.UserDetailsServiceImpl;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import io.jsonwebtoken.security.Keys;
 import java.time.Duration;
@@ -33,12 +30,13 @@ import static today.todaysentence.global.exception.exception.ExceptionCode.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtUtil {
 
     private static final String BEARER_PREFIX ="Bearer ";
     public static final String ACCESS_KEY ="ACCESS-TOKEN";
     public static final String REFRESH_KEY ="REFRESH-TOKEN";
-    private static final long ACCESS_TIME = Duration.ofMinutes(5).toMillis();
+    private static final long ACCESS_TIME = Duration.ofMinutes(15).toMillis();
     private static final long REFRESH_TIME = Duration.ofDays(7).toMillis();
     private final MemberRepository memberRepository;
 
@@ -108,15 +106,16 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SignatureException | SecurityException | MalformedJwtException e) {
-            throw new BaseException(INVALID_TOKEN);
+        } catch (SecurityException | MalformedJwtException e) {
+            log.info("Invalid JWT signature, 유효하지 않은 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
-            throw new BaseException(EXPIRED_TOKEN);
+            log.info("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {
-            throw new BaseException(UNSUPPORTED_TOKEN);
+            log.info("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
-            throw new BaseException(WRONG_TOKEN);
+            log.info("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
+        return false;
     }
 
     public void setHeaderToken(HttpServletResponse response, String accessToken, String refreshToken) {
@@ -195,7 +194,6 @@ public class JwtUtil {
     private void validateDeviceId(String memberEmail, String deviceId) {
         MemberDeviceIdDto memberDeviceIdDto = redisService.getRefreshToken(memberEmail);
         if (memberDeviceIdDto == null || deviceId == null || !deviceId.equals(memberDeviceIdDto.deviceId())) {
-            redisService.deleteRefreshToken(memberEmail);
             throw new BaseException(NOT_ACCORDANCE_DEVICE_ID);
         }
     }
