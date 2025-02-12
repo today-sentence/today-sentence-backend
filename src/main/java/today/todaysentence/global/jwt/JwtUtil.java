@@ -36,7 +36,7 @@ public class JwtUtil {
     private static final String BEARER_PREFIX ="Bearer ";
     public static final String ACCESS_KEY ="ACCESS-TOKEN";
     public static final String REFRESH_KEY ="REFRESH-TOKEN";
-    private static final long ACCESS_TIME = Duration.ofSeconds(15).toMillis();
+    private static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis();
     private static final long REFRESH_TIME = Duration.ofDays(7).toMillis();
     private final MemberRepository memberRepository;
 
