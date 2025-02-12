@@ -2,6 +2,9 @@ package today.todaysentence.domain.comment.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +39,8 @@ public class CommentController {
     }
 
     @GetMapping("/posts/{post_id}/comments")
-    public CommonResponse<List<CommentResponse.CommentInfo>> getComments(@PathVariable(name = "post_id") Long postId) {
-        return CommonResponse.ok(commentService.getComments(postId));
+    public CommonResponse<List<CommentResponse.CommentInfo>> getComments(@PathVariable(name = "post_id") Long postId,
+                                                                         @PageableDefault(sort = "createAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        return CommonResponse.ok(commentService.getComments(postId, pageable));
     }
 }

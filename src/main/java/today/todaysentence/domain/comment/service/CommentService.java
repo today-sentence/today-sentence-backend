@@ -1,6 +1,8 @@
 package today.todaysentence.domain.comment.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.comment.Comment;
@@ -25,10 +27,10 @@ public class CommentService {
         commentRepository.save(new Comment(member, postId, request.content()));
     }
 
-    public List<CommentResponse.CommentInfo> getComments(Long postId) {
+    public List<CommentResponse.CommentInfo> getComments(Long postId, Pageable pageable) {
         postService.validatePost(postId);
 
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreateAtAsc(postId);
+        Slice<Comment> comments = commentRepository.findByPostId(postId, pageable);
 
         return comments.stream()
                 .map(comment -> new CommentResponse.CommentInfo(
