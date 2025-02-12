@@ -73,7 +73,7 @@ public class PostService {
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 
-    public void isValidPost(Long postId) {
+    public void validatePost(Long postId) {
         if (postRepository.existsById(postId)) {
             return;
         }

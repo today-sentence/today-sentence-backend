@@ -9,7 +9,6 @@ import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.service.PostService;
-import today.todaysentence.global.response.CommonResponse;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class BookmarkService {
 
     @Transactional
     public BookmarkResponse.SavedStatus bookmark(Long postId, Member member) {
-        postService.isValidPost(postId);
+        postService.validatePost(postId);
 
         Bookmark bookmark = bookmarkRepository.findByMemberAndPostId(member, postId)
                 .orElseGet(() -> bookmarkRepository.save(new Bookmark(member, postId)));
