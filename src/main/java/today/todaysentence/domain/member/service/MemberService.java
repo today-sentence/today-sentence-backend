@@ -118,8 +118,8 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public CommonResponse<?> findEmail(@NotBlank String nickname) {
-        Member member = memberRepository.findByNickname(nickname)
+    public CommonResponse<?> findEmail(MemberRequest.CheckNickname nickname) {
+        Member member = memberRepository.findByNickname(nickname.nickname())
                 .orElseThrow(() -> new BaseException(ExceptionCode.MEMBER_NOT_FOUND));
         String email = member.getEmail();
         int findIndex = email.indexOf("@");
@@ -153,9 +153,9 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> findPassword(String email) throws MessagingException {
+    public CommonResponse<?> findPassword(MemberRequest.CheckEmail email) throws MessagingException {
 
-        Member member = findByEmail(email);
+        Member member = findByEmail(email.email());
         String newPassword = VerificationCodeGenerator.generatePassword();
 
         member.passwordChange(passwordEncoder.encode(newPassword));
@@ -163,7 +163,7 @@ public class MemberService {
         memberRepository.save(member);
 
 
-        emailSenderService.sendEmailTemporaryPassword(email,newPassword);
+        emailSenderService.sendEmailTemporaryPassword(email.email(),newPassword);
 
         return CommonResponse.ok("임시 비밀번호 발급 완료");
 
@@ -182,11 +182,11 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails, String password) {
+    public CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password) {
 
         Member member = userDetails.member();
 
-        if(!passwordEncoder.matches(password,member.getPassword())){
+        if(!passwordEncoder.matches(password.password(),member.getPassword())){
             throw new BaseException(ExceptionCode.NOT_MATCHED_INFORMATION);
         }
         return CommonResponse.success();
@@ -226,9 +226,9 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> changeEmail(CustomUserDetails userDetails, @NotBlank @Email String email) {
+    public CommonResponse<?> changeEmail(CustomUserDetails userDetails,MemberRequest.CheckEmail email) {
 
-        return changeField(userDetails.member(),EMAIL_TYPE,email);
+        return changeField(userDetails.member(),EMAIL_TYPE,email.email());
 
     }
 
