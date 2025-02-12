@@ -1,6 +1,5 @@
 package today.todaysentence.global.security;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class EndpointHandler extends Http403ForbiddenEntryPoint implements Acces
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "NOT FOUND");
         } else {
             if (exception instanceof AuthenticationException) {
-                super.commence(request, response, (AuthenticationException) exception);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             } else if (exception instanceof AccessDeniedException) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
             }
