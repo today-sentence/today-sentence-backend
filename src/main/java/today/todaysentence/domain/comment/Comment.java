@@ -5,14 +5,17 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.global.timeStamped.Timestamped;
 
+@Table(indexes = @Index(name = "idx_comment_post_id_create_at", columnList = "postId, createAt"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
