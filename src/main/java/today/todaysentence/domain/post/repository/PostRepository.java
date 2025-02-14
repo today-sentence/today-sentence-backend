@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
+import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.search.dto.SearchResponse;
 
 import java.time.LocalDateTime;
@@ -118,6 +119,30 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    Long countPostsByCategory(@Param("search") String search);
 
   boolean existsById(@NonNull Long id);
+
+  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+            "p.category, COUNT(*)" +
+            ")  " +
+            "FROM Post p " +
+            "WHERE p.writer.id = :memberId " +
+            "GROUP BY p.category")
+  List<PostResponse.CategoryCount> findByMemberRecordsStatistics(@Param("memberId") Long id);
+
+  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+            "p.category, COUNT(*)" +
+            ")  " +
+            "FROM Post p " +
+            "WHERE p.id IN " +
+                "(SELECT b.postId " +
+                "FROM Bookmark b " +
+                "WHERE b.member.id = :memberId ) " +
+            "GROUP BY p.category")
+  List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
+
+
+
+
+
 }
 
 

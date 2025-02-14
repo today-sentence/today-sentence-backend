@@ -3,6 +3,7 @@ package today.todaysentence.domain.post.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import today.todaysentence.domain.book.dto.BookInfo;
+import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.member.Member;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.Book;
@@ -16,9 +17,15 @@ import today.todaysentence.domain.post.repository.PostQueryRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.exception.exception.PostException;
+import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -80,4 +87,27 @@ public class PostService {
 
         throw new PostException(ExceptionCode.POST_NOT_FOUND);
     }
+
+
+    @Transactional(readOnly = true)
+    public CommonResponse<PostResponse.Statistics> getStatistics(CustomUserDetails userDetails) {
+
+        List<PostResponse.CategoryCount> recordsStatistics =postRepository.findByMemberRecordsStatistics(userDetails.member().getId());
+        List<PostResponse.CategoryCount> bookmarkStatistics =postRepository.findByMemberBookmarksStatistics(userDetails.member().getId());
+
+        Map<Category, Long> records = new EnumMap<>(Category.class);
+        Map<Category, Long> bookmarks = new EnumMap<>(Category.class);
+
+        for(Category c : Category.values()){
+            records.put(c,0L);
+            bookmarks.put(c,0L);
+        }
+        recordsStatistics.forEach(s->records.put(s.category(),s.count()));
+        bookmarkStatistics.forEach(s->bookmarks.put(s.category(),s.count()));
+
+
+        return CommonResponse.ok(new PostResponse.Statistics(records, bookmarks));
+
+    }
+
 }
