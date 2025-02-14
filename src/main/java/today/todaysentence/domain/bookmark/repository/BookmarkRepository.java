@@ -1,6 +1,7 @@
 package today.todaysentence.domain.bookmark.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import today.todaysentence.domain.bookmark.Bookmark;
@@ -18,4 +19,8 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
                                  @Param("year") int year);
 
     Optional<Bookmark> findByMemberAndPostId(Member member, Long postId);
+
+    @Modifying
+    @Query("DELETE FROM Bookmark b WHERE b.isSaved = false")
+    int deleteIsSavedFalse();
 }
