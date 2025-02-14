@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.global.response.CommonResponse;
@@ -131,4 +132,41 @@ public interface PostApiSpec {
             }))
     })
     CommonResponse<PostResponse.Detail> getPostDetail(Long post_id);
+
+
+
+    @Operation(summary = "통계 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "통계 조회 성공", value = """
+                            {
+                                 "data": {
+                                     "records": {
+                                         "POEM_NOVEL_ESSAY": 2,
+                                         "ECONOMY_MANAGEMENT": 3,
+                                         "HISTORY_SOCIETY": 3,
+                                         "PHILOSOPHY_PSYCHOLOGY": 1,
+                                         "SELF_DEVELOPMENT": 7,
+                                         "ARTS_PHYSICAL": 7,
+                                         "KID_YOUTH": 1,
+                                         "TRAVEL_CULTURE": 6,
+                                         "ETC": 1
+                                     },
+                                     "bookmarks": {
+                                         "POEM_NOVEL_ESSAY": 1,
+                                         "ECONOMY_MANAGEMENT": 2,
+                                         "HISTORY_SOCIETY": 3,
+                                         "PHILOSOPHY_PSYCHOLOGY": 2,
+                                         "SELF_DEVELOPMENT": 4,
+                                         "ARTS_PHYSICAL": 1,
+                                         "KID_YOUTH": 0,
+                                         "TRAVEL_CULTURE": 4,
+                                         "ETC": 1
+                                     }
+                                 }
+                             }
+                            """)
+            }))
+    })
+    CommonResponse<PostResponse.Statistics> getStatistics( CustomUserDetails userDetails);
 }

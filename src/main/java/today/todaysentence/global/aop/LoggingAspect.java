@@ -54,11 +54,11 @@ public class LoggingAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
-            log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result.toString());
+            log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result);
             return;
         }
         CustomUserDetails member = (CustomUserDetails) authentication.getPrincipal();
-        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", member.getMemberNickname(), methodName, result.toString());
+        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", member.getMemberNickname(), methodName, result);
     }
 
 
