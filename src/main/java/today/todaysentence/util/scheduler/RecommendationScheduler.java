@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.dailyquote.service.DailyQuoteService;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.repository.MemberRepository;
@@ -25,6 +26,7 @@ public class RecommendationScheduler {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     private final EntityManager entityManager;
 
@@ -41,6 +43,17 @@ public class RecommendationScheduler {
         int deletedCount = likeRepository.deleteIsLikeFalse();
 
         log.info("unliked delete process completed. Today deleted unliked: {}", deletedCount);
+
+        deleteCanceledBookmarkRecords();
+    }
+
+    @Transactional
+    public void deleteCanceledBookmarkRecords() {
+        log.info("bookmark delete process start");
+
+        int deletedCount = bookmarkRepository.deleteIsSavedFalse();
+
+        log.info("bookmark delete process completed. Today deleted bookmark: {}", deletedCount);
     }
 
     @Scheduled(cron = "0 0 2 * * ?")
