@@ -3,6 +3,7 @@ package today.todaysentence.domain.search.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.search.service.SearchService;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.swagger.SearchApiSpec;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +33,12 @@ public class SearchController implements SearchApiSpec {
 
         return searchService.findPosts(type,search,pageable);
 
+    }
+
+  @GetMapping("/hashtags")
+    public ResponseEntity<List<String>> getRelatedHashtags(@RequestParam("query") String query) {
+        List<String> relatedHashtags = searchService.getRelatedHashtags(query);
+        return ResponseEntity.ok(relatedHashtags);
     }
 
 

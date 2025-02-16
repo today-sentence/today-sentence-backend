@@ -55,4 +55,10 @@ public class PostController implements PostApiSpec {
     public CommonResponse<PostResponse.Detail> getPostDetail(@PathVariable("post_id") Long postId) {
         return CommonResponse.ok(postService.getPostDetail(postId));
     }
+
+    @GetMapping("/statistics")
+    public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return postService.getStatistics(userDetails);
+    }
+
 }

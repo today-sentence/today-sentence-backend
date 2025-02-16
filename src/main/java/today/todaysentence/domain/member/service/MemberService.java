@@ -19,6 +19,8 @@ import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.member.repository.WithdrawRepository;
+import today.todaysentence.domain.post.Post;
+import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -39,12 +41,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final WithdrawRepository withdrawRepository;
+    private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
     private final EmailSenderService emailSenderService;
 
+    private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
     private static final String MESSAGE_TYPE = "MESSAGE";
     private static final long RE_SIGNUP =7L;
@@ -67,13 +71,13 @@ public class MemberService {
                     LocalDateTime withdrawDate = withdrawMember.getCreateAt();
                     LocalDateTime now = LocalDateTime.now();
 
-                    long daysBetween = calculateDaysBetween(withdrawDate, now);
+                    long daysBetween = calculateDaysBetween(withdrawDate,now);
 
                     if (daysBetween >= CHANGE_FIELD_TIME) {
                         return registerNewMember(signUpRequest);
                     } else {
-                        String message = "이미 탈퇴한 회원입니다.";
-                        return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, withdrawDate.plusDays(CHANGE_FIELD_TIME)));
+                        String message = String.format("이미탈퇴한 회원입니다. 재가입 은 %d일 후에 변경 가능합니다.", CHANGE_FIELD_TIME);
+                        return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, withdrawDate.plusDays(CHANGE_FIELD_TIME).withSecond(0).withNano(0)));
                     }
 
                 })
@@ -114,8 +118,8 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public CommonResponse<?> findEmail(@NotBlank String nickname) {
-        Member member = memberRepository.findByNickname(nickname)
+    public CommonResponse<?> findEmail(MemberRequest.CheckNickname nickname) {
+        Member member = memberRepository.findByNickname(nickname.nickname())
                 .orElseThrow(() -> new BaseException(ExceptionCode.MEMBER_NOT_FOUND));
         String email = member.getEmail();
         int findIndex = email.indexOf("@");
@@ -134,6 +138,9 @@ public class MemberService {
 
         String originEmail = member.getEmail();
 
+        postRepository.findByWriter(member)
+                .forEach(Post::deleted);
+
         member.withdraw();
         WithdrawMember wMember = WithdrawMember
                 .builder()
@@ -146,9 +153,9 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> findPassword(String email) throws MessagingException {
+    public CommonResponse<?> findPassword(MemberRequest.CheckEmail email) throws MessagingException {
 
-        Member member = findByEmail(email);
+        Member member = findByEmail(email.email());
         String newPassword = VerificationCodeGenerator.generatePassword();
 
         member.passwordChange(passwordEncoder.encode(newPassword));
@@ -156,11 +163,12 @@ public class MemberService {
         memberRepository.save(member);
 
 
-        emailSenderService.sendEmailTemporaryPassword(email,newPassword);
-        
+        emailSenderService.sendEmailTemporaryPassword(email.email(),newPassword);
+
         return CommonResponse.ok("임시 비밀번호 발급 완료");
 
     }
+
 
 
     @Transactional
@@ -174,17 +182,18 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails, String password) {
+    public CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password) {
 
         Member member = userDetails.member();
 
-        if(!passwordEncoder.matches(password,member.getPassword())){
+        if(!passwordEncoder.matches(password.password(),member.getPassword())){
             throw new BaseException(ExceptionCode.NOT_MATCHED_INFORMATION);
         }
         return CommonResponse.success();
     }
 
     public CommonResponse<?> sendEmail(String email) throws MessagingException {
+        log.info("debuging email : {}",email);
 
         checkEmail(email);
 
@@ -194,7 +203,7 @@ public class MemberService {
 
         redisService.saveCode(email,code,CODE_TIME);
 
-        return CommonResponse.ok("입력하신 메일로 인증번호 전송 완료.");
+        return CommonResponse.ok(true);
     }
 
     public CommonResponse<?> checkVerifyCode(String email, String code) {
@@ -216,25 +225,40 @@ public class MemberService {
         return changeField(userDetails.member(),MESSAGE_TYPE,statusMessage.message());
     }
 
+    @Transactional
+    public CommonResponse<?> changeEmail(CustomUserDetails userDetails,MemberRequest.CheckEmail email) {
+
+        return changeField(userDetails.member(),EMAIL_TYPE,email.email());
+
+    }
 
 
+
+    @Transactional
     private CommonResponse<?> changeField(Member member, String type, String field){
 
-        LocalDateTime changedTime = type.equals(MESSAGE_TYPE) ? member.getMessageUpdatedAt() : member.getNicknameUpdatedAt();
-        long daysBetween = calculateDaysBetween(changedTime, LocalDateTime.now());
+        LocalDateTime changedTime = switch (type) {
+            case MESSAGE_TYPE -> member.getMessageUpdatedAt();
+            case NICKNAME_TYPE -> member.getNicknameUpdatedAt();
+            case EMAIL_TYPE -> member.getEmailUpdatedAt();
+            default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
+        };
 
-        if (daysBetween > RE_SIGNUP) {
-            if(type.equals(MESSAGE_TYPE)){
-                member.setStatusMessage(field);
-            }else if(type.equals(NICKNAME_TYPE)){
-                member.setNickname(field);
+        long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
+
+        if (daysBetween > CHANGE_FIELD_TIME) {
+            switch (type) {
+                case MESSAGE_TYPE -> member.changeMessage(field);
+                case NICKNAME_TYPE -> member.changeNickname(field);
+                case EMAIL_TYPE -> member.changeEmail(field);
             }
             memberRepository.save(member);
+
             return CommonResponse.ok(new MemberResponse.MemberInfo(member));
         } else {
 
             String message = String.format("%s 변경은 가입 or 수정 후 %d일 후에 변경 가능합니다.", type, CHANGE_FIELD_TIME);
-            return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, changedTime.plusDays(CHANGE_FIELD_TIME)));
+            return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, changedTime.plusDays(CHANGE_FIELD_TIME).withSecond(0).withNano(0)));
 
         }
 
@@ -243,6 +267,7 @@ public class MemberService {
     private long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate) {
         return Duration.between(startDate.withSecond(0).withNano(0), endDate.withSecond(0).withNano(0)).toDays();
     }
+
     @Transactional(readOnly = true)
     public void checkEmail(String email) {
 
@@ -269,7 +294,6 @@ public class MemberService {
 
     }
 
-
     private CommonResponse<?> registerNewMember(MemberRequest.SignUp signUpRequest) {
 
         checkEmail(signUpRequest.email());
@@ -285,7 +309,6 @@ public class MemberService {
 
         return CommonResponse.ok(new MemberResponse.MemberInfo(savedMember));
     }
-
 
 
 }

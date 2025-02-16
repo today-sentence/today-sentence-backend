@@ -5,10 +5,10 @@ public class SearchResponse {
 
     public record BookSearchResult(
             String bookTitle,
-            String author,
-            String coverUrl,
-            String publisher,
-            Integer publishingYear,
+            String bookAuthor,
+            String bookCover,
+            String bookPublisher,
+            Integer bookPublishingYear,
             Long postCount
 
     ){
@@ -18,10 +18,10 @@ public class SearchResponse {
     public record PostSearchResult(
             //book
             String bookTitle,
-            String author,
-            String coverUrl,
-            String publisher,
-            Integer publishingYear,
+            String bookAuthor,
+            String bookCover,
+            String bookPublisher,
+            Integer bookPublishingYear,
 
             //post
             Long postId,

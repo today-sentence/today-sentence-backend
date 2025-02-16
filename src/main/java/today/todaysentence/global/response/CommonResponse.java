@@ -22,4 +22,12 @@ public class CommonResponse<T> {
     public static CommonResponse<?> success() {
         return new CommonResponse<>(Map.of("success", true), null);
     }
+
+    @Override
+    public String toString() {
+        return "CommonResponse {" +
+                " data = " + data +
+                " , message='" + message + '\'' +
+                '}';
+    }
 }

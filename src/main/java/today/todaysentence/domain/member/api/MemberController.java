@@ -49,8 +49,8 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @PostMapping("/verify-password")
-    public CommonResponse<?> checkVerificationPassword(@AuthenticationPrincipal CustomUserDetails userDetails,@RequestBody MemberRequest.VerificationPassword password) {
-        return memberService.checkVerificationPassword(userDetails,password.password());
+    public CommonResponse<?> checkVerificationPassword(@AuthenticationPrincipal CustomUserDetails userDetails,@RequestBody MemberRequest.CheckPassword password) {
+        return memberService.checkVerificationPassword(userDetails,password);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MemberController implements MemberApiSpec {
     @Override
     @PostMapping("/find-password")
     public CommonResponse<?> findPassword(@RequestBody @Valid MemberRequest.CheckEmail email) throws MessagingException {
-        return memberService.findPassword(email.email());
+        return memberService.findPassword(email);
     }
 
     @Override
@@ -74,16 +74,24 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
+    @PutMapping("/change-email")
+    public CommonResponse<?> changeEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody MemberRequest.CheckEmail email) {
+        return memberService.changeEmail(userDetails,email);
+    }
+
+    @Override
     @PutMapping("/change-message")
     public CommonResponse<?> changeMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @RequestBody @Valid MemberRequest.CheckMessage message) {
         return memberService.changeMessage(userDetails,message);
     }
 
+
     @Override
     @PostMapping("/find-email")
-    public CommonResponse<?> findEmail(@RequestBody MemberRequest.FindEmail nickname) {
-        return memberService.findEmail(nickname.nickname());
+    public CommonResponse<?> findEmail(@RequestBody MemberRequest.CheckNickname nickname) {
+        return memberService.findEmail(nickname);
 
     }
 

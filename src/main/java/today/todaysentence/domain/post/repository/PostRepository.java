@@ -1,11 +1,13 @@
 package today.todaysentence.domain.post.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
+import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.search.dto.SearchResponse;
 
 import java.time.LocalDateTime;
@@ -86,6 +88,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                                            @Param("limit") int limit,
                                                            @Param("offset") int offset);
 
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.deletedAt < :thirtyDays")
+    int deletePostsDeletedBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
+
+    List<Post> findByWriter(Member member);
+
+    @Query("SELECT p.id FROM Post p WHERE p.deletedAt < :oneMinuteAgo")
+    List<Long> findPostIdsDeletedBefore(@Param("oneMinuteAgo") LocalDateTime oneMinuteAgo);
+
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.id IN :ids")
+    void deleteByPostIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT p.id FROM Post p WHERE p.writer.id IN :memberIds" )
+    List<Long> findPostIdsDeleteToMemberIds(@Param("memberIds") List<Long> memberIds);
+
+
 //    검색결과의 총 개수 혹시나 추후사용 가능성이 있어서 만들어만놓았어요
 //    @Query(value = "SELECT COUNT(DISTINCT p.id) " +
 //            "FROM post p " +
@@ -99,6 +118,25 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    Long countPostsByCategory(@Param("search") String search);
 
   boolean existsById(@NonNull Long id);
+
+  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+            "p.category, COUNT(*)" +
+            ")  " +
+            "FROM Post p " +
+            "WHERE p.writer.id = :memberId " +
+            "GROUP BY p.category")
+  List<PostResponse.CategoryCount> findByMemberRecordsStatistics(@Param("memberId") Long id);
+
+  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+            "p.category, COUNT(*)" +
+            ")  " +
+            "FROM Post p " +
+            "WHERE p.id IN " +
+                "(SELECT b.postId " +
+                "FROM Bookmark b " +
+                "WHERE b.member.id = :memberId ) " +
+            "GROUP BY p.category")
+  List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
 
   @Query(value = """
     SELECT p.*

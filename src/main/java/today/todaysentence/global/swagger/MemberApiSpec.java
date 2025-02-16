@@ -187,7 +187,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,MemberRequest.VerificationPassword password);
+    CommonResponse<?> checkVerificationPassword(CustomUserDetails userDetails,MemberRequest.CheckPassword password);
 
     @Operation(summary = "회원정보 변경 - 닉네임 변경")
     @ApiResponses({
@@ -230,6 +230,18 @@ public interface MemberApiSpec {
             }))
     })
     CommonResponse<?> changePassword(CustomUserDetails userDetails, MemberRequest.CheckPassword password);
+
+    @Operation(summary = "회원정보 변경 - 이메일 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "이메일 변경 성공", value = """
+                            {
+                                "success" : true
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<?> changeEmail(CustomUserDetails userDetails, MemberRequest.CheckEmail email);
 
     @Operation(summary = "회원정보 변경 - 상태메시지 변경")
     @ApiResponses({
@@ -277,7 +289,7 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> findEmail(MemberRequest.FindEmail nickname);
+    CommonResponse<?> findEmail(MemberRequest.CheckNickname nickname);
 
     @Operation(summary = "회원정보 검색 - 비밀번호찾기")
     @ApiResponses({
