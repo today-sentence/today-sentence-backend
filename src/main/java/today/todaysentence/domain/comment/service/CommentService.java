@@ -20,13 +20,13 @@ public class CommentService {
 
     @Transactional
     public void create(Member member, Long postId, CommentRequest.Create request) {
-        postService.validatePost(postId);
+        postService.isValidPost(postId);
 
         commentRepository.save(new Comment(member, postId, request.content()));
     }
 
     public CommentResponse.CommentInfos getComments(Long postId, Pageable pageable) {
-        postService.validatePost(postId);
+        postService.isValidPost(postId);
 
         Slice<Comment> comments = commentRepository.findByPostId(postId, pageable);
 

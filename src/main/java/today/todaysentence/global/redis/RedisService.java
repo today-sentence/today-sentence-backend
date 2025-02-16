@@ -1,22 +1,25 @@
 package today.todaysentence.global.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import today.todaysentence.domain.post.dto.ScheduledPosts;
 import today.todaysentence.global.jwt.MemberDeviceIdDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RedisService {
+    private final String DUPLICATED_POST_IDS_KEY = "duplicatePostIds";
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -102,4 +105,25 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
+    public Set<Long> getDuplicatedPostIds() {
+        if(!Boolean.TRUE.equals(redisTemplate.hasKey(DUPLICATED_POST_IDS_KEY))) {
+            throw new RuntimeException("키를 찾을 수 없습니다. : " + DUPLICATED_POST_IDS_KEY);
+        }
+
+        return redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).stream()
+                .map(id -> (Long)id)
+                .collect(Collectors.toSet());
+    }
+
+    public void addScheduledPosts(List<ScheduledPosts> scheduledPostsList) {
+        scheduledPostsList.forEach(scheduledPosts -> {
+                redisTemplate.opsForHash().put(scheduledPosts.category().name(), "post_id", scheduledPosts.postIds());
+                redisTemplate.opsForHash().put(scheduledPosts.category().name(), "writer_id", scheduledPosts.writerIds());
+                });
+
+        Set<Long> addedPostIds = scheduledPostsList.stream()
+                .flatMap(scheduledPosts -> scheduledPosts.postIds().stream())
+                .collect(Collectors.toSet());
+        redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).addAll(addedPostIds);
+    }
 }

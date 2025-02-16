@@ -20,7 +20,7 @@ public class BookmarkService {
 
     @Transactional
     public BookmarkResponse.SavedStatus bookmark(Long postId, Member member) {
-        postService.validatePost(postId);
+        postService.isValidPost(postId);
 
         Bookmark bookmark = bookmarkRepository.findByMemberAndPostId(member, postId)
                 .orElseGet(() -> bookmarkRepository.save(new Bookmark(member, postId)));

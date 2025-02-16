@@ -13,6 +13,7 @@ import today.todaysentence.domain.hashtag.service.HashtagService;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
+import today.todaysentence.domain.post.dto.ScheduledPosts;
 import today.todaysentence.domain.post.repository.PostQueryRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -24,8 +25,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -34,11 +35,6 @@ public class PostService {
     private final HashtagService hashtagService;
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
-
-    public Post findRandomPostNotInProvided(Member member, List<Long> recommendedPostIds) {
-        return postQueryRepository.findOneNotInRecommended(member, recommendedPostIds)
-                .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
-    }
 
     @Transactional
     public void record(PostRequest.Record dto, Member member) {
@@ -80,7 +76,7 @@ public class PostService {
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 
-    public void validatePost(Long postId) {
+    public void isValidPost(Long postId) {
         if (postRepository.existsById(postId)) {
             return;
         }
@@ -110,4 +106,13 @@ public class PostService {
 
     }
 
+
+    public List<ScheduledPosts> fetchScheduledPostsByEachCategory(int countForEach, Set<Long> duplicatedIds) {
+        return Arrays.stream(Category.values())
+                .map(Category::name)
+                .map(category -> postRepository.findRandomPostsByCategoryAndNotInIds(category, duplicatedIds, countForEach))
+                .filter(posts -> !posts.isEmpty())
+                .map(PostMapper::toScheduledPosts)
+                .toList();
+    }
 }

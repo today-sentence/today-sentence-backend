@@ -17,6 +17,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(
+        indexes = @Index(name = "idx_category", columnList = "category") // 단일 인덱스 적용
+)
 public class Post extends Timestamped {
 
     @Id
@@ -39,7 +42,6 @@ public class Post extends Timestamped {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
-
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Hashtag> hashtags = new ArrayList<>();
 
