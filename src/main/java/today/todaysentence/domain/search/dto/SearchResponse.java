@@ -1,6 +1,8 @@
 package today.todaysentence.domain.search.dto;
 
 
+import java.time.LocalDateTime;
+
 public class SearchResponse {
 
     public record BookSearchResult(
@@ -29,9 +31,11 @@ public class SearchResponse {
             String postContent,
             String category,
             String hashtags,
+            String createAt,
 
             //like_count
-            Long likesCount
+            Long likesCount,
+            Long bookmarkCount
     ) {}
 
 
