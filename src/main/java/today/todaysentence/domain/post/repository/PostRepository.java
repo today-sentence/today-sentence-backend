@@ -28,12 +28,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "b.title , b.author , b.cover, b.publisher, b.publishing_year, " +
             "p.id , m.nickname, p.content, p.category , " +
             "GROUP_CONCAT(DISTINCT h.name), " +
-            "COUNT(l.id) as like_count " +
+            "CAST(p.create_at AS CHAR) AS create_at, " +
+            "COUNT(l.id) as like_count, " +
+            "COUNT(bm.id) as bookmark_count " +
             "FROM post p " +
             "INNER JOIN member m ON m.id = p.writer_id " +
             "INNER JOIN book b ON b.isbn = p.book_isbn " +
             "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
             "LEFT JOIN likes l ON l.post_id = p.id " +
+            "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
             "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
             "WHERE b.title = :search " +
             "GROUP BY p.id " +
@@ -48,13 +51,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT " +
             "b.title, b.author, b.cover, b.publisher, b.publishing_year, " +
             "p.id, m.nickname, p.content, p.category, " +
-            "GROUP_CONCAT(DISTINCT h.name) AS hashtags, " +
-            "COUNT(l.id) AS like_count " +
+            "GROUP_CONCAT(DISTINCT h.name) AS hashtags," +
+            "CAST(p.create_at AS CHAR) AS create_at, " +
+            "COUNT(l.id) AS like_count, " +
+            "COUNT(bm.id) AS bookmark_count " +
             "FROM post p " +
             "INNER JOIN member m ON m.id = p.writer_id " +
             "INNER JOIN book b ON b.isbn = p.book_isbn " +
             "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
             "LEFT JOIN likes l ON l.post_id = p.id " +
+            "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
             "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
             "WHERE ph.post_id IN (" +
             "  SELECT ph.post_id " +
@@ -73,12 +79,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "b.title , b.author , b.cover, b.publisher, b.publishing_year, " +
             "p.id , m.nickname, p.content, p.category , " +
             "GROUP_CONCAT(DISTINCT h.name), " +
-            "COUNT(l.id) as like_count " +
+            "CAST(p.create_at AS CHAR) AS create_at, " +
+            "COUNT(l.id) as like_count, " +
+            "COUNT(bm.id) AS bookmark_count " +
             "FROM post p " +
             "INNER JOIN member m ON m.id = p.writer_id " +
             "INNER JOIN book b ON b.isbn = p.book_isbn " +
             "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
             "LEFT JOIN likes l ON l.post_id = p.id " +
+            "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
             "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
             "WHERE p.category = :search " +
             "GROUP BY p.id " +
@@ -117,17 +126,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //             nativeQuery = true)
 //    Long countPostsByCategory(@Param("search") String search);
 
-  boolean existsById(@NonNull Long id);
+    boolean existsById(@NonNull Long id);
 
-  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+    @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
             "p.category, COUNT(*)" +
             ")  " +
             "FROM Post p " +
             "WHERE p.writer.id = :memberId " +
             "GROUP BY p.category")
-  List<PostResponse.CategoryCount> findByMemberRecordsStatistics(@Param("memberId") Long id);
+    List<PostResponse.CategoryCount> findByMemberRecordsStatistics(@Param("memberId") Long id);
 
-  @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
+    @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
             "p.category, COUNT(*)" +
             ")  " +
             "FROM Post p " +
@@ -136,25 +145,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 "FROM Bookmark b " +
                 "WHERE b.member.id = :memberId ) " +
             "GROUP BY p.category")
-  List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
 
-  @Query(value = """
-    SELECT p.*
-    FROM Post p
-    WHERE p.category = :category
-    AND p.id NOT IN :duplicatedIds
-    ORDER BY RAND()
-    LIMIT :count
-    """, nativeQuery = true)
-  List<Post> findRandomPostsByCategoryAndNotInIds(String category, Set<Long> duplicatedIds, int count);
-}
+    List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
 
-
-
-
-
-
-
-
-
-
+    @Query(value = """
+      SELECT p.*
+      FROM Post p
+      WHERE p.category = :category
+      AND p.id NOT IN :duplicatedIds
+      ORDER BY RAND()
+      LIMIT :count
+      """, nativeQuery = true)
+    List<Post> findRandomPostsByCategoryAndNotInIds(String category, Set<Long> duplicatedIds, int count);
+           }
