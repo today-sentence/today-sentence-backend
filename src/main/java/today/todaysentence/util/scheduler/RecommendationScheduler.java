@@ -1,18 +1,15 @@
 package today.todaysentence.util.scheduler;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
-import today.todaysentence.domain.dailyquote.service.DailyQuoteService;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
