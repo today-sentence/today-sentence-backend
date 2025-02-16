@@ -4,13 +4,14 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.book.dto.BookInfo;
-import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
+import today.todaysentence.domain.post.dto.ScheduledPosts;
 
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -59,5 +60,13 @@ public class PostMapper {
                 .category(post.getCategory().name())
                 .hashtags(post.getHashtagNames())
                 .build();
+    }
+
+    public static ScheduledPosts toScheduledPosts(List<Post> posts) {
+        return new ScheduledPosts(
+                posts.get(0).getCategory(),
+                posts.stream().map(Post::getId).toList(),
+                posts.stream().map(Post::getWriter).map(Member::getId).toList()
+        );
     }
 }

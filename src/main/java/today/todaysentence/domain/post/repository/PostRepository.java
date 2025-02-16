@@ -1,7 +1,5 @@
 package today.todaysentence.domain.post.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +11,7 @@ import today.todaysentence.domain.search.dto.SearchResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -100,6 +99,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    Long countPostsByCategory(@Param("search") String search);
 
   boolean existsById(@NonNull Long id);
+
+  @Query(value = """
+    SELECT p.*
+    FROM Post p
+    WHERE p.category = :category
+    AND p.id NOT IN :duplicatedIds
+    ORDER BY RAND()
+    LIMIT :count
+    """, nativeQuery = true)
+  List<Post> findRandomPostsByCategoryAndNotInIds(String category, Set<Long> duplicatedIds, int count);
 }
 
 
