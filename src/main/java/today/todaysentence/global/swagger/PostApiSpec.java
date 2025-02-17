@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
+import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
@@ -169,4 +170,31 @@ public interface PostApiSpec {
             }))
     })
     CommonResponse<PostResponse.Statistics> getStatistics( CustomUserDetails userDetails);
+
+    @Operation(summary = "오늘의 명언 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "명언 조회 성공", value = """
+                            {
+                                  "data": {
+                                      "bookTitle": "김종원",
+                                      "bookAuthor": "테스트",
+                                      "bookCover": "image.url",
+                                      "bookPublisher": "출판사1",
+                                      "bookPublishingYear": 2025,
+                                      "postId": 279,
+                                      "postWriter": "test10",
+                                      "postContent": "오늘의명언 테스트 데이터 입니다279",
+                                      "category": "TRAVEL_CULTURE",
+                                      "hashtags": "여행",
+                                      "createAt": "2025-02-16 03:48:31.202127",
+                                      "likesCount": 1,
+                                      "bookmarkCount": 0,
+                                      "commentCount": 0
+                                  }
+                              }
+                            """)
+            }))
+    })
+    CommonResponse<PostResponseDTO> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
 }
