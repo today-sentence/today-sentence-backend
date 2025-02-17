@@ -12,6 +12,7 @@ import today.todaysentence.domain.hashtag.repository.HashtagRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
+import today.todaysentence.global.redis.RedisService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -27,6 +28,7 @@ public class RecommendationScheduler {
     private final BookmarkRepository bookmarkRepository;
     private final StringRedisTemplate redisTemplate;
     private final HashtagRepository hashtagRepository;
+    private final RedisService redisService;
 
 
     @Scheduled(cron = "0 */10 * * * ?")
@@ -63,6 +65,19 @@ public class RecommendationScheduler {
 
         log.info("new Hashtags count : {}",newHashtags.size());
 
+    }
+
+    @Scheduled(cron = "0 */10 * * * ?")
+    public void famousTagsZeroScoreDelAndDecrement(){
+        redisService.decreaseAllScoresForAllTags(2);
+    }
+    @Scheduled(cron = "0 0 */1 * * ?")
+    public void famousTagsZeroScoreDelAndDecrementHour(){
+        redisService.decreaseAllScoresForAllTags(4);
+    }
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void famousTagsZeroScoreDelAndDecrementDay(){
+        redisService.decreaseAllScoresForAllTags(10);
     }
 
 

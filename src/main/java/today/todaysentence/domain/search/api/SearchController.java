@@ -35,10 +35,15 @@ public class SearchController implements SearchApiSpec {
 
     }
 
-  @GetMapping("/hashtags")
-    public ResponseEntity<List<String>> getRelatedHashtags(@RequestParam("query") String query) {
+    @GetMapping("/hashtags")
+    public CommonResponse<List<String>> getRelatedHashtags(@RequestParam("query") String query) {
         List<String> relatedHashtags = searchService.getRelatedHashtags(query);
-        return ResponseEntity.ok(relatedHashtags);
+        return CommonResponse.ok(relatedHashtags);
+    }
+
+    @GetMapping("/famous-tags")
+    public CommonResponse<?> getFamousTags(){
+        return searchService.getFamousTags();
     }
 
 

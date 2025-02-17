@@ -1,7 +1,7 @@
 package today.todaysentence.domain.search.dto;
 
 
-import java.time.LocalDateTime;
+import java.util.Set;
 
 public class SearchResponse {
 
@@ -38,6 +38,14 @@ public class SearchResponse {
             Long bookmarkCount,
             Long commentCount
     ) {}
+
+    public record HashTagRank(
+            Set<String> search,
+            Set<String> record
+
+    ){
+
+    }
 
 
 
