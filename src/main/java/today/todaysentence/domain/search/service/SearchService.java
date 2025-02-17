@@ -1,26 +1,21 @@
 package today.todaysentence.domain.search.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.repository.BookRepository;
-import today.todaysentence.domain.hashtag.Hashtag;
-import today.todaysentence.domain.hashtag.repository.HashtagRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
+import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.response.CommonResponse;
 
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +23,9 @@ import java.util.stream.Collectors;
 public class SearchService {
 
     private final BookRepository bookRepository;
-    private final PostRepository postRepository;
-    private final HashtagRepository hashtagRepository ;
-    private final RedisTemplate<String,Object> redisTemplate;
+    private final PostRepositoryCustom postRepositoryCustom;
 
     private final StringRedisTemplate stringRedisTemplate;
-
 
 
     public CommonResponse<?> findBooks(String type, String search, Pageable pageable) {
@@ -55,19 +47,25 @@ public class SearchService {
         return CommonResponse.ok(books);
     }
 
-    public CommonResponse<?> findPosts(String type, String search , Pageable pageable) {
-
-        int limit = pageable.getPageSize();
-        int offset = pageable.getPageNumber()*pageable.getPageSize();
+    public CommonResponse<?> findPosts(String type, String search ) {
 
         List<SearchResponse.PostSearchResult> posts;
 
+        String query;
         if ("title".equals(type)) {
-            posts = postRepository.findPostsByBookTitle(search,limit,offset);
-        } else if ("tag".equals(type)) {
-           posts = postRepository.findPostsHashtag(search,limit,offset);
+            query="b.title = '" + search + "'";
+            posts = postRepositoryCustom.findPostsByDynamicQuery(query);
         }else if ("category".equals(type)) {
-           posts = postRepository.findPostsCategory(search,limit,offset);
+            query="p.category = '" + search + "'";
+            posts = postRepositoryCustom.findPostsByDynamicQuery(query);
+        } else if ("tag".equals(type)) {
+            query= "ph.post_id IN (" +
+                    "  SELECT ph.post_id " +
+                    "  FROM post_hashtag ph " +
+                    "  INNER JOIN hashtag h ON h.id = ph.hashtag_id " +
+                    "  WHERE h.name = '" +search +"'"+
+                    ") ";
+                    posts = postRepositoryCustom.findPostsByDynamicQuery(query);
         }else{
             throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
         }
@@ -77,24 +75,6 @@ public class SearchService {
 
 
         return CommonResponse.ok(posts);
-    }
-
-    @PostConstruct
-    public void hashtagInit() {
-//        if (!redisTemplate.hasKey("hashtags")) {
-            tagNameCaching();
-//        }
-    }
-
-    @Transactional(readOnly = true)
-    public void tagNameCaching() {
-        List<Hashtag> hashtagsNames = hashtagRepository.findAllName();
-        System.out.println("DB에서 가져온 해시태그: " + hashtagsNames);
-        hashtagsNames.forEach(tag -> {
-            redisTemplate.opsForZSet().add("hashtags", tag.getName(), 0);
-            redisTemplate.opsForSet().add("hashtagsId",String.valueOf(tag.getId()));
-        });
-        ;
     }
 
     /**
@@ -131,13 +111,4 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
-
-
-
 }
-
-
-
-
-
-

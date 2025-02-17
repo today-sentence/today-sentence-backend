@@ -112,7 +112,7 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findPosts(String type, String search, Pageable pageable);
+    CommonResponse<?>findPosts(String type, String search);
 
 
 }

@@ -35,7 +35,8 @@ public class SearchResponse {
 
             //like_count
             Long likesCount,
-            Long bookmarkCount
+            Long bookmarkCount,
+            Long commentCount
     ) {}
 
 
