@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import today.todaysentence.domain.post.dto.ScheduledPosts;
 import today.todaysentence.global.jwt.MemberDeviceIdDto;
@@ -22,7 +23,7 @@ public class RedisService {
     private final String DUPLICATED_POST_IDS_KEY = "duplicatePostIds";
 
     private final RedisTemplate<String, Object> redisTemplate;
-
+    private final StringRedisTemplate sRedisTemplate;
     public void saveRefreshToken(String memberId, String refreshToken,String deviceId, long duration) {
         String key = "refresh:" + memberId;
 
@@ -110,8 +111,8 @@ public class RedisService {
             throw new RuntimeException("키를 찾을 수 없습니다. : " + DUPLICATED_POST_IDS_KEY);
         }
 
-        return redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).stream()
-                .map(id -> (Long)id)
+        return sRedisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).stream()
+                .map(Long::parseLong)
                 .collect(Collectors.toSet());
     }
 
@@ -124,6 +125,6 @@ public class RedisService {
         Set<Long> addedPostIds = scheduledPostsList.stream()
                 .flatMap(scheduledPosts -> scheduledPosts.postIds().stream())
                 .collect(Collectors.toSet());
-        redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).addAll(addedPostIds);
+        redisTemplate.opsForSet().members("DUPLICATED_POST_IDS_KEY").addAll(addedPostIds);
     }
 }
