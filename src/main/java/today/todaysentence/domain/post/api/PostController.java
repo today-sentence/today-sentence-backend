@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
+import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.domain.post.service.PostService;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
@@ -60,5 +61,12 @@ public class PostController implements PostApiSpec {
     public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal CustomUserDetails userDetails){
         return postService.getStatistics(userDetails);
     }
+
+    @GetMapping("/today-sentence")
+    public CommonResponse<PostResponseDTO> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return postService.getTodaySentence(userDetails);
+    }
+
+
 
 }
