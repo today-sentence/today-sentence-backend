@@ -67,16 +67,18 @@ public class RecommendationScheduler {
 
     }
 
-    @Scheduled(cron = "0 */10 * * * ?")
-    public void famousTagsZeroScoreDelAndDecrement(){
+    @Scheduled(fixedDelay = 600000)
+    public void famousTagsZeroScoreDelAndDecrement() {
         redisService.decreaseAllScoresForAllTags(2);
     }
-    @Scheduled(cron = "0 0 */1 * * ?")
-    public void famousTagsZeroScoreDelAndDecrementHour(){
+
+    @Scheduled(fixedDelay = 3600000)
+    public void famousTagsZeroScoreDelAndDecrementHour() {
         redisService.decreaseAllScoresForAllTags(4);
     }
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void famousTagsZeroScoreDelAndDecrementDay(){
+
+    @Scheduled(fixedDelay = 86400000)
+    public void famousTagsZeroScoreDelAndDecrementDay() {
         redisService.decreaseAllScoresForAllTags(10);
     }
 
