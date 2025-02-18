@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.repository.HashtagRepository;
+import today.todaysentence.global.redis.RedisService;
 
 import java.util.List;
 
@@ -11,10 +12,12 @@ import java.util.List;
 @Service
 public class HashtagService {
     private final HashtagRepository hashtagRepository;
+    private final RedisService redisService;
 
     public List<Hashtag> findOrCreate(List<String> hashtagNames) {
         return hashtagNames.stream()
                 .map(this::findOrCreateSingle)
+                .peek(tag -> redisService.saveOrUpdateKeyword("record", tag.getName()))
                 .toList();
     }
 

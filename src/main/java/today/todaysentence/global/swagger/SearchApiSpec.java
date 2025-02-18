@@ -14,7 +14,7 @@ import today.todaysentence.global.response.CommonResponse;
 @Tag(name = "검색 API")
 public interface SearchApiSpec {
 
-    @Operation(summary = "검색 - 책 or 저자 검색")
+    @Operation(summary = "책 검색 - 책 or 저자 검색")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검색 성공 ", value = """
@@ -61,7 +61,7 @@ public interface SearchApiSpec {
     })
     CommonResponse<?>findBooks(String type, String search, Pageable pageable);
 
-    @Operation(summary = "검색 - 책 or 저자 검색")
+    @Operation(summary = "명언 검색 - 태그,책 제목, 카테고리 ")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검색 성공 ", value = """
@@ -113,6 +113,28 @@ public interface SearchApiSpec {
             })),
     })
     CommonResponse<?>findPosts(String type, String search);
+
+
+    @Operation(summary = "인기태그 요청")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                @ExampleObject(name = "검색 성공 ", value = """
+                        {
+                            "data": {
+                                "search": [
+                                    "책",
+                                    "한강",
+                                    "오늘의책",
+                                    "행복"
+                                ],
+                                "record": [
+                                    "책추천",
+                                    "여행"
+                                ]
+                            }
+                        }
+                        """)
+    }))
+    CommonResponse<?> getFamousTags();
 
 
 }

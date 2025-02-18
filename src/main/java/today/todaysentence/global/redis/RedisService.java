@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RedisService {
     private final String DUPLICATED_POST_IDS_KEY = "duplicatePostIds";
+    public static final String FAMOUS_SEARCH_TAG_KEY ="search_tag";
+    public static final String FAMOUS_RECORD_TAG_KEY ="record_tag";
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate sRedisTemplate;
@@ -127,4 +129,47 @@ public class RedisService {
                 .collect(Collectors.toSet());
         redisTemplate.opsForSet().members("DUPLICATED_POST_IDS_KEY").addAll(addedPostIds);
     }
+
+
+    public void saveOrUpdateKeyword(String type,String keyword) {
+
+
+        String key = switch (type){
+            case "search" -> FAMOUS_SEARCH_TAG_KEY;
+            case "record"-> FAMOUS_RECORD_TAG_KEY;
+            default ->  throw new RuntimeException("타입이 올바르지 않습니다.");
+        };
+
+        Double score = sRedisTemplate.opsForZSet().score(key, keyword);
+
+        System.out.println("현재 개발중에는 100점 실배포시에 20점으로 낮추기(스케쥴링포함)");
+        if (score == null) {
+            sRedisTemplate.opsForZSet().add(key, keyword, 100);
+        } else {
+            sRedisTemplate.opsForZSet().incrementScore(key, keyword, 2);
+        }
+    }
+
+
+    public void decreaseAllScores(String key, double amount) {
+        Set<String> keywords = sRedisTemplate.opsForZSet().range(key, 0, -1);
+
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                sRedisTemplate.opsForZSet().incrementScore(key, keyword, -amount);
+            }
+        }
+    }
+
+    public void decreaseAllScoresForAllTags(double decrease) {
+
+        sRedisTemplate.opsForZSet().removeRangeByScore(FAMOUS_SEARCH_TAG_KEY, 0, 0);
+        sRedisTemplate.opsForZSet().removeRangeByScore(FAMOUS_RECORD_TAG_KEY, 0, 0);
+
+        decreaseAllScores(FAMOUS_SEARCH_TAG_KEY,decrease);
+        decreaseAllScores(FAMOUS_RECORD_TAG_KEY,decrease);
+    }
+
+
+
 }

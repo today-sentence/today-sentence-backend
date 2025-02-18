@@ -12,11 +12,15 @@ import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
+import today.todaysentence.global.redis.RedisService;
 import today.todaysentence.global.response.CommonResponse;
 
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static today.todaysentence.global.redis.RedisService.FAMOUS_RECORD_TAG_KEY;
+import static today.todaysentence.global.redis.RedisService.FAMOUS_SEARCH_TAG_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class SearchService {
 
     private final BookRepository bookRepository;
     private final PostRepositoryCustom postRepositoryCustom;
+    private final RedisService redisService;
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -59,6 +64,7 @@ public class SearchService {
             query="p.category = '" + search + "'";
             posts = postRepositoryCustom.findPostsByDynamicQuery(query);
         } else if ("tag".equals(type)) {
+            redisService.saveOrUpdateKeyword("search",search);
             query= "ph.post_id IN (" +
                     "  SELECT ph.post_id " +
                     "  FROM post_hashtag ph " +
@@ -81,7 +87,7 @@ public class SearchService {
      * 1.사전순으로 레디스에 넣은정보를 전부꺼내와서 스프링에서 재정렬후 리턴
      * 2.추후 검색어만 앞글자에 포함한 결과를 리턴
      *    ㄴ 레디스에서 range검색
-     * @param prefix
+     * @param prefix (검색단어)
      * @return List . 검색결과 1.검색어앞글자 우선 2.검색어 포함글자 뒤
      *
      */
@@ -111,4 +117,11 @@ public class SearchService {
                 .collect(Collectors.toList());
     }
 
+    public CommonResponse<?> getFamousTags() {
+
+        Set<String> search =stringRedisTemplate.opsForZSet().reverseRange(FAMOUS_SEARCH_TAG_KEY, 0, 6 - 1);
+        Set<String> record =stringRedisTemplate.opsForZSet().reverseRange(FAMOUS_RECORD_TAG_KEY, 0, 6 - 1);
+
+        return CommonResponse.ok(new SearchResponse.HashTagRank(search,record)) ;
+    }
 }
