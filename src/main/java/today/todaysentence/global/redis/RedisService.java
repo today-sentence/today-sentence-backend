@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.post.dto.ScheduledPosts;
 import today.todaysentence.global.jwt.MemberDeviceIdDto;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -128,6 +126,35 @@ public class RedisService {
                 .flatMap(scheduledPosts -> scheduledPosts.postIds().stream())
                 .collect(Collectors.toSet());
         redisTemplate.opsForSet().members("DUPLICATED_POST_IDS_KEY").addAll(addedPostIds);
+    }
+
+    public void sentenceIdsCheckOfWithdrawMember(Map<Long, Category> check) {
+
+
+        try{
+            log.info("check today-sentence postIds due to member withdraw");
+            check.forEach((withdrawMemberId,category)->{
+                List<Long> posts = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), "post_id")));
+                List<Long> members = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), "writer_id")));
+
+                if (posts.contains(withdrawMemberId)) {
+                    log.info("today sentence postIds reSettings [ category : {} ]  [ removePostId : {} ]",category.name(),withdrawMemberId);
+                    int index = posts.indexOf(withdrawMemberId);
+                    posts.remove(index);
+                    members.remove(index);
+
+                    redisTemplate.opsForHash().put(category.name(), "post_id", posts);
+                    redisTemplate.opsForHash().put(category.name(), "writer_id", members);
+
+                }else{
+                    log.info("no deleted postIds");
+                }
+            });
+
+        }catch (NullPointerException e){
+            log.error("key not found - error occur withdraw flow {}",e.getMessage());
+        }
+
     }
 
 

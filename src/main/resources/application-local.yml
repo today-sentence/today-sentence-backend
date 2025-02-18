@@ -3,17 +3,29 @@ server:
 
 spring:
   datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/today
     username: root
     password: "0000"
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "mical0108@gmail.com"
+    password: "zjqb opgn ijti fnjd"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+        debug: true
   data:
     redis:
       host: localhost
       port: 6379
-
-
 
   jpa:
     hibernate:
@@ -21,8 +33,7 @@ spring:
     show-sql: true  # SQL 쿼리 출력
     properties:
       hibernate:
-        format_sql: false  # SQL 포맷팅
-#        use_sql_comments: true
+        format_sql: false
 
   h2:
     console:
@@ -36,10 +47,3 @@ jwt:
 logging:
   level:
     root: info
-
-
-
-
-
-
-

@@ -32,6 +32,8 @@ public class Member extends Timestamped {
     @Builder.Default
     private String statusMessage = "상태메시지를 입력해주세요.";
 
+    private Long todayPostId;
+
     @Column(name = "nickname_updated_at")
     @Builder.Default
     private LocalDateTime nicknameUpdatedAt = LocalDateTime.now();
@@ -78,6 +80,10 @@ public class Member extends Timestamped {
     public void changeMessage(String message){
         this.statusMessage = message;
     }
+
+    public void insertTodaySentenceId(Long id){ this.todayPostId = id;}
+
+    public void removeTodaySentenceId(){ this.todayPostId = null;}
 
 
 }

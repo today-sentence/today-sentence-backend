@@ -10,6 +10,7 @@ import today.todaysentence.domain.member.Member;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(@Param("email") String email);
@@ -28,4 +29,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("DELETE FROM Member m WHERE m.id IN :ids")
     void deleteByMemberIds(@Param("ids") List<Long> ids);
 
+    @Query("SELECT m FROM Member m WHERE m.todayPostId IN :postIds")
+    List<Member> findByPostIds(@Param("postIds")Set<Long> postIds);
 }
