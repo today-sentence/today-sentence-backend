@@ -125,7 +125,7 @@ public class RedisService {
         Set<Long> addedPostIds = scheduledPostsList.stream()
                 .flatMap(scheduledPosts -> scheduledPosts.postIds().stream())
                 .collect(Collectors.toSet());
-        redisTemplate.opsForSet().members("DUPLICATED_POST_IDS_KEY").addAll(addedPostIds);
+        redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).addAll(addedPostIds);
     }
 
     public void sentenceIdsCheckOfWithdrawMember(Map<Long, Category> check) {
@@ -169,7 +169,6 @@ public class RedisService {
 
         Double score = sRedisTemplate.opsForZSet().score(key, keyword);
 
-        System.out.println("현재 개발중에는 100점 실배포시에 20점으로 낮추기(스케쥴링포함)");
         if (score == null) {
             sRedisTemplate.opsForZSet().add(key, keyword, 100);
         } else {
