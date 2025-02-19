@@ -8,6 +8,7 @@ import today.todaysentence.domain.bookmark.Bookmark;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.Post;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,12 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     @Modifying
     @Query("DELETE FROM Bookmark b WHERE b.isSaved = false")
     int deleteIsSavedFalse();
+
+    @Modifying
+    @Query("UPDATE Bookmark bm SET bm.deletedAt = CURRENT_TIMESTAMP WHERE bm.member.id =:memberId")
+    int softDeleteBookmarkLikeByMember(@Param("memberId") Long memberId);
+
+    @Modifying
+    @Query("DELETE FROM Bookmark bm WHERE bm.deletedAt < :thirtyDays")
+    void deleteBookmarksBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
 }

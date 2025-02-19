@@ -23,11 +23,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     @Query("SELECT m.id FROM Member m WHERE m.deletedAt < :thirtyDays")
-    List<Long> findMemberIdsDeletedBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
-
-    @Modifying
-    @Query("DELETE FROM Member m WHERE m.id IN :ids")
-    void deleteByMemberIds(@Param("ids") List<Long> ids);
+    Set<Long> findMemberIdsDeletedBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
 
     @Query("SELECT m FROM Member m WHERE m.todayPostId IN :postIds")
     List<Member> findByPostIds(@Param("postIds")Set<Long> postIds);
