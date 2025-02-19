@@ -21,9 +21,9 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(l.id) as like_count, " +
-                "COUNT(bm.id) as bookmark_count, " +
-                "COUNT(cm.id) as comment_count " +
+                "COUNT(DISTINCT l.id) as like_count, " +
+                "COUNT(DISTINCT bm.id) as bookmark_count, " +
+                "COUNT(DISTINCT cm.id) as comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
@@ -47,9 +47,9 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(l.id) as like_count, " +
-                "COUNT(bm.id) as bookmark_count, " +
-                "COUNT(cm.id) as comment_count " +
+                "COUNT(DISTINCT l.id) as like_count, " +
+                "COUNT(DISTINCT bm.id) as bookmark_count, " +
+                "COUNT(DISTINCT cm.id) as comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
@@ -73,9 +73,9 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(l.id) as like_count, " +
-                "COUNT(bm.id) as bookmark_count, " +
-                "COUNT(cm.id) as comment_count " +
+                "COUNT(DISTINCT l.id) as like_count, " +
+                "COUNT(DISTINCT bm.id) as bookmark_count, " +
+                "COUNT(DISTINCT cm.id) as comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +

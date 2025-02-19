@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.WithdrawMember;
 import today.todaysentence.domain.member.dto.MemberRequest;
@@ -33,6 +34,8 @@ import today.todaysentence.util.email.VerificationCodeGenerator;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -138,19 +141,33 @@ public class MemberService {
 
         String originEmail = member.getEmail();
 
-        postRepository.findByWriter(member)
-                .forEach(Post::deleted);
+        List<Post> wMemberPosts =postRepository.findByWriter(member);
+
+        Map<Long,Category> checkList = wMemberPosts.stream()
+                .peek(Post::deleted)
+                .collect(Collectors.toMap(Post::getId,Post::getCategory));
+
+        List<Member> members= memberRepository.findByPostIds(checkList.keySet());
+
+        members.forEach(Member::removeTodaySentenceId);
+
+        redisService.sentenceIdsCheckOfWithdrawMember(checkList);
 
         member.withdraw();
+        members.add(member);
+
         WithdrawMember wMember = WithdrawMember
                 .builder()
                 .email(originEmail)
                 .build();
-        memberRepository.save(member);
+
+        memberRepository.saveAll(members);
+
         withdrawRepository.save(wMember);
 
         return signOut(userDetails, request);
     }
+
 
     @Transactional
     public CommonResponse<?> findPassword(MemberRequest.CheckEmail email) throws MessagingException {
@@ -222,6 +239,7 @@ public class MemberService {
 
     @Transactional
     public CommonResponse<?> changeMessage(CustomUserDetails userDetails, MemberRequest.CheckMessage statusMessage) {
+
         return changeField(userDetails.member(),MESSAGE_TYPE,statusMessage.message());
     }
 
