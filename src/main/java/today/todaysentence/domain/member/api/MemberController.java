@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import today.todaysentence.domain.member.dto.MemberRequest;
+import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.service.MemberService;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
@@ -22,6 +23,12 @@ import today.todaysentence.global.swagger.MemberApiSpec;
 public class MemberController implements MemberApiSpec {
 
     private final MemberService memberService;
+
+    @Override
+    @GetMapping()
+    public CommonResponse<MemberResponse.MemberInfo>getMemberInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return memberService.getMemberInfo(userDetails);
+    }
 
     @Override
     @PostMapping("/sign-up")

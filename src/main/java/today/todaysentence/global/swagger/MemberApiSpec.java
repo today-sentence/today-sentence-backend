@@ -13,11 +13,30 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import today.todaysentence.domain.member.dto.MemberRequest;
+import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
 @Tag(name = "유저 API")
 public interface MemberApiSpec {
+
+
+    @Operation(summary = "회원조회 - 발급 받은 토큰으로 자신조회.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "조회성공", value = """
+                        {
+                        "data": {
+                                "email": "test3@test.com",
+                                "nickname": "test3",
+                                "statusMessage": "상태메시지를 입력해주세요.",
+                                "profileImg": "basicProfileUrl"
+                        }
+                    }"""
+                    )
+            }))
+    })
+    CommonResponse<MemberResponse.MemberInfo>getMemberInfo(@AuthenticationPrincipal CustomUserDetails userDetails);
 
     @Operation(summary = "회원가입 - 이메일 중복 검증")
     @ApiResponses({
@@ -130,16 +149,16 @@ public interface MemberApiSpec {
     @Operation(summary = "로그인 - 로그인 요청")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-                    @ExampleObject(name = "로그인 성공", value = """
-                            {
-                                "data" : {
-                                    "email" : String,
-                                    "nickname" : String,
-                                    "statusMessage": String,
-                                    "profileImg" : String
-                                }
-                            }
-                            """)
+                    @ExampleObject(name = "로그인성공", value = """
+                        {
+                        "data": {
+                                "email": "test3@test.com",
+                                "nickname": "test3",
+                                "statusMessage": "상태메시지를 입력해주세요.",
+                                "profileImg": "basicProfileUrl"
+                        }
+                    }"""
+                    )
             }))
     })
     CommonResponse<?> signIn(MemberRequest.SignIn sinin, HttpServletRequest request, HttpServletResponse response);

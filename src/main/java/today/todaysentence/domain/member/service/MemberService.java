@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -63,6 +64,13 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+
+    @Transactional(readOnly = true)
+    public CommonResponse<MemberResponse.MemberInfo> getMemberInfo(CustomUserDetails userDetails) {
+        return CommonResponse.ok(new MemberResponse.MemberInfo(userDetails.member()));
+
+
+    }
 
     @Transactional
     public CommonResponse<?> signUp(MemberRequest.SignUp signUpRequest) {
@@ -327,6 +335,7 @@ public class MemberService {
 
         return CommonResponse.ok(new MemberResponse.MemberInfo(savedMember));
     }
+
 
 
 }
