@@ -28,7 +28,7 @@ public class CommentService {
     public CommentResponse.CommentInfos getComments(Long postId, Pageable pageable) {
         postService.isValidPost(postId);
 
-        Slice<Comment> comments = commentRepository.findByPostId(postId, pageable);
+        Slice<Comment> comments = commentRepository.findByPostIdAndDeletedAtIsNull(postId, pageable);
 
         return new CommentResponse.CommentInfos(
                 comments.stream()
