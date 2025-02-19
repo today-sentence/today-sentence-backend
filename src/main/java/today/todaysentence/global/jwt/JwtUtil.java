@@ -18,6 +18,7 @@ import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.redis.RedisService;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import today.todaysentence.global.security.userDetails.UserDetailsServiceImpl;
 
 import java.security.Key;
@@ -83,6 +84,7 @@ public class JwtUtil {
                     + Jwts.builder()
                     .setSubject(authentication.getName())
                     .claim("nickname", customUserDetails.getMemberNickname())
+                    .claim("id",customUserDetails.member().getId())
                     .signWith(key)
                     .setIssuedAt(date)
                     .setExpiration(new Date(date.getTime() + ACCESS_TIME))
@@ -133,29 +135,20 @@ public class JwtUtil {
 
 
     public Authentication getAuthentication(String accessToken) {
-        String memberEmail = parseClaims(accessToken);
+        Claims claims = parseClaims(accessToken);
 
-//추후 권한이 확장된다면 추가
-//        String role = claims.get("role", String.class);
-//        if (role == null) {
-//            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-//        }
-//
-//        Collection<? extends GrantedAuthority> authorities =
-//                Arrays.stream(role.split(","))
-//                        .map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(memberEmail);
+        String username = claims.getSubject();
+        String nickname = claims.get("nickname", String.class);
+        Long id = claims.get("id", Long.class);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
+        return new UsernamePasswordAuthenticationToken(new JwtUserDetails(id,username,nickname), null, Collections.emptyList());
     }
-    public String parseClaims(String token) {
+    public Claims parseClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
     public void createTokenAndSaved(Authentication authentication, HttpServletResponse response,HttpServletRequest request, String memberEmail) {
@@ -169,7 +162,8 @@ public class JwtUtil {
     }
 
     public void handleRefreshToken(String refreshToken, HttpServletResponse response, HttpServletRequest request) {
-        String memberEmail = parseClaims(refreshToken);
+        Claims claims= parseClaims(refreshToken);
+        String memberEmail = claims.getSubject();
         String deviceId = request.getHeader("Device-Id");
 
         validateDeviceId(memberEmail, deviceId);

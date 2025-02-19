@@ -20,6 +20,7 @@ import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.domain.post.service.PostService;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import today.todaysentence.global.swagger.PostApiSpec;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class PostController implements PostApiSpec {
     }
 
     @GetMapping("/statistics")
-    public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal JwtUserDetails userDetails){
         return postService.getStatistics(userDetails);
     }
 

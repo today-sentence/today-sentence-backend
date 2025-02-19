@@ -25,6 +25,7 @@ import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.exception.exception.PostException;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -105,10 +106,10 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public CommonResponse<PostResponse.Statistics> getStatistics(CustomUserDetails userDetails) {
+    public CommonResponse<PostResponse.Statistics> getStatistics(JwtUserDetails userDetails) {
 
-        List<PostResponse.CategoryCount> recordsStatistics =postRepository.findByMemberRecordsStatistics(userDetails.member().getId());
-        List<PostResponse.CategoryCount> bookmarkStatistics =postRepository.findByMemberBookmarksStatistics(userDetails.member().getId());
+        List<PostResponse.CategoryCount> recordsStatistics =postRepository.findByMemberRecordsStatistics(userDetails.id());
+        List<PostResponse.CategoryCount> bookmarkStatistics =postRepository.findByMemberBookmarksStatistics(userDetails.id());
 
         Map<Category, Long> records = new EnumMap<>(Category.class);
         Map<Category, Long> bookmarks = new EnumMap<>(Category.class);
