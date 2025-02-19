@@ -26,10 +26,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     int deleteIsSavedFalse();
 
     @Modifying
-    @Query("UPDATE Bookmark bm SET bm.deletedAt = CURRENT_TIMESTAMP WHERE bm.member.id =:memberId")
+    @Query("UPDATE Bookmark bm SET bm.isSaved = false WHERE bm.member.id =:memberId")
     int softDeleteBookmarkLikeByMember(@Param("memberId") Long memberId);
 
-    @Modifying
-    @Query("DELETE FROM Bookmark bm WHERE bm.deletedAt < :thirtyDays")
-    void deleteBookmarksBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
 }

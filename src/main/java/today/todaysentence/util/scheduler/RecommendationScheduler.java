@@ -121,8 +121,8 @@ public class RecommendationScheduler {
         if (memberIdsToDelete.isEmpty()) {
             log.info("No data deleted today.");
         } else {
-            likeRepository.deleteLikesBefore(thirtyDays);
-            bookmarkRepository.deleteBookmarksBefore(thirtyDays);
+            likeRepository.deleteIsLikeFalse();
+            bookmarkRepository.deleteIsSavedFalse();
             commentRepository.deleteCommentBefore(thirtyDays);
             int postHardDeleteCount = postRepository.deletePostsBefore(thirtyDays);
 

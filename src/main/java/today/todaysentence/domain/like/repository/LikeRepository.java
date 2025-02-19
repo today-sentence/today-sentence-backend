@@ -22,10 +22,8 @@ public interface LikeRepository extends JpaRepository<Likes,Long> {
     int deleteIsLikeFalse();
 
     @Modifying
-    @Query("UPDATE Likes l SET l.deletedAt = CURRENT_TIMESTAMP WHERE l.member.id = :memberId")
+    @Query("UPDATE Likes l SET l.isLiked = false WHERE l.member.id = :memberId")
     int softDeleteLikeByMember(@Param("memberId") Long memberId);
 
-    @Modifying
-    @Query("DELETE FROM Likes l WHERE l.deletedAt < :thirtyDays")
-    void deleteLikesBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
+
 }
