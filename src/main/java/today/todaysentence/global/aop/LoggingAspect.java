@@ -12,10 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.dto.MemberRequest;
+import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +36,7 @@ public class LoggingAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         List<String> args = Arrays.stream(joinPoint.getArgs())
-                .filter(arg ->!(arg instanceof CustomUserDetails) )
+                .filter(arg ->!(arg instanceof CustomUserDetails) &&!(arg instanceof JwtUserDetails)  )
                 .map(Object::toString)
                 .toList();
 
@@ -41,8 +44,10 @@ public class LoggingAspect {
             log.info("Service - [ Member :  anonymousUser ]  [ Method : {}]  [ args : {} ] ", methodName, args);
             return;
         }
-        CustomUserDetails member = (CustomUserDetails) authentication.getPrincipal();
-        log.info("Service - [ Member : {} ]  [ Method : [{}] ]  [ args : {} ] " , member.getMemberNickname(), methodName, args);
+
+        String nickname = getNickname(authentication);
+
+        log.info("Service - [ Member : {} ]  [ Method : [{}] ]  [ args : {} ] " , nickname, methodName, args);
 
 
     }
@@ -50,16 +55,28 @@ public class LoggingAspect {
     @AfterReturning(pointcut = "execution(* today.todaysentence.domain.*.service..*(..))", returning = "result")
     public void logAfterReturning(JoinPoint joinPoint, Object result) {
 
+
         String methodName = joinPoint.getSignature().getName();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
+        String nickname = getNickname(authentication);
+
+        String className = joinPoint.getSignature().getDeclaringTypeName();
+
+        if (className.contains("SearchService")) {
+            log.info("Return - [ Member : {} ]  [ Method : {} ]", nickname, methodName);
+            return;
+        }
+
+        if (authentication.getPrincipal() == "anonymousUser") {
             log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result);
             return;
         }
-        CustomUserDetails member = (CustomUserDetails) authentication.getPrincipal();
-        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", member.getMemberNickname(), methodName, result);
+
+        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", nickname, methodName, result);
     }
+
+
 
 
     @AfterThrowing(pointcut = "execution(* today.todaysentence.domain..*(..))" ,throwing ="ex")
@@ -70,7 +87,7 @@ public class LoggingAspect {
 
 
         List<String> args = Arrays.stream(joinPoint.getArgs())
-                .filter(arg ->!(arg instanceof CustomUserDetails) )
+                .filter(arg ->!(arg instanceof CustomUserDetails) &&!(arg instanceof JwtUserDetails)  )
                 .map(Object::toString)
                 .toList();
 
@@ -79,12 +96,25 @@ public class LoggingAspect {
                      methodName, ex.getClass().getName(), ex.getMessage());
 
         } else {
-            CustomUserDetails member = (CustomUserDetails) authentication.getPrincipal();
+            String nickname = getNickname(authentication);
             log.error("Error : [ Member : {} ]  [ Method : {} ]  [ Exception : {} ]  [ Message : {} ]",
-                    member.getMemberNickname(), methodName, ex.getClass().getName(), ex.getMessage());
+                    nickname, methodName, ex.getClass().getName(), ex.getMessage());
 
         }
 
+    }
+
+
+    private static String getNickname(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        String nickname="";
+
+        if(principal instanceof CustomUserDetails){
+            nickname=((CustomUserDetails) principal).getMemberNickname();
+        }else if(principal instanceof JwtUserDetails){
+            nickname = ((JwtUserDetails) principal).nickname();
+        }
+        return nickname;
     }
 
 
