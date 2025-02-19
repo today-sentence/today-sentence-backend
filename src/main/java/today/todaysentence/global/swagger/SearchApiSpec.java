@@ -2,14 +2,17 @@ package today.todaysentence.global.swagger;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import today.todaysentence.global.response.CommonResponse;
+
+import java.util.List;
 
 @Tag(name = "검색 API")
 public interface SearchApiSpec {
@@ -136,5 +139,21 @@ public interface SearchApiSpec {
     }))
     CommonResponse<?> getFamousTags();
 
+
+    @Operation(summary = "연관검색(자동완성) 태그 이름 검색 - event 발생시마다 요청을 받아서 값을 리턴하게 됩니다.")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "검색 성공", value = """
+                    {
+                        "data":
+                        [
+                            "책추천",
+                            "오늘의책"
+                        ]
+                    }
+                    """)
+    }))
+    public CommonResponse<List<String>> getRelatedHashtags(
+            @Parameter(description = "검색할 태그 키워드", example = "책")
+            String query);
 
 }

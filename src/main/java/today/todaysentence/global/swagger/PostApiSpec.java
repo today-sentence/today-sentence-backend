@@ -14,6 +14,7 @@ import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 import java.util.List;
 
@@ -169,7 +170,7 @@ public interface PostApiSpec {
                             """)
             }))
     })
-    CommonResponse<PostResponse.Statistics> getStatistics( CustomUserDetails userDetails);
+    CommonResponse<PostResponse.Statistics> getStatistics( JwtUserDetails userDetails);
 
     @Operation(summary = "오늘의 명언 조회")
     @ApiResponses({
