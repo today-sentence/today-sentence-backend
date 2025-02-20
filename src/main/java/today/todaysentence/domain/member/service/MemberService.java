@@ -352,6 +352,11 @@ public class MemberService {
         return CommonResponse.ok(new MemberResponse.MemberInfo(savedMember));
     }
 
+    @Transactional
+    public void initTodaySentence (){
+        memberRepository.initTodaySentence();
+    }
+
 
 
 }
