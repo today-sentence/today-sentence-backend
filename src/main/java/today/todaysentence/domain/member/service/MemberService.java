@@ -355,6 +355,7 @@ public class MemberService {
     @Transactional
     public int initTodaySentence (){
         memberRepository.initTodaySentence();
+        return 0;
     }
 
 
