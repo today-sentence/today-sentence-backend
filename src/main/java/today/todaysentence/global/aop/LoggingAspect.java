@@ -10,15 +10,9 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import today.todaysentence.domain.member.Member;
-import today.todaysentence.domain.member.dto.MemberRequest;
-import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,7 +62,7 @@ public class LoggingAspect {
             return;
         }
 
-        if (authentication.getPrincipal() == "anonymousUser") {
+        if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
             log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result);
             return;
         }
@@ -86,11 +80,6 @@ public class LoggingAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 
-        List<String> args = Arrays.stream(joinPoint.getArgs())
-                .filter(arg ->!(arg instanceof CustomUserDetails) &&!(arg instanceof JwtUserDetails)  )
-                .map(Object::toString)
-                .toList();
-
         if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
             log.error("Error : [ Member :  anonymousUser ]  [ Method : {} ]  [ Exception : {} ]  [ Message : {} ]",
                      methodName, ex.getClass().getName(), ex.getMessage());
@@ -106,6 +95,7 @@ public class LoggingAspect {
 
 
     private static String getNickname(Authentication authentication) {
+        if(authentication ==null ) return "Scheduler";
         Object principal = authentication.getPrincipal();
         String nickname="";
 
