@@ -64,7 +64,7 @@ public class PostController implements PostApiSpec {
     }
 
     @GetMapping("/today-sentence")
-    public CommonResponse<PostResponseDTO> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails){
         return postService.getTodaySentence(userDetails);
     }
 

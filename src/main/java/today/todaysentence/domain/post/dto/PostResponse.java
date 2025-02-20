@@ -3,6 +3,7 @@ package today.todaysentence.domain.post.dto;
 import lombok.Builder;
 import lombok.Getter;
 import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +48,16 @@ public class PostResponse {
             Map<Category,Long> bookmarks
     ){
     }
+
+
+    public record PostResults(
+            List<PostResponseDTO> posts,
+            List<InteractionResponseDTO> interaction
+    ) {}
+
+    public record PostResult(
+            PostResponseDTO posts,
+            InteractionResponseDTO interaction
+    ) {}
+
 }

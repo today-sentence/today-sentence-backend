@@ -197,5 +197,5 @@ public interface PostApiSpec {
                             """)
             }))
     })
-    CommonResponse<PostResponseDTO> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
+    CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findBooks(String type, String search, Pageable pageable);
+    CommonResponse<?>findBooks(String type, String search, Pageable pageable,JwtUserDetails userDetails);
 
     @Operation(summary = "명언 검색 - 태그,책 제목, 카테고리 ")
     @ApiResponses({
@@ -115,7 +116,7 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findPosts(String type, String search);
+    CommonResponse<?>findPosts(String type, String search , JwtUserDetails userDetails);
 
 
     @Operation(summary = "인기태그 요청")

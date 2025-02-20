@@ -6,7 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.repository.BookRepository;
+import today.todaysentence.domain.member.dto.InteractionResponseDTO;
+import today.todaysentence.domain.member.service.MemberService;
+import today.todaysentence.domain.post.dto.PostResponse;
+import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.search.dto.SearchResponse;
@@ -14,6 +19,7 @@ import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.redis.RedisService;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 
 import java.util.*;
@@ -29,6 +35,7 @@ public class SearchService {
     private final BookRepository bookRepository;
     private final PostRepositoryCustom postRepositoryCustom;
     private final RedisService redisService;
+    private final MemberService memberService;
 
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -49,17 +56,20 @@ public class SearchService {
         }
 
 
+
         return CommonResponse.ok(books);
     }
 
-    public CommonResponse<?> findPosts(String type, String search ) {
+    @Transactional(readOnly = true)
+    public CommonResponse<?> findPosts(String type, String search, JwtUserDetails userDetails) {
 
-        List<SearchResponse.PostSearchResult> posts;
+        List<PostResponseDTO> posts;
 
         String query;
         if ("title".equals(type)) {
             query="b.title = '" + search + "'";
             posts = postRepositoryCustom.findPostsByDynamicQuery(query);
+
         }else if ("category".equals(type)) {
             query="p.category = '" + search + "'";
             posts = postRepositoryCustom.findPostsByDynamicQuery(query);
@@ -78,9 +88,12 @@ public class SearchService {
         if (posts.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");
         }
+        List<Long> postIds= posts.stream()
+                .map(PostResponseDTO::getPostId)
+                .toList();
+        List<InteractionResponseDTO> interactions = memberService.checkInteractions(postIds, userDetails.id());
 
-
-        return CommonResponse.ok(posts);
+        return CommonResponse.ok(new PostResponse.PostResults(posts,interactions));
     }
 
     /**

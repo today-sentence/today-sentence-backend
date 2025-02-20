@@ -19,12 +19,14 @@ import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.WithdrawMember;
+import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.member.repository.WithdrawRepository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.repository.PostRepository;
+import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -57,6 +59,7 @@ public class MemberService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
 
     private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
@@ -354,6 +357,15 @@ public class MemberService {
 
     @Transactional
     public int initTodaySentence (){return memberRepository.initTodaySentence(); }
+
+    public List<InteractionResponseDTO> checkInteractions(List<Long> postIds, Long memberId){
+
+       return  postRepositoryCustom.checkInteractions(postIds,memberId);
+    }
+    public InteractionResponseDTO checkInteraction(Long postId, Long memberId){
+
+        return  postRepositoryCustom.checkInteraction(postId,memberId);
+    }
 
 
 
