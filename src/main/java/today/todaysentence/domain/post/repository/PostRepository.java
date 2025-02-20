@@ -23,22 +23,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findById(@NonNull Long id);
 
-    @Modifying
-    @Query("DELETE FROM Post p WHERE p.deletedAt < :thirtyDays")
-    int deletePostsDeletedBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
-
     List<Post> findByWriter(Member member);
-
-    @Query("SELECT p.id FROM Post p WHERE p.deletedAt < :oneMinuteAgo")
-    List<Long> findPostIdsDeletedBefore(@Param("oneMinuteAgo") LocalDateTime oneMinuteAgo);
-
-    @Modifying
-    @Query("DELETE FROM Post p WHERE p.id IN :ids")
-    void deleteByPostIds(@Param("ids") List<Long> ids);
-
-    @Query("SELECT p.id FROM Post p WHERE p.writer.id IN :memberIds" )
-    List<Long> findPostIdsDeleteToMemberIds(@Param("memberIds") List<Long> memberIds);
-
 
 //    검색결과의 총 개수 혹시나 추후사용 가능성이 있어서 만들어만놓았어요
 //    @Query(value = "SELECT COUNT(DISTINCT p.id) " +
@@ -101,6 +86,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
           "GROUP BY p.category")
     List<PostResponse.CategoryCount> findByMemberAllStatistics(@Param("memberId") Long memberId);
 
+
+    @Modifying
+    @Query("UPDATE Post p SET p.deletedAt = CURRENT_TIMESTAMP WHERE p.id IN :postIds")
+    void softDeleteByPostIds(@Param("postIds") List<Long> postIds);
+
+    @Modifying
+    @Query("DELETE FROM Post p WHERE p.deletedAt < :thirtyDays")
+    int deletePostsBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
 
 }
 

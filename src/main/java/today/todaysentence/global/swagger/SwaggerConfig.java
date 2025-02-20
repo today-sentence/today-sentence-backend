@@ -24,8 +24,10 @@ public class SwaggerConfig {
     }
 
     private SecurityScheme createAPIKeyScheme() {
-        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                .bearerFormat("JWT")
-                .scheme("bearer");
+        return new SecurityScheme().type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.HEADER)
+                .name("ACCESS-TOKEN");
     }
 }
+
+

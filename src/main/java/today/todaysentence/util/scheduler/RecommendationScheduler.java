@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
+import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.repository.HashtagRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
@@ -29,6 +30,7 @@ public class RecommendationScheduler {
     private final StringRedisTemplate redisTemplate;
     private final HashtagRepository hashtagRepository;
     private final RedisService redisService;
+    private final CommentRepository commentRepository;
 
 
     @Scheduled(cron = "0 */10 * * * ?")
@@ -113,22 +115,20 @@ public class RecommendationScheduler {
 
         LocalDateTime thirtyDays = LocalDateTime.now().minusDays(30);
 
-        List<Long> memberIdsToDelete = memberRepository.findMemberIdsDeletedBefore(thirtyDays);
-        //추후리플도추가
-        List<Long> postIdsToDelete = postRepository.findPostIdsDeleteToMemberIds(memberIdsToDelete);
-        Set<Long> likeIdsToDelete = likeRepository.findLikeIdsDeleteToPosts(postIdsToDelete);
-        likeIdsToDelete.addAll(likeRepository.findByMemberId(memberIdsToDelete));
+        Set<Long> memberIdsToDelete = memberRepository.findMemberIdsDeletedBefore(thirtyDays);
+
 
         if (memberIdsToDelete.isEmpty()) {
             log.info("No data deleted today.");
-            return;
         } else {
-            likeRepository.deleteByLikesIds(likeIdsToDelete);
-            postRepository.deleteByPostIds(postIdsToDelete);
-            memberRepository.deleteByMemberIds(memberIdsToDelete);
+            likeRepository.deleteIsLikeFalse();
+            bookmarkRepository.deleteIsSavedFalse();
+            commentRepository.deleteCommentBefore(thirtyDays);
+            int postHardDeleteCount = postRepository.deletePostsBefore(thirtyDays);
+
+            log.info("Hard delete process completed. Today deleted Members : {} , Posts : {}", memberIdsToDelete.size(), postHardDeleteCount);
         }
 
-        log.info("Hard delete process completed. Today deleted Members : {} , Posts : {}", memberIdsToDelete.size(), postIdsToDelete.size());
     }
 
 

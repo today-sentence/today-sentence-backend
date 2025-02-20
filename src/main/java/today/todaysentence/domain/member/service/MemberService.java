@@ -13,7 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.comment.repository.CommentRepository;
+import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.WithdrawMember;
 import today.todaysentence.domain.member.dto.MemberRequest;
@@ -51,6 +54,9 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
     private final EmailSenderService emailSenderService;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
@@ -150,9 +156,16 @@ public class MemberService {
         String originEmail = member.getEmail();
 
         List<Post> wMemberPosts =postRepository.findByWriter(member);
+        List<Long> postIds = wMemberPosts.stream()
+                .map(Post::getId)
+                .toList();
+        postRepository.softDeleteByPostIds(postIds);
+        int commentDeletedCount = commentRepository.softDeleteCommentByMember(member.getId());
+        int likeDeleteCount = likeRepository.softDeleteLikeByMember(member.getId());
+        int bookmarkDeleteCount = bookmarkRepository.softDeleteBookmarkLikeByMember(member.getId());
+
 
         Map<Long,Category> checkList = wMemberPosts.stream()
-                .peek(Post::deleted)
                 .collect(Collectors.toMap(Post::getId,Post::getCategory));
 
         List<Member> members= memberRepository.findByPostIds(checkList.keySet());
@@ -172,6 +185,9 @@ public class MemberService {
         memberRepository.saveAll(members);
 
         withdrawRepository.save(wMember);
+
+        log.info("[ WithdrawMember : {} ] DELETED DATA [ Post : {}  /  Comment : {}  /  Like : {}  /  Bookmark : {} ]",
+                member.getEmail(),postIds.size(),commentDeletedCount,likeDeleteCount,bookmarkDeleteCount);
 
         return signOut(userDetails, request);
     }
