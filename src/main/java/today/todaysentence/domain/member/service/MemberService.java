@@ -353,7 +353,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void initTodaySentence (){
+    public int initTodaySentence (){
         memberRepository.initTodaySentence();
     }
 

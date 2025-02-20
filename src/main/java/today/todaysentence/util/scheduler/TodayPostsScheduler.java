@@ -22,14 +22,16 @@ public class TodayPostsScheduler {
     private final PostService postService;
     private final MemberService memberService;
 
-    @Scheduled(cron = "0 30 2 * * ?")
+    @Scheduled(cron = "0 0 3 * * ?")
     public void fetchAndCachePosts() {
-        memberService.initTodaySentence();
+        int resetMemberCount = memberService.initTodaySentence();
 
         Set<Long> duplicatedIds = redisService.getDuplicatedPostIds();
 
         List<ScheduledPosts> scheduledPosts = postService.fetchScheduledPostsByEachCategory(POST_COUNT_FOR_EACH, duplicatedIds);
 
         redisService.addScheduledPosts(scheduledPosts);
+
+        log.info("resetMember : {} ",resetMemberCount);
     }
 }
