@@ -27,4 +27,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m WHERE m.todayPostId IN :postIds")
     List<Member> findByPostIds(@Param("postIds")Set<Long> postIds);
+
+    @Modifying
+    @Query("UPDATE Member m SET m.todayPostId = NULL WHERE m.todayPostId IS NOT NULL")
+    void initTodaySentence();
+
 }
