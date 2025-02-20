@@ -49,6 +49,9 @@ public class CustomSecurityConfig {
     private final static String[] PERMIT_ALL_URI_SEARCH = {
             "/api/search/**"
     };
+    private final static String[] PERMIT_ALL_URI_MONITOR = {
+            "/actuator/**"
+    };
 
     private final JwtAuthFilter jwtAuthFilter;
 
@@ -74,14 +77,14 @@ public class CustomSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
 
                 .authorizeHttpRequests(request->{
 
                     String[] permitAllUri = Stream.of(
                                     PERMIT_ALL_URI_MEMBER,
                                     PERMIT_ALL_URI_UTIL,
-                                    PERMIT_ALL_URI_SEARCH
+                                    PERMIT_ALL_URI_SEARCH,
+                                    PERMIT_ALL_URI_MONITOR
                             )
                             .flatMap(Arrays::stream)
                             .toArray(String[]::new);
