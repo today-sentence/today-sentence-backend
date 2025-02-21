@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 import today.todaysentence.global.response.CommonResponse;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 
 import java.util.List;
 
@@ -62,42 +63,60 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findBooks(String type, String search, Pageable pageable);
+    CommonResponse<?>findBooks(String type, String search, Pageable pageable,JwtUserDetails userDetails);
 
     @Operation(summary = "명언 검색 - 태그,책 제목, 카테고리 ")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "검색 성공 ", value = """
                             {
-                                "data": [
-                                    {
-                                        "bookTitle": "소년이 온다",
-                                        "author": "한강",
-                                        "coverUrl": "image.url",
-                                        "publisher": "출판사1",
-                                        "publishingYear": 2025,
-                                        "postId": 31,
-                                        "postWriter": "test1",
-                                        "postContent": "오늘의명언 테스트 데이터 입니다31",
-                                        "category": "POEM_NOVEL_ESSAY",
-                                        "hashtags": "베스트셀러",
-                                        "likesCount": 1
-                                    },
-                                    {
-                                        "bookTitle": "소년이 온다",
-                                        "author": "한강",
-                                        "coverUrl": "image.url",
-                                        "publisher": "출판사1",
-                                        "publishingYear": 2025,
-                                        "postId": 20,
-                                        "postWriter": "test10",
-                                        "postContent": "오늘의명언 테스트 데이터 입니다20",
-                                        "category": "ETC",
-                                        "hashtags": "여행,운동",
-                                        "likesCount": 0
-                                    }
-                                ]
-                            }
+                                "data": {
+                                    "posts": [
+                                        {
+                                            "bookTitle": "채식주의자",
+                                            "bookAuthor": "한강",
+                                            "bookCover": "image.url",
+                                            "bookPublisher": "출판사1",
+                                            "bookPublishingYear": 2025,
+                                            "postId": 3,
+                                            "postWriter": "test2",
+                                            "postContent": "오늘의명언 테스트 데이터 입니다3",
+                                            "category": "TRAVEL_CULTURE",
+                                            "hashtags": "1일1독,감동,독서,베스트셀러,짧은명언,책",
+                                            "createAt": "2025-02-20 02:02:07.517177",
+                                            "likesCount": 3,
+                                            "bookmarkCount": 0,
+                                            "commentCount": 0
+                                        },
+                                        {
+                                            "bookTitle": "채식주의자",
+                                            "bookAuthor": "한강",
+                                            "bookCover": "image.url",
+                                            "bookPublisher": "출판사1",
+                                            "bookPublishingYear": 2025,
+                                            "postId": 3,
+                                            "postWriter": "test2",
+                                            "postContent": "오늘의명언 테스트 데이터 입니다3",
+                                            "category": "TRAVEL_CULTURE",
+                                            "hashtags": "1일1독,감동,독서,베스트셀러,짧은명언,책",
+                                            "createAt": "2025-02-20 02:02:07.517177",
+                                            "likesCount": 3,
+                                            "bookmarkCount": 0,
+                                            "commentCount": 0
+                                        }
+                                ],
+                                           "interaction": [
+                                               {
+                                                   "isLiked": false,
+                                                   "isSaved": false
+                                               },
+                                               {
+                                                   "isLiked": false,
+                                                   "isSaved": false
+                                               }
+                                           ]
+                                 }
+                             }
                             """)
             })),
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
@@ -115,7 +134,7 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findPosts(String type, String search);
+    CommonResponse<?>findPosts(String type, String search , JwtUserDetails userDetails);
 
 
     @Operation(summary = "인기태그 요청")

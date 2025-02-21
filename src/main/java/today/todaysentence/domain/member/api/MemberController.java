@@ -83,8 +83,9 @@ public class MemberController implements MemberApiSpec {
     @Override
     @PutMapping("/change-email")
     public CommonResponse<?> changeEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                         @RequestBody MemberRequest.CheckEmail email) {
-        return memberService.changeEmail(userDetails,email);
+                                         @RequestBody MemberRequest.CheckEmail email,
+                                         HttpServletRequest request,HttpServletResponse response) {
+        return memberService.changeEmail(userDetails,email,response,request);
     }
 
     @Override

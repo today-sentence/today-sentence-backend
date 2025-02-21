@@ -177,25 +177,31 @@ public interface PostApiSpec {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
                     @ExampleObject(name = "명언 조회 성공", value = """
                             {
-                                  "data": {
-                                      "bookTitle": "김종원",
-                                      "bookAuthor": "테스트",
-                                      "bookCover": "image.url",
-                                      "bookPublisher": "출판사1",
-                                      "bookPublishingYear": 2025,
-                                      "postId": 279,
-                                      "postWriter": "test10",
-                                      "postContent": "오늘의명언 테스트 데이터 입니다279",
-                                      "category": "TRAVEL_CULTURE",
-                                      "hashtags": "여행",
-                                      "createAt": "2025-02-16 03:48:31.202127",
-                                      "likesCount": 1,
-                                      "bookmarkCount": 0,
-                                      "commentCount": 0
-                                  }
-                              }
+                                   "data": {
+                                       "posts": {
+                                           "bookTitle": "한강은 흐른다",
+                                           "bookAuthor": "일우",
+                                           "bookCover": "image.url",
+                                           "bookPublisher": "출판사1",
+                                           "bookPublishingYear": 2025,
+                                           "postId": 294,
+                                           "postWriter": "test6",
+                                           "postContent": "오늘의명언 테스트 데이터 입니다294",
+                                           "category": "ECONOMY_MANAGEMENT",
+                                           "hashtags": "1일1독,개발,사랑,새벽,운동,짧은명언",
+                                           "createAt": "2025-02-20 02:02:13.200824",
+                                           "likesCount": 0,
+                                           "bookmarkCount": 1,
+                                           "commentCount": 0
+                                       },
+                                       "interaction": {
+                                           "isLiked": false,
+                                           "isSaved": true
+                                       }
+                                   }
+                               }
                             """)
             }))
     })
-    CommonResponse<PostResponseDTO> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
+    CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
 }

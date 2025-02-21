@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +21,14 @@ import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.WithdrawMember;
+import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.repository.MemberRepository;
 import today.todaysentence.domain.member.repository.WithdrawRepository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.repository.PostRepository;
+import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -36,6 +40,7 @@ import today.todaysentence.util.email.VerificationCodeGenerator;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +62,7 @@ public class MemberService {
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final PostRepositoryCustom postRepositoryCustom;
 
     private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
@@ -268,9 +274,44 @@ public class MemberService {
     }
 
     @Transactional
-    public CommonResponse<?> changeEmail(CustomUserDetails userDetails,MemberRequest.CheckEmail email) {
+    public CommonResponse<?> changeEmail(CustomUserDetails userDetails,MemberRequest.CheckEmail email,HttpServletResponse response,HttpServletRequest request){
 
-        return changeField(userDetails.member(),EMAIL_TYPE,email.email());
+        Member member = userDetails.member();
+        String changeEmail = email.email();
+        String originEmail = member.getEmail();
+
+        if(changeEmail.equals(originEmail)){
+            throw new BaseException(ExceptionCode.NOT_CHANGED_EQUAL_EMAIL);
+        }
+        checkEmail(changeEmail);
+
+
+        LocalDateTime changedTime = member.getEmailUpdatedAt();
+
+        long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
+
+        if (daysBetween > CHANGE_FIELD_TIME) {
+            member.changeEmail(changeEmail);
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    new CustomUserDetails(member),
+                    null,
+                    Collections.EMPTY_LIST);
+            jwtUtil.createTokenAndSaved(authentication,response,request,changeEmail);
+            SecurityContextHolder.setContext(context);
+
+            redisService.deleteRefreshToken(originEmail);
+
+            memberRepository.save(member);
+
+            return CommonResponse.ok(new MemberResponse.MemberInfo(member));
+        } else {
+
+            String message = String.format("이메일 변경은 가입 or 수정 후 %d일 후에 변경 가능합니다.", CHANGE_FIELD_TIME);
+            return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, changedTime.plusDays(CHANGE_FIELD_TIME).withSecond(0).withNano(0)));
+
+        }
 
     }
 
@@ -282,7 +323,6 @@ public class MemberService {
         LocalDateTime changedTime = switch (type) {
             case MESSAGE_TYPE -> member.getMessageUpdatedAt();
             case NICKNAME_TYPE -> member.getNicknameUpdatedAt();
-            case EMAIL_TYPE -> member.getEmailUpdatedAt();
             default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
         };
 
@@ -292,7 +332,6 @@ public class MemberService {
             switch (type) {
                 case MESSAGE_TYPE -> member.changeMessage(field);
                 case NICKNAME_TYPE -> member.changeNickname(field);
-                case EMAIL_TYPE -> member.changeEmail(field);
             }
             memberRepository.save(member);
 
@@ -354,6 +393,15 @@ public class MemberService {
 
     @Transactional
     public int initTodaySentence (){return memberRepository.initTodaySentence(); }
+
+    public List<InteractionResponseDTO> checkInteractions(List<Long> postIds, Long memberId){
+
+       return  postRepositoryCustom.checkInteractions(postIds,memberId);
+    }
+    public InteractionResponseDTO checkInteraction(Long postId, Long memberId){
+
+        return  postRepositoryCustom.checkInteraction(postId,memberId);
+    }
 
 
 

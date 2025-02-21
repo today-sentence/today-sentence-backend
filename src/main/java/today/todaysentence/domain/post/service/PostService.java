@@ -11,7 +11,8 @@ import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.service.HashtagService;
 import today.todaysentence.domain.member.Member;
-import today.todaysentence.domain.member.repository.MemberRepository;
+import today.todaysentence.domain.member.dto.InteractionResponseDTO;
+import today.todaysentence.domain.member.service.MemberService;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
@@ -44,7 +45,8 @@ public class PostService {
     private final PostRepositoryCustom postRepositoryCustom;
     private final PostQueryRepository postQueryRepository;
     private final RedisTemplate<String,Object> redisTemplate;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+
 
     final int FIRST_RANK_LIMIT = 4;
     final int SECOND_RANK_LIMIT = 9;
@@ -137,7 +139,7 @@ public class PostService {
 
 
     @Transactional
-    public CommonResponse<PostResponseDTO> getTodaySentence(CustomUserDetails userDetails) {
+    public CommonResponse<PostResponse.PostResult> getTodaySentence(CustomUserDetails userDetails) {
 
         Member member =userDetails.member();
 
@@ -161,7 +163,8 @@ public class PostService {
                     //그래도없을시
                     String query = " p.writer_id != " + member.getId() ;
                     PostResponseDTO result = postRepositoryCustom.findPostByNotMatchMember(query);
-                    return CommonResponse.ok(result);
+                    InteractionResponseDTO interaction = memberService.checkInteraction(result.getPostId(), member.getId());
+                    return CommonResponse.ok(new PostResponse.PostResult(result,interaction));
                 }
             }
 
@@ -180,14 +183,16 @@ public class PostService {
         }
 
         //step4 캐싱값 확인 CacheHit >> 바로반환  CacheMiss >>  DATABASE 조회후 캐싱후 반환
-        return Optional.ofNullable((PostResponseDTO) redisTemplate.opsForValue().get("postId : "+randomPostId))
+        return Optional.ofNullable((PostResponseDTO)redisTemplate.opsForValue().get("postId : " + randomPostId))
+                .map(post -> new PostResponse.PostResult(post, memberService.checkInteraction(randomPostId, member.getId())))
                 .or(() -> {
                     String query = "p.id = " + randomPostId;
                     PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
+                    InteractionResponseDTO interaction = memberService.checkInteraction(randomPostId, member.getId());
 
-                    redisTemplate.opsForValue().set("postId : "+randomPostId, result, 15, TimeUnit.MINUTES);
+                    redisTemplate.opsForValue().set("postId : " + randomPostId, result, 15, TimeUnit.MINUTES);
 
-                    return Optional.of(result);
+                    return Optional.of(new PostResponse.PostResult(result, interaction));
                 })
                 .map(CommonResponse::ok)
                 .orElseThrow(() -> new BaseException(ExceptionCode.POST_NOT_FOUND));
@@ -236,5 +241,7 @@ public class PostService {
                 )
                 .collect(Collectors.toSet());
     }
+
+
 
 }

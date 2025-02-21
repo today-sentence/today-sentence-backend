@@ -47,7 +47,7 @@ public class CustomSecurityConfig {
             "/v3/api-docs/**",
     };
     private final static String[] PERMIT_ALL_URI_SEARCH = {
-            "/api/search/**"
+//            "/api/search/**"
     };
     private final static String[] PERMIT_ALL_URI_MONITOR = {
             "/actuator/**"
