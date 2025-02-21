@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.RequestBody;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.global.response.CommonResponse;
@@ -257,7 +258,9 @@ public interface MemberApiSpec {
                             """)
             }))
     })
-    CommonResponse<?> changeEmail(CustomUserDetails userDetails, MemberRequest.CheckEmail email);
+    CommonResponse<?> changeEmail(CustomUserDetails userDetails,
+                                  MemberRequest.CheckEmail email,
+                                  HttpServletRequest request,HttpServletResponse response);
 
     @Operation(summary = "회원정보 변경 - 상태메시지 변경")
     @ApiResponses({

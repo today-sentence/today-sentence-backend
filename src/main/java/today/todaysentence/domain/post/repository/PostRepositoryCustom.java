@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
-import today.todaysentence.domain.search.dto.SearchResponse;
 
 import java.util.List;
 
@@ -17,6 +16,7 @@ public class PostRepositoryCustom {
     private final EntityManager entityManager;
 
     public List<PostResponseDTO> findPostsByDynamicQuery(String query) {
+
         String sql = "SELECT " +
                 "b.title, b.author, b.cover, b.publisher, b.publishing_year, " +
                 "p.id, m.nickname, p.content, p.category, " +
@@ -70,6 +70,7 @@ public class PostRepositoryCustom {
     }
 
     public PostResponseDTO findPostByNotMatchMember(String query) {
+
         String sql = "SELECT " +
                 "b.title, b.author, b.cover, b.publisher, b.publishing_year, " +
                 "p.id, m.nickname, p.content, p.category, " +
