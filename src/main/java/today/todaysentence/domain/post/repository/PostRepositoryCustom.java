@@ -29,10 +29,10 @@ public class PostRepositoryCustom {
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
+                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL " +
+                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id " +
+                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC";
@@ -55,10 +55,10 @@ public class PostRepositoryCustom {
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
+                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL " +
+                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id " +
+                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC";
@@ -82,10 +82,10 @@ public class PostRepositoryCustom {
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id " +
+                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL " +
+                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id " +
+                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC " +
