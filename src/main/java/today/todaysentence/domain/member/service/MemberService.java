@@ -29,7 +29,6 @@ import today.todaysentence.domain.member.repository.WithdrawRepository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
-import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -69,7 +68,7 @@ public class MemberService {
     private static final String NICKNAME_TYPE = "NICKNAME";
     private static final String MESSAGE_TYPE = "MESSAGE";
     private static final long RE_SIGNUP =7L;
-    private static final long CHANGE_FIELD_TIME =0L;
+    private static final long CHANGE_FIELD_TIME =1L;
     private static final long CODE_TIME = Duration.ofMinutes(15).toMillis();
 
 
@@ -279,6 +278,14 @@ public class MemberService {
 
         Member member = userDetails.member();
         String changeEmail = email.email();
+        String originEmail = member.getEmail();
+
+        if(changeEmail.equals(originEmail)){
+            throw new BaseException(ExceptionCode.NOT_CHANGED_EQUAL_EMAIL);
+        }
+        checkEmail(changeEmail);
+
+
         LocalDateTime changedTime = member.getEmailUpdatedAt();
 
         long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
@@ -293,6 +300,8 @@ public class MemberService {
                     Collections.EMPTY_LIST);
             jwtUtil.createTokenAndSaved(authentication,response,request,changeEmail);
             SecurityContextHolder.setContext(context);
+
+            redisService.deleteRefreshToken(originEmail);
 
             memberRepository.save(member);
 
