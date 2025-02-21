@@ -74,6 +74,7 @@ public class RedisService {
     public void deleteRefreshToken(String memberEmail) {
         String key = "refresh:" + memberEmail;
         redisTemplate.delete(key);
+        log.info("리프레쉬 키 삭제 Member : {}", memberEmail);
     }
     public void addToBlacklist(String token, long expirationTime) {
         redisTemplate.opsForValue().set(token, "blacklisted", expirationTime, TimeUnit.MILLISECONDS);
