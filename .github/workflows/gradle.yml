@@ -69,7 +69,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu
-#            ./deploy.sh
             ls -l
             if [ -f "docker-compose.yml" ]; then
               echo "docker-compose.yml found. Proceeding..."
