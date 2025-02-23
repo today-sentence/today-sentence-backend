@@ -1,20 +1,24 @@
 package today.todaysentence.domain.member.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Setter
 @Getter
 @NoArgsConstructor
 public class InteractionResponseDTO {
 
-    Boolean isLiked;
-    Boolean isSaved;
+    Object isLiked;
 
-    public InteractionResponseDTO(Long liked, Long bookmark){
-        isLiked = liked != null && liked == 1L;
-        isSaved = bookmark != null && bookmark == 1L;
+    Object isSaved;
+
+    public InteractionResponseDTO(Object liked, Object saved) {
+        this.isLiked = liked != null && ((BigDecimal) liked).intValue() == 1;
+        this.isSaved = saved != null && ((BigDecimal) saved).intValue() == 1;
     }
 
 }

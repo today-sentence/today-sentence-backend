@@ -100,8 +100,8 @@ public class PostRepositoryCustom {
 
     public List<InteractionResponseDTO> checkInteractions(List<Long> postIds, Long memberId) {
         String sql = "SELECT " +
-                "CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END AS is_liked, " +
-                "CASE WHEN COUNT(bm.id) > 0 THEN 1 ELSE 0 END AS is_saved " +
+                "COALESCE(MAX(l.is_liked), 0) AS is_liked, " +
+                "COALESCE(MAX(bm.is_saved), 0) AS is_saved " +
                 "FROM post p " +
                 "LEFT JOIN likes l ON l.post_id = p.id AND l.member_id = :memberId " +
                 "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.member_id = :memberId " +
@@ -117,8 +117,8 @@ public class PostRepositoryCustom {
 
     public InteractionResponseDTO checkInteraction(Long postId, Long memberId) {
         String sql = "SELECT " +
-                "CASE WHEN COUNT(l.id) > 0 THEN 1 ELSE 0 END AS is_liked, " +
-                "CASE WHEN COUNT(bm.id) > 0 THEN 1 ELSE 0 END AS is_saved " +
+                "COALESCE(MAX(l.is_liked), 0) AS is_liked, " +
+                "COALESCE(MAX(bm.is_saved), 0) AS is_saved " +
                 "FROM post p " +
                 "LEFT JOIN likes l ON l.post_id = p.id AND l.member_id = :memberId " +
                 "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.member_id = :memberId " +
