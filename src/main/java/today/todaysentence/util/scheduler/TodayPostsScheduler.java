@@ -22,7 +22,7 @@ public class TodayPostsScheduler {
     private final PostService postService;
     private final MemberService memberService;
 
-    @Scheduled(cron = "0 30 2 * * ?")
+    @Scheduled(cron = "0 50 12 * * ?")
     public void fetchAndCachePosts() {
         int resetMemberCount = memberService.initTodaySentence();
 
