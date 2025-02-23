@@ -8,6 +8,7 @@ import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -99,6 +100,9 @@ public class PostRepositoryCustom {
 
 
     public List<InteractionResponseDTO> checkInteractions(List<Long> postIds, Long memberId) {
+
+        String postIdsString = postIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+
         String sql = "SELECT " +
                 "COALESCE(MAX(l.is_liked), 0) AS is_liked, " +
                 "COALESCE(MAX(bm.is_saved), 0) AS is_saved " +
@@ -106,7 +110,8 @@ public class PostRepositoryCustom {
                 "LEFT JOIN likes l ON l.post_id = p.id AND l.member_id = :memberId " +
                 "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.member_id = :memberId " +
                 "WHERE p.id IN :postIds " +
-                "GROUP BY p.id";
+                "GROUP BY p.id " +
+                "ORDER BY FIELD(p.id, " + postIdsString + ")";
 
         Query nativeQuery = entityManager.createNativeQuery(sql, InteractionResponseDTO.class);
         nativeQuery.setParameter("postIds", postIds);
