@@ -75,7 +75,7 @@ public class SearchService {
         String query = null;
         String orderByQuery  = " like_count DESC ";
 
-        if(sortField.equals("create_At")){
+        if(sortField.equals("create_at")){
             orderByQuery  = " p.create_at DESC ";
         }
 
