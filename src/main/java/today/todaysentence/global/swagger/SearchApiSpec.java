@@ -134,7 +134,13 @@ public interface SearchApiSpec {
                             """)
             })),
     })
-    CommonResponse<?>findPosts(String type, String search , JwtUserDetails userDetails);
+    CommonResponse<?>findPosts(
+            String type,
+            String search ,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("size") int size,
+            @RequestParam("page") int page,
+            JwtUserDetails userDetails);
 
 
     @Operation(summary = "인기태그 요청")

@@ -61,30 +61,42 @@ public class SearchService {
     }
 
     @Transactional(readOnly = true)
-    public CommonResponse<?> findPosts(String type, String search, JwtUserDetails userDetails) {
+    public CommonResponse<?> findPosts(
+            String type,
+            String search,
+            String sortField,
+            int size,
+            int page,
+            JwtUserDetails userDetails
+    ) {
 
         List<PostResponseDTO> posts;
 
-        String query;
-        if ("title".equals(type)) {
-            query="b.title = '" + search + "'";
-            posts = postRepositoryCustom.findPostsByDynamicQuery(query);
+        String query = null;
+        String orderByQuery  = " like_count DESC ";
 
+        if(sortField.equals("create_At")){
+            orderByQuery  = " p.create_at DESC ";
+        }
+
+        if ("title".equals(type)) {
+            query="b.title = :search";
         }else if ("category".equals(type)) {
-            query="p.category = '" + search + "'";
-            posts = postRepositoryCustom.findPostsByDynamicQuery(query);
+            query="p.category = :search";
         } else if ("tag".equals(type)) {
             redisService.saveOrUpdateKeyword("search",search);
             query= "ph.post_id IN (" +
                     "  SELECT ph.post_id " +
                     "  FROM post_hashtag ph " +
                     "  INNER JOIN hashtag h ON h.id = ph.hashtag_id " +
-                    "  WHERE h.name = '" +search +"'"+
+                    "  WHERE h.name = :search" +
                     ") ";
-                    posts = postRepositoryCustom.findPostsByDynamicQuery(query);
         }else{
             throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
         }
+
+        posts = postRepositoryCustom.findPostsByDynamicQuery(search,query,orderByQuery ,size,page);
+
         if (posts.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");
         }
@@ -93,7 +105,14 @@ public class SearchService {
                 .toList();
         List<InteractionResponseDTO> interactions = memberService.checkInteractions(postIds, userDetails.id());
 
-        return CommonResponse.ok(new PostResponse.PostResults(posts,interactions));
+        Long totalCount = postRepositoryCustom.totalCount(query,search);
+        System.out.println("totalCount"+totalCount);
+
+        int totalPage = (int)Math.ceil(totalCount /(double)size);
+        boolean hasNextPage = (page+1) <totalPage;
+
+
+        return CommonResponse.ok(new PostResponse.PostResults(posts,interactions,totalPage,hasNextPage));
     }
 
     /**

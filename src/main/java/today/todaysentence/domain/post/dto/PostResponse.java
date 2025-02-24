@@ -52,7 +52,10 @@ public class PostResponse {
 
     public record PostResults(
             List<PostResponseDTO> posts,
-            List<InteractionResponseDTO> interaction
+            List<InteractionResponseDTO> interaction,
+            int totalPage,
+            boolean hasNextPage
+
     ) {}
 
     public record PostResult(

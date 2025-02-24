@@ -32,10 +32,15 @@ public class SearchController implements SearchApiSpec {
     }
 
     @GetMapping("/posts")
-    public CommonResponse<?> findPosts(@RequestParam("type")String type, @RequestParam("search")String search,
-                                       @AuthenticationPrincipal JwtUserDetails userDetails){
+    public CommonResponse<?> findPosts(
+            @RequestParam("type")String type,
+            @RequestParam("search")String search,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("size") int size,
+            @RequestParam("page") int page,
+            @AuthenticationPrincipal JwtUserDetails userDetails){
 
-        return searchService.findPosts(type,search,userDetails);
+        return searchService.findPosts(type,search,sortBy,size,page,userDetails);
 
     }
 

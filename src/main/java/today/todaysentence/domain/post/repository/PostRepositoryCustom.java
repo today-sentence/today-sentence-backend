@@ -16,7 +16,7 @@ public class PostRepositoryCustom {
 
     private final EntityManager entityManager;
 
-    public List<PostResponseDTO> findPostsByDynamicQuery(String query) {
+    public List<PostResponseDTO> findPostsByDynamicQuery(String search,String query,String orderBy, int size, int page) {
 
         String sql = "SELECT " +
                 "b.title, b.author, b.cover, b.publisher, b.publishing_year, " +
@@ -36,9 +36,16 @@ public class PostRepositoryCustom {
                 "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
-                "ORDER BY like_count DESC";
+                "ORDER BY " + orderBy +
+                "LIMIT :size OFFSET :offset";
+
+
 
         Query nativeQuery = entityManager.createNativeQuery(sql, PostResponseDTO.class);
+
+        nativeQuery.setParameter("search", search);
+        nativeQuery.setParameter("size", size);
+        nativeQuery.setParameter("offset", page * size);
 
         return nativeQuery.getResultList();
     }
@@ -137,4 +144,18 @@ public class PostRepositoryCustom {
         return (InteractionResponseDTO)nativeQuery.getSingleResult();
     }
 
+    public Long totalCount(String query, String search) {
+        String countQuery = "SELECT COUNT(DISTINCT p.id) " +
+                "FROM post p " +
+                "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
+                "INNER JOIN book b ON b.isbn = p.book_isbn " +
+                "WHERE " + query + " AND p.deleted_at IS NULL";
+
+        Query countNativeQuery = entityManager.createNativeQuery(countQuery);
+        countNativeQuery.setParameter("search",search);
+
+        return  (Long) countNativeQuery.getSingleResult();
+
+
+    }
 }
