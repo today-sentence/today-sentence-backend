@@ -64,7 +64,7 @@ public class SearchService {
     public CommonResponse<?> findPosts(
             String type,
             String search,
-            String sortBy,
+            String sortField,
             int size,
             int page,
             JwtUserDetails userDetails
@@ -73,13 +73,12 @@ public class SearchService {
         List<PostResponseDTO> posts;
 
         String query = null;
-        String orderBy = " like_count DESC ";
+        String orderByQuery  = " like_count DESC ";
 
-        if(sortBy.equals("create_at")){
-            orderBy = " p.create_at DESC ";
-        }else if(sortBy.equals("like_count")){
-            orderBy = " like_count DESC ";
+        if(sortField.equals("create_At")){
+            orderByQuery  = " p.create_at DESC ";
         }
+
         if ("title".equals(type)) {
             query="b.title = :search";
         }else if ("category".equals(type)) {
@@ -96,7 +95,7 @@ public class SearchService {
             throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
         }
 
-        posts = postRepositoryCustom.findPostsByDynamicQuery(search,query,orderBy,size,page);
+        posts = postRepositoryCustom.findPostsByDynamicQuery(search,query,orderByQuery ,size,page);
 
         if (posts.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");
