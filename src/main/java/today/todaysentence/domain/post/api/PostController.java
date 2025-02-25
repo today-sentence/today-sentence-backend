@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.member.repository.MemberRepository;
+import today.todaysentence.domain.member.service.MemberService;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
+import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.post.service.PostService;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
@@ -30,6 +33,10 @@ import java.util.List;
 @RestController
 public class PostController implements PostApiSpec {
     private final PostService postService;
+    
+    //테스트용으로 실배포시 삭제
+    private final PostRepositoryCustom postRepositoryCustom;
+    private final MemberService memberService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -56,6 +63,16 @@ public class PostController implements PostApiSpec {
     @GetMapping("/{post_id}")
     public CommonResponse<PostResponse.Detail> getPostDetail(@PathVariable("post_id") Long postId) {
         return CommonResponse.ok(postService.getPostDetail(postId));
+    }
+
+    @GetMapping("/test/{post_id}")
+    public CommonResponse<?> test(@AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable("post_id") Long postId) {
+
+        String query = "p.id = " + postId;
+        PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
+        PostResponse.PostResult testDto = new PostResponse.PostResult(result,memberService.checkInteraction(postId, userDetails.id()));
+        return CommonResponse.ok(testDto);
     }
 
     @GetMapping("/statistics")
