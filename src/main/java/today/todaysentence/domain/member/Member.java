@@ -34,22 +34,6 @@ public class Member extends Timestamped {
 
     private Long todayPostId;
 
-    @Column(name = "nickname_updated_at")
-    @Builder.Default
-    private LocalDateTime nicknameUpdatedAt = LocalDateTime.now();
-
-    @Column(name = "email_updated_at")
-    @Builder.Default
-    private LocalDateTime emailUpdatedAt = LocalDateTime.now();
-
-    @Column(name = "password_updated_at")
-    @Builder.Default
-    private LocalDateTime passwordUpdatedAt = LocalDateTime.now();
-
-    @Column(name = "message_updated_at")
-    @Builder.Default
-    private LocalDateTime messageUpdatedAt = LocalDateTime.now();
-
     @Setter
     @Builder.Default
     private String profileImg = "basicProfileUrl";

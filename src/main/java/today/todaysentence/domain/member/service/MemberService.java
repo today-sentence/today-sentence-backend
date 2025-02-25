@@ -20,11 +20,13 @@ import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.member.MemberUpdateAt;
 import today.todaysentence.domain.member.WithdrawMember;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.repository.MemberRepository;
+import today.todaysentence.domain.member.repository.MemberUpdateAtRepository;
 import today.todaysentence.domain.member.repository.WithdrawRepository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.repository.PostRepository;
@@ -40,6 +42,7 @@ import today.todaysentence.util.email.VerificationCodeGenerator;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,15 +57,17 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final WithdrawRepository withdrawRepository;
     private final PostRepository postRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final RedisService redisService;
     private final EmailSenderService emailSenderService;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final BookmarkRepository bookmarkRepository;
     private final PostRepositoryCustom postRepositoryCustom;
+    private final MemberUpdateAtRepository memberUpdateAtRepository;
+
+    private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
@@ -189,6 +194,7 @@ public class MemberService {
                 .build();
 
         memberRepository.saveAll(members);
+        memberUpdateAtRepository.deleteById(member.getId());
 
         withdrawRepository.save(wMember);
 
@@ -279,14 +285,14 @@ public class MemberService {
         Member member = userDetails.member();
         String changeEmail = email.email();
         String originEmail = member.getEmail();
+        MemberUpdateAt memberUpdateAt = getMemberUpdateAt(member);
 
         if(changeEmail.equals(originEmail)){
             throw new BaseException(ExceptionCode.NOT_CHANGED_EQUAL_EMAIL);
         }
         checkEmail(changeEmail);
 
-
-        LocalDateTime changedTime = member.getEmailUpdatedAt();
+        LocalDateTime changedTime = memberUpdateAt.getEmailUpdatedAt();
 
         long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
 
@@ -303,7 +309,9 @@ public class MemberService {
 
             redisService.deleteRefreshToken(originEmail);
 
+            memberUpdateAt.updateEmailTime();
             memberRepository.save(member);
+            memberUpdateAtRepository.save(memberUpdateAt);
 
             return CommonResponse.ok(new MemberResponse.MemberInfo(member));
         } else {
@@ -319,21 +327,31 @@ public class MemberService {
 
     @Transactional
     private CommonResponse<?> changeField(Member member, String type, String field){
+        MemberUpdateAt updateAtMember = getMemberUpdateAt(member);
 
         LocalDateTime changedTime = switch (type) {
-            case MESSAGE_TYPE -> member.getMessageUpdatedAt();
-            case NICKNAME_TYPE -> member.getNicknameUpdatedAt();
+            case MESSAGE_TYPE -> updateAtMember.getMessageUpdatedAt();
+            case NICKNAME_TYPE -> updateAtMember.getNicknameUpdatedAt();
             default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
         };
 
         long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
 
-        if (daysBetween > CHANGE_FIELD_TIME) {
+        if (daysBetween >= CHANGE_FIELD_TIME) {
             switch (type) {
-                case MESSAGE_TYPE -> member.changeMessage(field);
-                case NICKNAME_TYPE -> member.changeNickname(field);
+                case MESSAGE_TYPE -> {
+                    member.changeMessage(field);
+                    updateAtMember.updateMessageTime();
+
+                }
+                case NICKNAME_TYPE -> {
+                    checkNickname(field);
+                    member.changeNickname(field);
+                    updateAtMember.updateNicknameTime();
+                }
             }
             memberRepository.save(member);
+            memberUpdateAtRepository.save(updateAtMember);
 
             return CommonResponse.ok(new MemberResponse.MemberInfo(member));
         } else {
@@ -345,8 +363,13 @@ public class MemberService {
 
     }
 
+    private MemberUpdateAt getMemberUpdateAt(Member member) {
+        return memberUpdateAtRepository.findByMember(member)
+                .orElseGet(() -> memberUpdateAtRepository.save(new MemberUpdateAt(member)));
+    }
+
     private long calculateDaysBetween(LocalDateTime startDate, LocalDateTime endDate) {
-        return Duration.between(startDate.withSecond(0).withNano(0), endDate.withSecond(0).withNano(0)).toDays();
+        return ChronoUnit.DAYS.between(startDate, endDate);
     }
 
     @Transactional(readOnly = true)
