@@ -19,12 +19,10 @@ public class Likes extends Timestamped {
     private Long id;
 
     @JoinColumn(name = "member_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Long memberId;
 
     @JoinColumn(name = "post_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Post post;
+    private Long postId;
 
     @Builder.Default
     @Column(nullable = false)

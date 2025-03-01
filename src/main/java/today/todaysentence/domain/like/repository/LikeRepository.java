@@ -15,14 +15,15 @@ import java.util.Set;
 
 public interface LikeRepository extends JpaRepository<Likes,Long> {
 
-    Optional<Likes> findByMemberAndPost(Member member, Post post);
+    @Query("SELECT l FROM Likes l WHERE l.memberId = :memberId AND l.postId = :postId")
+    Optional<Likes> findByMemberAndPost(@Param("memberId") Long memberId,@Param("postId") Long postId);
 
     @Modifying
     @Query("DELETE FROM Likes l WHERE l.isLiked = false")
     int deleteIsLikeFalse();
 
     @Modifying
-    @Query("UPDATE Likes l SET l.isLiked = false WHERE l.member.id = :memberId")
+    @Query("UPDATE Likes l SET l.isLiked = false WHERE l.memberId = :memberId")
     int softDeleteLikeByMember(@Param("memberId") Long memberId);
 
 
