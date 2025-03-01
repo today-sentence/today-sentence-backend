@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
+import today.todaysentence.domain.post.dto.PostCategoryLikeCountDTO;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class PostRepositoryCustom {
                 "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
-                "ORDER BY " + orderBy +
+                "ORDER BY " + orderBy +",p.id DESC "+
                 "LIMIT :size OFFSET :offset";
 
 
@@ -69,7 +70,7 @@ public class PostRepositoryCustom {
                 "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
-                "ORDER BY like_count DESC";
+                "ORDER BY like_count DESC, p.id DESC";
 
         Query nativeQuery = entityManager.createNativeQuery(sql, PostResponseDTO.class);
 
@@ -158,4 +159,21 @@ public class PostRepositoryCustom {
 
 
     }
+
+    public PostCategoryLikeCountDTO findPostCategoryAndLikeCount(Long postId) {
+        String query = "SELECT " +
+                "p.category, " +
+                "COUNT(DISTINCT l.id) as like_count " +
+                "FROM post p " +
+                "LEFT JOIN likes l ON l.post_id = p.id AND l.is_liked = true AND l.deleted_at IS NULL " +
+                "WHERE p.id = :postId " +
+                "GROUP BY p.id ";
+
+        Query nativeQuery = entityManager.createNativeQuery(query, PostCategoryLikeCountDTO.class);
+        nativeQuery.setParameter("postId",postId);
+
+        return (PostCategoryLikeCountDTO)nativeQuery.getSingleResult();
+    }
+
+//    public
 }

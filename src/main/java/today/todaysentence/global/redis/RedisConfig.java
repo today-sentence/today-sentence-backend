@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -21,6 +23,8 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.port}")
     private int redisPort;
+
+//    private final LikeMessageListener likeMessageListener;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -48,4 +52,23 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+
+
+    // 메시지 리스너 컨테이너 등록 방법1
+//    @Bean
+//    public RedisMessageListenerContainer messageListenerContainer(RedisConnectionFactory connectionFactory) {
+//        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+//        container.setConnectionFactory(connectionFactory);
+//        container.addMessageListener(new MessageListenerAdapter(likeMessageListener), new ChannelTopic("like_count"));
+//        return container;
+//    }
+    //방법 2 간단하게 사용할 수 있다고하네요
+//    @RedisListener(topics = "likeQueue")
+//    public void processLike(LikeEvent event) {
+//        Likes like = likeRepository.findByPostId(event.getPostId()).orElseGet(() -> createLike(event.getPostId()));
+//        like.toggle();
+//        likeRepository.save(like);
+//    }
+
 }
