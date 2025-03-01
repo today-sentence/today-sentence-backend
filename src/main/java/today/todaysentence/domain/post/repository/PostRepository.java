@@ -25,18 +25,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByWriter(Member member);
 
-//    검색결과의 총 개수 혹시나 추후사용 가능성이 있어서 만들어만놓았어요
-//    @Query(value = "SELECT COUNT(DISTINCT p.id) " +
-//            "FROM post p " +
-//            "INNER JOIN member m ON m.id = p.writer_id " +
-//            "INNER JOIN book b ON b.isbn = p.book_isbn " +
-//            "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-//            "LEFT JOIN likes l ON l.post_id = p.id " +
-//            "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-//            "WHERE b.title = :search",
-//             nativeQuery = true)
-//    Long countPostsByCategory(@Param("search") String search);
-
     boolean existsById(@NonNull Long id);
 
     @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
