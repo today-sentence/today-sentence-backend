@@ -78,7 +78,7 @@ public class SearchService {
         //캐시먼저검사 (look aside)
         List<PostResponseDTO> posts;
 
-        if(type.equals("category") && page<3){
+        if(type.equals("category") && page<5){
             String key = type+"_"+search;
 
             //캐시검사
