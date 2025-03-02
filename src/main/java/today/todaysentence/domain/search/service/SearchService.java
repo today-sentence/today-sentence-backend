@@ -1,9 +1,8 @@
 package today.todaysentence.domain.search.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Range;
+import org.springframework.data.domain.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +11,6 @@ import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.member.service.MemberService;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
-import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.exception.exception.BaseException;
@@ -38,6 +36,9 @@ public class SearchService {
     private final MemberService memberService;
 
     private final StringRedisTemplate stringRedisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public static final int CACHE_MAX_SIZE = 50;
 
 
     public CommonResponse<?> findBooks(String type, String search, Pageable pageable) {
@@ -70,43 +71,43 @@ public class SearchService {
             JwtUserDetails userDetails
     ) {
 
+        String orderByQuery = getOrderByQuery(sortField);
+
+        String query = getSearchQuery(type, search);
+
+        //캐시먼저검사 (look aside)
         List<PostResponseDTO> posts;
 
-        String query = null;
-        String orderByQuery  = " like_count DESC ";
+        if(type.equals("category") && page<5){
+            String key = type+"_"+search;
 
-        if(sortField.equals("create_at")){
-            orderByQuery  = " p.create_at DESC ";
-        }
+            //캐시검사
+            posts = getCachePosts(key,type, search, size, page);
 
-        if ("title".equals(type)) {
-            query="b.title = :search";
-        }else if ("category".equals(type)) {
-            query="p.category = :search";
-        } else if ("tag".equals(type)) {
-            redisService.saveOrUpdateKeyword("search",search);
-            query= "ph.post_id IN (" +
-                    "  SELECT ph.post_id " +
-                    "  FROM post_hashtag ph " +
-                    "  INNER JOIN hashtag h ON h.id = ph.hashtag_id " +
-                    "  WHERE h.name = :search" +
-                    ") ";
+            if(posts==null){
+
+                posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery,size,page);
+
+                for (PostResponseDTO p : posts) {
+                    redisTemplate.opsForZSet().add(key,p,p.getLikesCount());
+                }
+            }
         }else{
-            throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
+            posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery, size, page);
         }
-
-        posts = postRepositoryCustom.findPostsByDynamicQuery(search,query,orderByQuery ,size,page);
 
         if (posts.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");
         }
+
         List<Long> postIds= posts.stream()
                 .map(PostResponseDTO::getPostId)
                 .toList();
+
         List<InteractionResponseDTO> interactions = memberService.checkInteractions(postIds, userDetails.id());
 
         Long totalCount = postRepositoryCustom.totalCount(query,search);
-        System.out.println("totalCount"+totalCount);
+
 
         int totalPage = (int)Math.ceil(totalCount /(double)size);
         boolean hasNextPage = (page+1) <totalPage;
@@ -115,14 +116,76 @@ public class SearchService {
         return CommonResponse.ok(new PostResponse.PostResults(posts,interactions,totalPage,hasNextPage));
     }
 
-    /**
-     * 1.사전순으로 레디스에 넣은정보를 전부꺼내와서 스프링에서 재정렬후 리턴
-     * 2.추후 검색어만 앞글자에 포함한 결과를 리턴
-     *    ㄴ 레디스에서 range검색
-     * @param prefix (검색단어)
-     * @return List . 검색결과 1.검색어앞글자 우선 2.검색어 포함글자 뒤
-     *
-     */
+    private List<PostResponseDTO> getCachePosts(String key, String type, String search, int size, int page) {
+
+        List<PostResponseDTO> posts;
+        posts = searchResultCache(type, search, page, size);
+        int startIndex = page*size;
+        if(posts.size() != 10) {
+
+            redisTemplate.opsForZSet().removeRange(key, startIndex, - 1);
+            return null;
+        }
+
+        return posts;
+    }
+
+    private String getSearchQuery(String type, String search) {
+
+        String query;
+        switch (type){
+            case "title" -> {
+                query=" b.title = :search ";
+            }
+
+            case "category" -> {
+                query=" p.category = :search ";
+            }
+
+            case "tag" -> {
+                redisService.saveOrUpdateKeyword("search", search);
+                query= "ph.post_id IN (" +
+                        "  SELECT ph.post_id " +
+                        "  FROM post_hashtag ph " +
+                        "  INNER JOIN hashtag h ON h.id = ph.hashtag_id " +
+                        "  WHERE h.name = :search" +
+                        ") ";
+            }
+            default ->  throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
+
+        }
+        return query;
+    }
+
+    private static String getOrderByQuery(String sortField) {
+
+        String orderByQuery  = " like_count DESC ";
+
+        if(sortField.equals("create_at")){
+            orderByQuery  = " p.create_at DESC ";
+        }
+        return orderByQuery;
+    }
+
+
+
+    public List<PostResponseDTO> searchResultCache(String type, String search,int page, int size){
+
+        List<PostResponseDTO> posts;
+
+        String key = type+"_"+search;
+        int start = page * size;
+        int end = (page+1) * size -1;
+
+        Set<Object> test= redisTemplate.opsForZSet().reverseRange(key,start ,end);
+
+        posts = test.stream().map(o-> (PostResponseDTO)o).toList();
+
+        return posts;
+
+    }
+
+
     public List<String> getRelatedHashtags(String prefix) {
         String min = "";
         String max = prefix + "\uFFFF";
@@ -156,4 +219,7 @@ public class SearchService {
 
         return CommonResponse.ok(new SearchResponse.HashTagRank(search,record)) ;
     }
+
+
+
 }
