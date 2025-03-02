@@ -39,7 +39,6 @@ public class JwtUtil {
     public static final String REFRESH_KEY ="REFRESH-TOKEN";
     private static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis();
     private static final long REFRESH_TIME = Duration.ofDays(7).toMillis();
-    private final MemberRepository memberRepository;
 
 
 
@@ -77,14 +76,17 @@ public class JwtUtil {
 
     public String createToken(Authentication authentication, String type) {
         Date date = new Date();
+        Object principal = authentication.getPrincipal();
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        Long userId = getUserId(principal);
+        String nickname = getNickname(principal);
+
         if(type.equals("Access")) {
             return BEARER_PREFIX
                     + Jwts.builder()
                     .setSubject(authentication.getName())
-                    .claim("nickname", customUserDetails.getMemberNickname())
-                    .claim("id",customUserDetails.member().getId())
+                    .claim("nickname", nickname)
+                    .claim("id",userId)
                     .signWith(key)
                     .setIssuedAt(date)
                     .setExpiration(new Date(date.getTime() + ACCESS_TIME))
@@ -93,11 +95,31 @@ public class JwtUtil {
             return BEARER_PREFIX
                     + Jwts.builder()
                     .setSubject(authentication.getName())
+                    .claim("id",userId)
+                    .claim("nickname", nickname)
                     .signWith(key)
                     .setIssuedAt(date)
                     .setExpiration(new Date(date.getTime() + REFRESH_TIME))
                     .compact();
         }
+    }
+
+    private Long getUserId(Object principal) {
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).member().getId();
+        } else if (principal instanceof JwtUserDetails) {
+            return ((JwtUserDetails) principal).id();
+        }
+        return null;
+    }
+
+    private String getNickname(Object principal) {
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getMemberNickname();
+        } else if (principal instanceof JwtUserDetails) {
+            return ((JwtUserDetails) principal).nickname();
+        }
+        return null;
     }
 
     public boolean validateToken(String token) {
@@ -164,15 +186,14 @@ public class JwtUtil {
     public void handleRefreshToken(String refreshToken, HttpServletResponse response, HttpServletRequest request) {
         Claims claims= parseClaims(refreshToken);
         String memberEmail = claims.getSubject();
+        Long id = claims.get("id", Long.class);
+        String nickname = claims.get("nickname", String.class);
         String deviceId = request.getHeader("Device-Id");
 
         validateDeviceId(memberEmail, deviceId);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(memberEmail);
-
-
         Authentication authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                new UsernamePasswordAuthenticationToken(new JwtUserDetails(id,memberEmail,nickname), null,  Collections.emptyList());
 
         TokenDto tokenDto = createAllToken(authentication);
 
