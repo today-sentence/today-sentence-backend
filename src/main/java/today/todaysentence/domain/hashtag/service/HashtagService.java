@@ -23,6 +23,11 @@ public class HashtagService {
 
     private Hashtag findOrCreateSingle(String hashtagName) {
         return hashtagRepository.findByName(hashtagName)
-                .orElseGet(() -> hashtagRepository.save(new Hashtag(hashtagName)));
+                .orElseGet(() -> {
+                    Hashtag newHashtag = hashtagRepository.save(new Hashtag(hashtagName));
+                    redisService.recordNewHashtag(newHashtag);
+                    return newHashtag;
+                    }
+                );
     }
 }

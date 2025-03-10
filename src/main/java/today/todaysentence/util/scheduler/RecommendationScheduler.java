@@ -32,43 +32,6 @@ public class RecommendationScheduler {
     private final RedisService redisService;
     private final CommentRepository commentRepository;
 
-
-    @Scheduled(cron = "0 */10 * * * ?")
-
-    public void checkNewHashtag(){
-
-        log.info("start Hashtags insert process");
-
-        List<Long> hashIdsLong = Objects.requireNonNull(redisTemplate.opsForSet().members("hashtagsId"))
-                .stream().map(Long::parseLong)
-                .toList();
-        List<Hashtag> newHashtags;
-
-        if(!hashIdsLong.isEmpty()){
-            newHashtags = hashtagRepository.findNewIds(hashIdsLong);
-        }else{
-            newHashtags = hashtagRepository.findAllIds();
-        }
-
-        if (newHashtags.isEmpty()) return;
-
-        Map<String, Integer> zSetData = new HashMap<>();
-        Set<String> setData = new HashSet<>();
-
-        newHashtags.forEach(tag -> {
-            zSetData.put(tag.getName(), 0);
-            setData.add(String.valueOf(tag.getId()));
-        });
-
-        zSetData.forEach((name, score) ->
-                redisTemplate.opsForZSet().add("hashtags", name, score)
-        );
-        redisTemplate.opsForSet().add("hashtagsId", setData.toArray(new String[0]));
-
-        log.info("new Hashtags count : {}",newHashtags.size());
-
-    }
-
     @Scheduled(fixedDelay = 600000)
     public void famousTagsZeroScoreDelAndDecrement() {
         redisService.decreaseAllScoresForAllTags(2);

@@ -8,7 +8,10 @@ import today.todaysentence.domain.like.Likes;
 import today.todaysentence.domain.like.dto.LikeResponse;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.post.EventType;
+import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
+import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.global.redis.RedisService;
 import today.todaysentence.global.response.CommonResponse;
 
@@ -31,18 +34,9 @@ public class LikeService {
 
         like.toggle();
 
-        PostResponseDTO postCache = redisService.getPostCache(postId);
-        if(postCache != null){
-            if(like.getIsLiked()){
-                postCache.setLikesCount(postCache.getLikesCount()+1);
-            }else{
-                postCache.setLikesCount(postCache.getLikesCount()-1);
-            }
-            redisService.setPostCache(postId,postCache);
-//            stringRedisTemplate.convertAndSend("like_count",String.valueOf(postId));
-            likeRepository.save(like);
-        }
-        eventPublisher.publishEvent(new LikeResponse.LikeEvent(postId));
+        likeRepository.save(like);
+
+        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.LIKE,like.getIsLiked()));
 
         return CommonResponse.ok(like.getIsLiked());
     }

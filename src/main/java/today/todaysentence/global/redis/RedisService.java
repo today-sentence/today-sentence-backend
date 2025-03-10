@@ -4,15 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import today.todaysentence.domain.category.Category;
-import today.todaysentence.domain.like.dto.LikeResponse;
-import today.todaysentence.domain.post.dto.PostCategoryLikeCountDTO;
+import org.springframework.transaction.annotation.Transactional;
+import today.todaysentence.domain.post.Category;
+import today.todaysentence.domain.hashtag.Hashtag;
+import today.todaysentence.domain.post.EventType;
+import today.todaysentence.domain.post.Post;
+import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
 import today.todaysentence.domain.post.dto.ScheduledPosts;
+import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.global.jwt.MemberDeviceIdDto;
 
@@ -27,14 +33,21 @@ import static today.todaysentence.domain.search.service.SearchService.CACHE_MAX_
 @Slf4j
 public class RedisService {
     private final String DUPLICATED_POST_IDS_KEY = "duplicatePostIds";
-    private final String POST_CACHE_KEY = "postId : ";
+
+    public static final String POST_CACHE_KEY = "postId : ";
     public static final String FAMOUS_SEARCH_TAG_KEY ="search_tag";
     public static final String FAMOUS_RECORD_TAG_KEY ="record_tag";
+    public static final String HASHTAGS_LIST = "hashtags";
+    public static final String TODAY_SENTENCE_POST_IDS = "post_id";
+    public static final String TODAY_SENTENCE_WRITER_IDS = "writer_id";
+
+
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate sRedisTemplate;
 
     private final PostRepositoryCustom postRepositoryCustom;
+    private final PostRepository postRepository;
 
     public void saveRefreshToken(String memberId, String refreshToken,String deviceId, long duration) {
         String key = "refresh:" + memberId;
@@ -88,8 +101,10 @@ public class RedisService {
         redisTemplate.delete(key);
         log.info("리프레쉬 키 삭제 Member : {}", memberEmail);
     }
+
     public void addToBlacklist(String token, long expirationTime) {
-        redisTemplate.opsForValue().set(token, "blacklisted", expirationTime, TimeUnit.MILLISECONDS);
+        String BLACK_LIST = "blacklist";
+        redisTemplate.opsForValue().set(token, BLACK_LIST, expirationTime, TimeUnit.MILLISECONDS);
     }
 
     public boolean isBlacklisted(String token) {
@@ -98,9 +113,7 @@ public class RedisService {
 
 
     public void saveCode(String email, String code,long duration) {
-        String Key = email;
-        String value = code;
-        redisTemplate.opsForValue().set(Key, value, duration, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(email, code, duration, TimeUnit.MILLISECONDS);
 
     }
 
@@ -131,8 +144,8 @@ public class RedisService {
 
     public void addScheduledPosts(List<ScheduledPosts> scheduledPostsList) {
         scheduledPostsList.forEach(scheduledPosts -> {
-                redisTemplate.opsForHash().put(scheduledPosts.category().name(), "post_id", scheduledPosts.postIds());
-                redisTemplate.opsForHash().put(scheduledPosts.category().name(), "writer_id", scheduledPosts.writerIds());
+                redisTemplate.opsForHash().put(scheduledPosts.category().name(), TODAY_SENTENCE_POST_IDS, scheduledPosts.postIds());
+                redisTemplate.opsForHash().put(scheduledPosts.category().name(), TODAY_SENTENCE_WRITER_IDS, scheduledPosts.writerIds());
                 });
 
         Set<Long> addedPostIds = scheduledPostsList.stream()
@@ -147,8 +160,8 @@ public class RedisService {
         try{
             log.info("check today-sentence postIds due to member withdraw");
             check.forEach((withdrawMemberId,category)->{
-                List<Long> posts = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), "post_id")));
-                List<Long> members = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), "writer_id")));
+                List<Long> posts = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), TODAY_SENTENCE_POST_IDS)));
+                List<Long> members = new ArrayList<>((List<Long>) Objects.requireNonNull(redisTemplate.opsForHash().get(category.name(), TODAY_SENTENCE_WRITER_IDS)));
 
                 if (posts.contains(withdrawMemberId)) {
                     log.info("today sentence postIds reSettings [ category : {} ]  [ removePostId : {} ]",category.name(),withdrawMemberId);
@@ -156,8 +169,8 @@ public class RedisService {
                     posts.remove(index);
                     members.remove(index);
 
-                    redisTemplate.opsForHash().put(category.name(), "post_id", posts);
-                    redisTemplate.opsForHash().put(category.name(), "writer_id", members);
+                    redisTemplate.opsForHash().put(category.name(), TODAY_SENTENCE_POST_IDS, posts);
+                    redisTemplate.opsForHash().put(category.name(), TODAY_SENTENCE_WRITER_IDS, members);
 
                 }else{
                     log.info("no deleted postIds");
@@ -223,59 +236,85 @@ public class RedisService {
      * 좋아요가 눌리면 해당 post의 카테고리와 likeCount를 찾아와서
      * 해당 post가 이미등록된 캐싱에 포함이 되어있는지 확인을한다
      * true -> 기존데이터를 삭제후에 새롭게 넣는다
-     * false -> 아직 캐싱데이터의.size가 30개가안된다면 바로집어넣고
-     * 넘는다면 기존의것을 넣고 30개를 유지한다.
+     * false -> 아직 캐싱데이터의.size가 50개가안된다면 바로집어넣고
+     * 넘는다면 기존의것을 넣고 50개를 유지한다.
      *
-     * @variable CACHE_MAX_SIZE 캐시 최대 크기. 캐시가 30개 이상이 되면 기존 데이터를 삭제하고 새로 추가.
+     * @variable CACHE_MAX_SIZE 캐시 최대 크기. 캐시가 50개 이상이 되면 기존 데이터를 삭제하고 새로 추가.
      *
      *  */
     @EventListener
     @Async("taskExecutor")
-    public void searchRankObserver(LikeResponse.LikeEvent postId){
+    @Transactional
+    public void searchRankObserver(PostResponse.PostEventDto event) {
+        Long postId = event.postId();
 
-        //이벤트발생으로 전달받은 post의 category와 likecount를 가져온다
-        PostCategoryLikeCountDTO categoryAndCount = postRepositoryCustom.findPostCategoryAndLikeCount(postId.postId());
+        Post post = postRepository.findByIdLock(postId).orElseThrow();
 
-        Long listenPostId = postId.postId();
+        try {
+            if (event.type() == EventType.LIKE) {
+                if (event.result()) {
+                    post.incrementLikeCount();
+                } else {
+                    post.decrementLikeCount();
+                }
+            } else if (event.type() == EventType.BOOK_MARK) {
+                if (event.result()) {
+                    post.incrementBookmarkCount();
+                } else {
+                    post.decrementBookmarkCount();
+                }
+            } else if (event.type() == EventType.COMMENT) {
+                post.incrementCommentCount();
+            }
 
-        //key
-        String key = "category_"+categoryAndCount.getCategory();
+            postRepository.save(post);
 
-        //기존에 등록된 전체를 가져온다.
-        Set<Object> allEntries = redisTemplate.opsForZSet().range(key,0,-1);
-        
-        //기존에 포함된것인지 확인.
+        } catch (DeadlockLoserDataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        updateRedisCache(post, event, post.getLikeCount());
+    }
+
+    private void updateRedisCache(Post post, PostResponse.PostEventDto event, Long likeCount) {
+
+        Long listenPostId = post.getId();
+
+        //오늘의명언 부분
+        PostResponseDTO todaySentence = getPostCache(listenPostId);
+
+        if(todaySentence!=null){
+            updateTodaySentence(listenPostId);
+        }
+
+        String key = "category_" + post.getCategory();
+
+        // Redis에서 기존 항목을 가져옴
+        Set<Object> allEntries = redisTemplate.opsForZSet().range(key, 0, -1);
         PostResponseDTO existing = getPostResponseDTO(allEntries, listenPostId);
 
-        //기존에것이 있을시 삭제후 add
-        if(existing != null) {
-            redisTemplate.opsForZSet().remove(key,existing);
-            addNewEntry(listenPostId,key);
+        // 기존에 있으면 삭제 후 새 항목 추가
+        if (existing != null) {
+            redisTemplate.opsForZSet().remove(key, existing);
+            addNewEntry(listenPostId, key);
+        } else if (event.type() == EventType.LIKE) {
+            Set<Object> lastEntries = redisTemplate.opsForZSet().range(key, 0, 0);
+            PostResponseDTO lastEntry = (PostResponseDTO) lastEntries.iterator().next();
 
-        }else if(allEntries.size()<CACHE_MAX_SIZE) { //기존에 없지만 아직 30개가 채워지지않았을경우 
-            addNewEntry(listenPostId,key);
-
-        }else{ //기존에도없고 30개도 넘었을시에 마지막과 비교
-            Set<Object> lastEntries = redisTemplate.opsForZSet().range(key,0,0);
-
-            PostResponseDTO lastEntry =(PostResponseDTO) lastEntries.iterator().next();
-
-            //비교해서 기존의것보다 더 카운팅이 높다면 추가 및 기존삭제
-            if (lastEntry.getLikesCount() < categoryAndCount.getLikeCount()) {
+            // 기존 항목과 비교하여, 더 높은 카운트면 추가 및 기존 항목 삭제
+            if (lastEntry.getLikesCount() < likeCount) {
                 redisTemplate.opsForZSet().remove(key, lastEntry);
                 addNewEntry(listenPostId, key);
             }
         }
-
     }
 
     private PostResponseDTO getPostResponseDTO(Set<Object> allEntries, Long listenPostId) {
-        PostResponseDTO existing = allEntries.stream()
+        return allEntries.stream()
                 .map(o->(PostResponseDTO)o)
                 .filter(post->post.getPostId().equals(listenPostId))
                 .findFirst()
                 .orElse(null);
-        return existing;
     }
 
     private void addNewEntry(Long listenPostId, String key) {
@@ -284,5 +323,15 @@ public class RedisService {
         redisTemplate.opsForZSet().add(key,newEntry,newEntry.getLikesCount());
     }
 
+    private void updateTodaySentence(Long listenPostId) {
+        String query = " p.id = "+ listenPostId;
+        PostResponseDTO newTodaySentence = postRepositoryCustom.findPostByDynamicQuery(query);
+        redisTemplate.opsForValue().set(POST_CACHE_KEY+listenPostId, newTodaySentence, 15, TimeUnit.MINUTES);
+    }
+
+
+    public void recordNewHashtag(Hashtag newHashtag) {
+        redisTemplate.opsForZSet().add(HASHTAGS_LIST,newHashtag.getName(),0);
+    }
 
 }

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.book.Book;
 import today.todaysentence.domain.book.dto.BookInfo;
 import today.todaysentence.domain.book.service.BookService;
-import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.domain.hashtag.service.HashtagService;
 import today.todaysentence.domain.member.Member;
@@ -35,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static today.todaysentence.global.redis.RedisService.*;
 
 @RequiredArgsConstructor
 @Service
@@ -183,14 +185,14 @@ public class PostService {
         }
 
         //step4 캐싱값 확인 CacheHit >> 바로반환  CacheMiss >>  DATABASE 조회후 캐싱후 반환
-        return Optional.ofNullable((PostResponseDTO)redisTemplate.opsForValue().get("postId : " + randomPostId))
+        return Optional.ofNullable((PostResponseDTO)redisTemplate.opsForValue().get(POST_CACHE_KEY+ randomPostId))
                 .map(post -> new PostResponse.PostResult(post, memberService.checkInteraction(randomPostId, member.getId())))
                 .or(() -> {
                     String query = "p.id = " + randomPostId;
                     PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
                     InteractionResponseDTO interaction = memberService.checkInteraction(randomPostId, member.getId());
 
-                    redisTemplate.opsForValue().set("postId : " + randomPostId, result, 15, TimeUnit.MINUTES);
+                    redisTemplate.opsForValue().set(POST_CACHE_KEY+ randomPostId, result, 15, TimeUnit.MINUTES);
 
                     return Optional.of(new PostResponse.PostResult(result, interaction));
                 })
@@ -217,7 +219,7 @@ public class PostService {
                 .skip(skipRank)
                 .limit(rank)
                 .flatMap(c->{
-                    List<Long> memberIds = (List<Long>) redisTemplate.opsForHash().get(c.name(), "writer_id");
+                    List<Long> memberIds = (List<Long>) redisTemplate.opsForHash().get(c.name(), TODAY_SENTENCE_WRITER_IDS);
 
                     if (memberIds == null) {
                         return Stream.empty();
@@ -229,7 +231,7 @@ public class PostService {
                                     .boxed()
                                     .toList();
 
-                    List<Long> postIdsList = (List<Long>) redisTemplate.opsForHash().get(c.name(), "post_id");
+                    List<Long> postIdsList = (List<Long>) redisTemplate.opsForHash().get(c.name(), TODAY_SENTENCE_POST_IDS);
 
                     if (postIdsList == null) {
                         return Stream.empty();
