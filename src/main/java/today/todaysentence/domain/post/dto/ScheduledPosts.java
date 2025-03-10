@@ -1,6 +1,6 @@
 package today.todaysentence.domain.post.dto;
 
-import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.post.Category;
 
 import java.util.List;
 

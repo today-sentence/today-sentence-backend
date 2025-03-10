@@ -1,4 +1,4 @@
-package today.todaysentence.domain.category;
+package today.todaysentence.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
