@@ -24,8 +24,6 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-//    private final LikeMessageListener likeMessageListener;
-
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(redisHost, redisPort);
@@ -45,30 +43,10 @@ public class RedisConfig {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
 
-
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         redisTemplate.setValueSerializer(serializer);
 
-
         return redisTemplate;
     }
-
-
-
-    // 메시지 리스너 컨테이너 등록 방법1
-//    @Bean
-//    public RedisMessageListenerContainer messageListenerContainer(RedisConnectionFactory connectionFactory) {
-//        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-//        container.setConnectionFactory(connectionFactory);
-//        container.addMessageListener(new MessageListenerAdapter(likeMessageListener), new ChannelTopic("like_count"));
-//        return container;
-//    }
-    //방법 2 간단하게 사용할 수 있다고하네요
-//    @RedisListener(topics = "likeQueue")
-//    public void processLike(LikeEvent event) {
-//        Likes like = likeRepository.findByPostId(event.getPostId()).orElseGet(() -> createLike(event.getPostId()));
-//        like.toggle();
-//        likeRepository.save(like);
-//    }
 
 }

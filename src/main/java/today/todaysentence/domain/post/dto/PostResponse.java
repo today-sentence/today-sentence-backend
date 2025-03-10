@@ -1,9 +1,9 @@
 package today.todaysentence.domain.post.dto;
 
 import lombok.Builder;
-import lombok.Getter;
-import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
+import today.todaysentence.domain.post.EventType;
 
 import java.util.List;
 import java.util.Map;
@@ -62,5 +62,13 @@ public class PostResponse {
             PostResponseDTO posts,
             InteractionResponseDTO interaction
     ) {}
+
+    public record PostEventDto(
+            Long postId,
+            EventType type,
+            Boolean result
+
+    ){
+    }
 
 }

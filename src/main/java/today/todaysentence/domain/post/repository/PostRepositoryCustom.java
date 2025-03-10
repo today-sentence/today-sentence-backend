@@ -24,23 +24,18 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(DISTINCT l.id) as like_count, " +
-                "COUNT(DISTINCT bm.id) as bookmark_count, " +
-                "COUNT(DISTINCT cm.id) as comment_count " +
+                "p.like_count, " +
+                "p.bookmark_count, " +
+                "p.comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL AND l.is_liked = true " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL AND bm.is_saved = true " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY " + orderBy +",p.id DESC "+
                 "LIMIT :size OFFSET :offset";
-
-
 
         Query nativeQuery = entityManager.createNativeQuery(sql, PostResponseDTO.class);
 
@@ -57,17 +52,14 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(DISTINCT l.id) as like_count, " +
-                "COUNT(DISTINCT bm.id) as bookmark_count, " +
-                "COUNT(DISTINCT cm.id) as comment_count " +
+                "p.like_count, " +
+                "p.bookmark_count, " +
+                "p.comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL AND l.is_liked = true " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL AND bm.is_saved = true " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC, p.id DESC";
@@ -85,17 +77,14 @@ public class PostRepositoryCustom {
                 "p.id, m.nickname, p.content, p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
-                "COUNT(DISTINCT l.id) as like_count, " +
-                "COUNT(DISTINCT bm.id) as bookmark_count, " +
-                "COUNT(DISTINCT cm.id) as comment_count " +
+                "p.like_count, " +
+                "p.bookmark_count, " +
+                "p.comment_count " +
                 "FROM post p " +
                 "INNER JOIN member m ON m.id = p.writer_id " +
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
-                "LEFT JOIN likes l ON l.post_id = p.id AND l.deleted_at IS NULL AND l.is_liked = true " +
-                "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.deleted_at IS NULL AND bm.is_saved = true " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "LEFT JOIN comment cm ON cm.post_id = p.id AND cm.deleted_at IS NULL " +
                 "WHERE " + query + " " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC " +
@@ -163,9 +152,8 @@ public class PostRepositoryCustom {
     public PostCategoryLikeCountDTO findPostCategoryAndLikeCount(Long postId) {
         String query = "SELECT " +
                 "p.category, " +
-                "COUNT(DISTINCT l.id) as like_count " +
+                "p.like_count " +
                 "FROM post p " +
-                "LEFT JOIN likes l ON l.post_id = p.id AND l.is_liked = true AND l.deleted_at IS NULL " +
                 "WHERE p.id = :postId " +
                 "GROUP BY p.id ";
 
@@ -175,5 +163,4 @@ public class PostRepositoryCustom {
         return (PostCategoryLikeCountDTO)nativeQuery.getSingleResult();
     }
 
-//    public
 }

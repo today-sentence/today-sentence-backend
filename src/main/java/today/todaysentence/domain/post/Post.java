@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.book.Book;
-import today.todaysentence.domain.category.Category;
 import today.todaysentence.domain.hashtag.Hashtag;
 import today.todaysentence.global.timeStamped.Timestamped;
 
@@ -47,6 +46,10 @@ public class Post extends Timestamped {
 
     private String content;
 
+    private Long likeCount = 0L;
+    private Long bookmarkCount = 0L;
+    private Long CommentCount = 0L;
+
     public Post(Member writer, Book book, Category category, List<Hashtag> hashtags, String content) {
         this.writer = writer;
         this.book = book;
@@ -64,4 +67,11 @@ public class Post extends Timestamped {
     public void deleted(){
         this.deletedAt= LocalDateTime.now();
     }
+
+    public void incrementLikeCount(){this.likeCount++;}
+    public void incrementCommentCount(){this.CommentCount++;}
+    public void incrementBookmarkCount(){this.bookmarkCount++;}
+
+    public void decrementLikeCount(){this.likeCount--;}
+    public void decrementBookmarkCount(){this.bookmarkCount--;}
 }

@@ -3,8 +3,6 @@ package today.todaysentence.domain.member.service;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
-import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.like.repository.LikeRepository;
 import today.todaysentence.domain.member.Member;
@@ -46,7 +44,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor

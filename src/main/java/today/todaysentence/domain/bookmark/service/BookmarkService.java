@@ -1,12 +1,14 @@
 package today.todaysentence.domain.bookmark.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.bookmark.Bookmark;
 import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.post.EventType;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.service.PostService;
 
@@ -15,8 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class BookmarkService {
+
     private final PostService postService;
     private final BookmarkRepository bookmarkRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public BookmarkResponse.SavedStatus bookmark(Long postId, Member member) {
@@ -26,6 +30,8 @@ public class BookmarkService {
                 .orElseGet(() -> bookmarkRepository.save(new Bookmark(member, postId)));
 
         bookmark.toggle();
+
+        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.BOOK_MARK,bookmark.getIsSaved()));
 
         if (bookmark.getIsSaved()) {
             return BookmarkResponse.SavedStatus.saved(bookmark.getBookmarkedYear(), bookmark.getBookmarkedMonth());

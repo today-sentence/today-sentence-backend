@@ -2,7 +2,7 @@ package today.todaysentence.domain.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import today.todaysentence.domain.category.Category;
+import today.todaysentence.domain.post.Category;
 
 import java.util.List;
 

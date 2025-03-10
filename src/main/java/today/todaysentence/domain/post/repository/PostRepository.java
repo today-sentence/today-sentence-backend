@@ -1,8 +1,8 @@
 package today.todaysentence.domain.post.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import today.todaysentence.domain.member.Member;
@@ -83,6 +83,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("DELETE FROM Post p WHERE p.deletedAt < :thirtyDays")
     int deletePostsBefore(@Param("thirtyDays") LocalDateTime thirtyDays);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @QueryHints(@QueryHint(name = "javax.persistence.lock.timeout", value = "5000"))
+    @Query("SELECT p FROM Post p " +
+            "JOIN FETCH p.writer m " +
+            "JOIN FETCH p.hashtags h " +
+            "WHERE p.id = :postId")
+    Optional<Post> findByIdLock(@Param("postId") Long postId);
 }
 
 

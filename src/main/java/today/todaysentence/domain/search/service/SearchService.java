@@ -23,8 +23,7 @@ import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static today.todaysentence.global.redis.RedisService.FAMOUS_RECORD_TAG_KEY;
-import static today.todaysentence.global.redis.RedisService.FAMOUS_SEARCH_TAG_KEY;
+import static today.todaysentence.global.redis.RedisService.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,18 +44,16 @@ public class SearchService {
 
         Page<SearchResponse.BookSearchResult> books;
 
-        if ("title".equals(type)) {
-            books = bookRepository.findByTitleContain(search, pageable);
-        } else if ("author".equals(type)) {
-            books = bookRepository.findByAuthorContain(search, pageable);
-        } else {
-            throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
+        switch (type){
+            case "title" ->  books = bookRepository.findByTitleContain(search, pageable);
+            case "author" ->  books = bookRepository.findByAuthorContain(search, pageable);
+            default ->  throw new BaseException(ExceptionCode.NOT_MATCHED_TYPE_PARAMETER);
+
         }
+
         if (books.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");
         }
-
-
 
         return CommonResponse.ok(books);
     }
@@ -78,7 +75,7 @@ public class SearchService {
         //캐시먼저검사 (look aside)
         List<PostResponseDTO> posts;
 
-        if(type.equals("category") && page<5){
+        if(!sortField.equals("create_at") && type.equals("category") && page<5){
             String key = type+"_"+search;
 
             //캐시검사
@@ -134,13 +131,9 @@ public class SearchService {
 
         String query;
         switch (type){
-            case "title" -> {
-                query=" b.title = :search ";
-            }
+            case "title" -> query=" b.title = :search ";
 
-            case "category" -> {
-                query=" p.category = :search ";
-            }
+            case "category" -> query=" p.category = :search ";
 
             case "tag" -> {
                 redisService.saveOrUpdateKeyword("search", search);
@@ -159,7 +152,7 @@ public class SearchService {
 
     private static String getOrderByQuery(String sortField) {
 
-        String orderByQuery  = " like_count DESC ";
+        String orderByQuery  = " p.like_count DESC ";
 
         if(sortField.equals("create_at")){
             orderByQuery  = " p.create_at DESC ";
@@ -194,7 +187,7 @@ public class SearchService {
         Range.Bound<String> upperBound = Range.Bound.inclusive(max);
         Range<String> range = Range.of(lowerBound, upperBound);
 
-        Set<String> allTags = stringRedisTemplate.opsForZSet().rangeByLex("hashtags", range);
+        Set<String> allTags = stringRedisTemplate.opsForZSet().rangeByLex(HASHTAGS_LIST, range);
 
         return allTags.stream()
                 .filter(tag -> tag.contains(prefix))
@@ -219,7 +212,5 @@ public class SearchService {
 
         return CommonResponse.ok(new SearchResponse.HashTagRank(search,record)) ;
     }
-
-
 
 }
