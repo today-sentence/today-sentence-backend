@@ -11,8 +11,6 @@ import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.member.service.MemberService;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
-import today.todaysentence.domain.post.dto.PostResponseTestDTO;
-import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
 import today.todaysentence.domain.search.dto.SearchResponse;
 import today.todaysentence.global.exception.exception.BaseException;

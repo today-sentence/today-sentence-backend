@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.post.dto.PostCategoryLikeCountDTO;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
-import today.todaysentence.domain.post.dto.PostResponseTestDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
