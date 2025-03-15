@@ -151,7 +151,8 @@ public class RedisService {
         Set<Long> addedPostIds = scheduledPostsList.stream()
                 .flatMap(scheduledPosts -> scheduledPosts.postIds().stream())
                 .collect(Collectors.toSet());
-        redisTemplate.opsForSet().members(DUPLICATED_POST_IDS_KEY).addAll(addedPostIds);
+
+        redisTemplate.opsForSet().add(DUPLICATED_POST_IDS_KEY,addedPostIds.toArray());
     }
 
     public void sentenceIdsCheckOfWithdrawMember(Map<Long, Category> check) {
