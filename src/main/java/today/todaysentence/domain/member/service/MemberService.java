@@ -323,41 +323,34 @@ public class MemberService {
 
 
     @Transactional
-    private CommonResponse<?> changeField(Member member, String type, String field){
+    private CommonResponse<?> changeField(Member member, String type, String field) {
         MemberUpdateAt updateAtMember = getMemberUpdateAt(member);
 
-        LocalDateTime changedTime = switch (type) {
-            case MESSAGE_TYPE -> updateAtMember.getMessageUpdatedAt();
-            case NICKNAME_TYPE -> updateAtMember.getNicknameUpdatedAt();
-            default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
-        };
+        switch (type) {
+            case MESSAGE_TYPE -> {
+                updateAtMember.updateMessageTime();
+                member.changeMessage(field);
+            }
+            case NICKNAME_TYPE -> {
+                LocalDateTime changedTime = updateAtMember.getNicknameUpdatedAt();
+                long daysBetween = calculateDaysBetween(changedTime, LocalDateTime.now());
 
-        long daysBetween = calculateDaysBetween(changedTime,LocalDateTime.now());
-
-        if (daysBetween >= CHANGE_FIELD_TIME) {
-            switch (type) {
-                case MESSAGE_TYPE -> {
-                    member.changeMessage(field);
-                    updateAtMember.updateMessageTime();
-
-                }
-                case NICKNAME_TYPE -> {
+                if (daysBetween >= CHANGE_FIELD_TIME) {
                     checkNickname(field);
                     member.changeNickname(field);
                     updateAtMember.updateNicknameTime();
+                } else {
+                    String message = String.format("%s 변경은 가입 or 수정 후 %d일 후에 변경 가능합니다.", type, CHANGE_FIELD_TIME);
+                    return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, changedTime.plusDays(CHANGE_FIELD_TIME).withSecond(0).withNano(0)));
                 }
             }
-            memberRepository.save(member);
-            memberUpdateAtRepository.save(updateAtMember);
-
-            return CommonResponse.ok(new MemberResponse.MemberInfo(member));
-        } else {
-
-            String message = String.format("%s 변경은 가입 or 수정 후 %d일 후에 변경 가능합니다.", type, CHANGE_FIELD_TIME);
-            return CommonResponse.ok(new MemberResponse.ActionStatusResponse(message, changedTime.plusDays(CHANGE_FIELD_TIME).withSecond(0).withNano(0)));
-
+            default -> throw new BaseException(ExceptionCode.PARAMETER_VALIDATION_FAIL);
         }
 
+        memberRepository.save(member);
+        memberUpdateAtRepository.save(updateAtMember);
+
+        return CommonResponse.ok(new MemberResponse.MemberInfo(member));
     }
 
     private MemberUpdateAt getMemberUpdateAt(Member member) {
