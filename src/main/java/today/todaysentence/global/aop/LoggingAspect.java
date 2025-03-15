@@ -46,32 +46,29 @@ public class LoggingAspect {
 
     }
 
-    @AfterReturning(pointcut = "execution(* today.todaysentence.domain.*.service..*(..))", returning = "result")
-    public void logAfterReturning(JoinPoint joinPoint, Object result) {
-
-
-        String methodName = joinPoint.getSignature().getName();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String nickname = getNickname(authentication);
-
-        String className = joinPoint.getSignature().getDeclaringTypeName();
-
-        if (className.contains("SearchService")) {
-            log.info("Return - [ Member : {} ]  [ Method : {} ]", nickname, methodName);
-            return;
-        }
-
-        if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
-            log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result);
-            return;
-        }
-
-        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", nickname, methodName, result);
-    }
-
-
-
+//    @AfterReturning(pointcut = "execution(* today.todaysentence.domain.*.service..*(..))", returning = "result")
+//    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+//
+//
+//        String methodName = joinPoint.getSignature().getName();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        String nickname = getNickname(authentication);
+//
+//        String className = joinPoint.getSignature().getDeclaringTypeName();
+//
+//        if (className.contains("SearchService")) {
+//            log.info("Return - [ Member : {} ]  [ Method : {} ]", nickname, methodName);
+//            return;
+//        }
+//
+//        if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
+//            log.info("Return - [ Member :  anonymousUser ]  [ Method : {} ]  [ Result : {} ]", methodName, result);
+//            return;
+//        }
+//
+//        log.info("Return - [ Member : {} ]  [ Method : {} ]  [ Result : {} ]", nickname, methodName, result);
+//    }
 
     @AfterThrowing(pointcut = "execution(* today.todaysentence.domain..*(..))" ,throwing ="ex")
     public void logAfterThrow(JoinPoint joinPoint, Throwable ex){

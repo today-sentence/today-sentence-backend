@@ -24,25 +24,30 @@
         </encoder>
     </appender>
 
-    <!-- Loki 로그 전송을 위한 Appender 추가 -->
+<!--     Loki 로그 전송을 위한 Appender 추가-->
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
             <url>http://loki:3100/loki/api/v1/push</url>
         </http>
         <format>
             <label>
-                <pattern>app=my-app,host=${HOSTNAME}</pattern>
+                <pattern>app=${name},host=${HOSTNAME},level=%level</pattern>
+                <readMarkers>true</readMarkers>
             </label>
             <message>
                 <pattern>
                     {
                     "level":"%level",
-
+                    "class":"%logger{36}",
+                    "thread":"%thread",
+                    "message": "%message",
+                    "requestId": "%X{X-Request-ID}"
                     }
                 </pattern>
             </message>
         </format>
     </appender>
+
 
 
     <root level="info">
