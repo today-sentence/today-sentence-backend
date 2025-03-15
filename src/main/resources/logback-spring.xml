@@ -4,6 +4,10 @@
     <!-- 로그 경로 설정 -->
     <property name="LOGS_PATH" value="./logs" />
 
+    <property name="name" value="today" />
+
+    <property name="HOSTNAME" value="ip-172-31-38-223" />
+
     <!-- 콘솔 로그 (스택 트레이스 포함) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
