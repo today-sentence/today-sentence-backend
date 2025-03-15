@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'today'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.1-SNAPSHOT'
 
 java {
     toolchain {
@@ -67,6 +67,9 @@ dependencies {
     //metric
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    //log-loki
+    implementation 'com.github.loki4j:loki-logback-appender:1.4.2'
 
 
 
