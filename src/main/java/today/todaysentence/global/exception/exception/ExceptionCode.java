@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
 @RequiredArgsConstructor
@@ -33,7 +35,10 @@ public enum ExceptionCode {
     MEMBER_ALREADY_WITHDRAWN("이미 탈퇴한 회원입니다.",BAD_REQUEST ),
 
     //search
-    NOT_MATCHED_TYPE_PARAMETER("검색 타입이 일치하지않습니다.",BAD_REQUEST);
+    NOT_MATCHED_TYPE_PARAMETER("검색 타입이 일치하지않습니다.",BAD_REQUEST),
+
+    FAILED_CONVERT_FILE("프로필 파일 변경 로직에 문제 발생", HttpStatus.INTERNAL_SERVER_ERROR),
+    ;
 
     private final String message;
     private final HttpStatus status;

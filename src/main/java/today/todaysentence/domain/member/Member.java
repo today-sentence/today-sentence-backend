@@ -34,7 +34,6 @@ public class Member extends Timestamped {
 
     private Long todayPostId;
 
-    @Setter
     @Builder.Default
     private String profileImg = "basicProfileUrl";
 
@@ -69,5 +68,11 @@ public class Member extends Timestamped {
 
     public void removeTodaySentenceId(){ this.todayPostId = null;}
 
+    public boolean isDefaultProfile() {
+        return "basicProfileUrl".equals(profileImg);
+    }
 
+    public void changeProfile(String profileUrl) {
+        this.profileImg = profileUrl;
+    }
 }
