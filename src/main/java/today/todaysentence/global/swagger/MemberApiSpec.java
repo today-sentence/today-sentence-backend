@@ -10,6 +10,7 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.global.response.CommonResponse;
@@ -329,7 +330,9 @@ public interface MemberApiSpec {
     })
     CommonResponse<?> findPassword(MemberRequest.CheckEmail email) throws MessagingException;
 
-
+    @Operation(summary = "프로필 사진 변경")
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = "multipart/form-data"))
+    CommonResponse<?> updateProfile(CustomUserDetails user, MultipartFile file);
 
 
 
