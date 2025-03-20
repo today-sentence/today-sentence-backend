@@ -1,6 +1,5 @@
 package today.todaysentence.domain.member.api;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,9 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.service.MemberService;
+import today.todaysentence.global.exception.exception.BaseException;
+import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 import today.todaysentence.global.swagger.MemberApiSpec;
@@ -85,6 +87,13 @@ public class MemberController implements MemberApiSpec {
     public CommonResponse<?> changeEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          @RequestBody MemberRequest.CheckEmail email,
                                          HttpServletRequest request,HttpServletResponse response) {
+
+        Member member = userDetails.member();
+
+        if(!member.getIsSocialMember()){
+            throw new BaseException(ExceptionCode.SOCIAL_MEMBER_CANNOT_CHANGE_EMAIL);
+        }
+
         return memberService.changeEmail(userDetails,email,response,request);
     }
 

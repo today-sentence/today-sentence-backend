@@ -42,6 +42,10 @@ public class Member extends Timestamped {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    @Column
+    @Builder.Default
+    private boolean isSocialMember = false;
+
     public void passwordChange(String newPassword){
         this.password = newPassword;
     }
@@ -68,6 +72,10 @@ public class Member extends Timestamped {
     public void insertTodaySentenceId(Long id){ this.todayPostId = id;}
 
     public void removeTodaySentenceId(){ this.todayPostId = null;}
+
+    public boolean getIsSocialMember() {
+        return this.isSocialMember;
+    }
 
 
 }
