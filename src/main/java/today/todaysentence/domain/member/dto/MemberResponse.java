@@ -30,4 +30,21 @@ public class MemberResponse {
         }
 
     }
+
+    public record RegisterMemberResult(
+            Member member,
+            Boolean result
+    ){
+
+    }
+
+
+    public record SocialSignupResponse(
+            MemberInfo memberInfo,
+            Boolean isFirstSignUp
+
+    ){
+
+    }
+
 }

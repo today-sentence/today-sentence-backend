@@ -18,6 +18,7 @@ public enum ExceptionCode {
     DUPLICATED_NICKNAME("이미 사용중인 닉네임 입니다.", BAD_REQUEST),
     NOT_MATCHED_INFORMATION("사용자 정보가 일치하지 않습니다..", BAD_REQUEST),
     NOT_CHANGED_EQUAL_EMAIL("기존 이메일과 같은 이메일로는 변경할 수 없습니다.", BAD_REQUEST),
+    SOCIAL_MEMBER_CANNOT_CHANGE_EMAIL("소셜회원은 이메일을 변경할 수 없습니다.", BAD_REQUEST),
 
     // post
     POST_NOT_FOUND("게시된 명언 글을 찾을 수 없습니다.", NOT_FOUND),
