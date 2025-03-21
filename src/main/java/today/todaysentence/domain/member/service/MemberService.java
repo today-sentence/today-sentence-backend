@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.comment.repository.CommentRepository;
@@ -29,6 +30,7 @@ import today.todaysentence.domain.member.repository.WithdrawRepository;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
+import today.todaysentence.global.aws.S3Service;
 import today.todaysentence.util.email.EmailSenderService;
 import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
@@ -65,6 +67,8 @@ public class MemberService {
     private final RedisService redisService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    private final S3Service s3Service;
 
     private static final String EMAIL_TYPE = "EMAIL";
     private static final String NICKNAME_TYPE = "NICKNAME";
@@ -416,7 +420,14 @@ public class MemberService {
         return  postRepositoryCustom.checkInteraction(postId,memberId);
     }
 
+    @Transactional
+    public void updateProfile(Member member, MultipartFile file){
+        if (!member.isDefaultProfile()) {
+            s3Service.remove(member.getProfileImg());
+        }
 
-
+        String newProfileUrl = s3Service.upload(file);
+        member.changeProfile(newProfileUrl);
+    }
 }
 

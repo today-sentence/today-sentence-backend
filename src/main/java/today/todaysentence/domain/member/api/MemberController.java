@@ -1,6 +1,5 @@
 package today.todaysentence.domain.member.api;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.dto.MemberRequest;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.service.MemberService;
@@ -26,7 +27,7 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @GetMapping()
-    public CommonResponse<MemberResponse.MemberInfo>getMemberInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public CommonResponse<MemberResponse.MemberInfo> getMemberInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return memberService.getMemberInfo(userDetails);
     }
 
@@ -38,26 +39,26 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @PostMapping("/sign-in")
-    public CommonResponse<?> signIn(@RequestBody @Valid  MemberRequest.SignIn signIn, HttpServletRequest request,HttpServletResponse response) {
-        return memberService.signIn(signIn,request,response);
+    public CommonResponse<?> signIn(@RequestBody @Valid MemberRequest.SignIn signIn, HttpServletRequest request, HttpServletResponse response) {
+        return memberService.signIn(signIn, request, response);
     }
 
     @Override
     @DeleteMapping("/sign-out")
     public CommonResponse<?> signOut(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
-        return memberService.signOut(userDetails,request);
+        return memberService.signOut(userDetails, request);
     }
 
     @Override
     @GetMapping("/withdraw")
     public CommonResponse<?> withdraw(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
-        return memberService.withdraw(userDetails,request);
+        return memberService.withdraw(userDetails, request);
     }
 
     @Override
     @PostMapping("/verify-password")
-    public CommonResponse<?> checkVerificationPassword(@AuthenticationPrincipal CustomUserDetails userDetails,@RequestBody MemberRequest.CheckPassword password) {
-        return memberService.checkVerificationPassword(userDetails,password);
+    public CommonResponse<?> checkVerificationPassword(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody MemberRequest.CheckPassword password) {
+        return memberService.checkVerificationPassword(userDetails, password);
     }
 
     @Override
@@ -77,22 +78,22 @@ public class MemberController implements MemberApiSpec {
     @PutMapping("/change-password")
     public CommonResponse<?> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                             @RequestBody @Valid MemberRequest.CheckPassword password) {
-        return memberService.changePassword(userDetails,password);
+        return memberService.changePassword(userDetails, password);
     }
 
     @Override
     @PutMapping("/change-email")
     public CommonResponse<?> changeEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          @RequestBody MemberRequest.CheckEmail email,
-                                         HttpServletRequest request,HttpServletResponse response) {
-        return memberService.changeEmail(userDetails,email,response,request);
+                                         HttpServletRequest request, HttpServletResponse response) {
+        return memberService.changeEmail(userDetails, email, response, request);
     }
 
     @Override
     @PutMapping("/change-message")
     public CommonResponse<?> changeMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @RequestBody @Valid MemberRequest.CheckMessage message) {
-        return memberService.changeMessage(userDetails,message);
+        return memberService.changeMessage(userDetails, message);
     }
 
 
@@ -131,11 +132,17 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @PostMapping("/check-code")
-    public CommonResponse<?> checkVerifyCode(@RequestBody @Valid MemberRequest.VerifyCodeCheck request)  {
-        return memberService.checkVerifyCode(request.email(),request.code());
+    public CommonResponse<?> checkVerifyCode(@RequestBody @Valid MemberRequest.VerifyCodeCheck request) {
+        return memberService.checkVerifyCode(request.email(), request.code());
     }
 
-
+    @PostMapping("/profile")
+    public CommonResponse<?> updateProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                           @RequestPart MultipartFile file) {
+        Member member = userDetails.member();
+        memberService.updateProfile(member, file);
+        return CommonResponse.success();
+    }
 
 
 }

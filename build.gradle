@@ -71,9 +71,8 @@ dependencies {
     //log-loki
     implementation 'com.github.loki4j:loki-logback-appender:1.4.2'
 
-
-
-
+    // s3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('test') {
