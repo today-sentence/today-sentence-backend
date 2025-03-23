@@ -41,6 +41,10 @@ public class Member extends Timestamped {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    @Column
+    @Builder.Default
+    private boolean isSocialMember = false;
+
     public void passwordChange(String newPassword){
         this.password = newPassword;
     }
@@ -68,9 +72,15 @@ public class Member extends Timestamped {
 
     public void removeTodaySentenceId(){ this.todayPostId = null;}
 
+    public boolean getIsSocialMember() {
+        return this.isSocialMember;
+    }
+
+
     public boolean isDefaultProfile() {
         return "basicProfileUrl".equals(profileImg);
     }
+
 
     public void changeProfile(String profileUrl) {
         this.profileImg = profileUrl;
