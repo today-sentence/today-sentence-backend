@@ -55,8 +55,7 @@ public class S3Service {
     private String uploadFile(File file) {
         String fileName = makeFileName(file);
 
-        s3Client.putObject(new PutObjectRequest(bucketName, fileName, file)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        s3Client.putObject(new PutObjectRequest(bucketName, fileName, file));
 
         file.delete();
         return s3Client.getUrl(bucketName, fileName).toString();
