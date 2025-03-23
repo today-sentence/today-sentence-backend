@@ -32,4 +32,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("UPDATE Member m SET m.todayPostId = NULL WHERE m.todayPostId IS NOT NULL")
     int initTodaySentence();
 
+    Optional<Member> findByUsername(String username);
 }

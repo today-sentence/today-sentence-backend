@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -36,6 +37,7 @@ public class MemberSocialService {
 
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public MemberResponse.SocialSignupResponse socialLogin(String accessToken, SocialProvider provider, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
 
@@ -109,30 +111,39 @@ public class MemberSocialService {
     @Transactional
     private MemberResponse.RegisterMemberResult registerMember(SocialMemberInfoDTO memberInfoDTO) {
 
-        Optional<Member> existingMember = memberRepository.findByEmail(memberInfoDTO.getEmail());
+        Optional<Member> existingMember = memberRepository.findByUsername(memberInfoDTO.getUsername());
 
+        // 이메일이 이미 존재하면 저장하지 않고 기존 회원 반환
         if (existingMember.isPresent()) {
-            return new MemberResponse.RegisterMemberResult(existingMember.get(),false);
+            return new MemberResponse.RegisterMemberResult(existingMember.get(), false);
         }
 
         String originalNickname = memberInfoDTO.getNickname();
         String nickname = originalNickname;
         int suffix = 1;
 
+        // 닉네임 중복 처리
         while (memberRepository.existsByNickname(nickname)) {
             nickname = originalNickname + "_" + suffix;
             suffix++;
         }
 
+        // 새 회원 생성
         Member createdMember = Member.builder()
-                .email(memberInfoDTO.getUsername())
-                .password(UUID.randomUUID().toString())
+                .socialId(memberInfoDTO.getUsername())
+                .email(memberInfoDTO.getEmail())
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .isSocialMember(true)
                 .nickname(nickname)
                 .build();
+
+        // 새 회원 저장
         memberRepository.save(createdMember);
-        return new MemberResponse.RegisterMemberResult(createdMember,true);
+
+        // 새로 생성된 회원 반환
+        return new MemberResponse.RegisterMemberResult(createdMember, true);
     }
+
 
     private Authentication forceLogin(Member member) {
 

@@ -42,6 +42,9 @@ public class Member extends Timestamped {
     private Boolean isDeleted = false;
 
     @Column
+    private String socialId;
+
+    @Column
     @Builder.Default
     private boolean isSocialMember = false;
 
