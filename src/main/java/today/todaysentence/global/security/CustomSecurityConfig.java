@@ -39,7 +39,10 @@ public class CustomSecurityConfig {
             "/api/member/find-email",
             "/api/member/check-code",
             "/api/member/verify-code",
-            "/api/member/find-password"
+            "/api/member/find-password",
+
+            //scoial
+            "/api/social/**"
 
     };
     private final static String[] PERMIT_ALL_URI_UTIL = {
