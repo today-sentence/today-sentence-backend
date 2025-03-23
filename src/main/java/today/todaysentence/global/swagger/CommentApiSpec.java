@@ -71,6 +71,7 @@ public interface CommentApiSpec {
                                         {
                                             "nickname" : "test1",
                                             "content" : "좋은 글이네요.",
+                                            "profileImage" : "http://imageurl~~~~"
                                             "createdAt" : "2024.11.30T12:12:00"
                                         }
                                     ],
