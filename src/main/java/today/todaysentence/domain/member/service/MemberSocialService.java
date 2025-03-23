@@ -131,7 +131,7 @@ public class MemberSocialService {
                 .nickname(nickname)
                 .build();
         memberRepository.save(createdMember);
-        return new MemberResponse.RegisterMemberResult(existingMember.get(),true);
+        return new MemberResponse.RegisterMemberResult(createdMember,true);
     }
 
     private Authentication forceLogin(Member member) {

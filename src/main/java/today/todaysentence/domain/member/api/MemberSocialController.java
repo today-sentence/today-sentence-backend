@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.SocialProvider;
 import today.todaysentence.domain.member.dto.MemberResponse;
 import today.todaysentence.domain.member.service.MemberSocialService;
