@@ -16,6 +16,7 @@ public class CommentResponse {
     public record CommentInfo(
             String nickname,
             String content,
+            String profileImage,
             LocalDateTime createdAt
     ) {
     }

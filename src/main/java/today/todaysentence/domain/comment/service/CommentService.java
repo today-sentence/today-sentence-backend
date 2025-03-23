@@ -40,6 +40,7 @@ public class CommentService {
                         .map(comment -> new CommentResponse.CommentInfo(
                                 comment.getMember().getNickname(),
                                 comment.getContent(),
+                                comment.getMember().getProfileImg(),
                                 comment.getCreateAt()
                         ))
                         .toList(),
