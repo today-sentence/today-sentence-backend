@@ -42,7 +42,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE p.id IN " +
                 "(SELECT b.postId " +
                 "FROM Bookmark b " +
-                "WHERE b.member.id = :memberId ) " +
+                "WHERE b.member.id = :memberId AND b.isSaved = true ) " +
             "GROUP BY p.category")
     List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
 
