@@ -243,39 +243,39 @@ public class RedisService {
      * @variable CACHE_MAX_SIZE 캐시 최대 크기. 캐시가 50개 이상이 되면 기존 데이터를 삭제하고 새로 추가.
      *
      *  */
-//    @EventListener
-//    @Async("taskExecutor")
-//    @Transactional
-//    public void searchRankObserver(PostResponse.PostEventDto event) {
-//        Long postId = event.postId();
-//
-//        Post post = postRepository.findByIdLock(postId).orElseThrow();
-//
-//        try {
-//            if (event.type() == EventType.LIKE) {
-//                if (event.result()) {
-//                    post.incrementLikeCount();
-//                } else {
-//                    post.decrementLikeCount();
-//                }
-//            } else if (event.type() == EventType.BOOK_MARK) {
-//                if (event.result()) {
-//                    post.incrementBookmarkCount();
-//                } else {
-//                    post.decrementBookmarkCount();
-//                }
-//            } else if (event.type() == EventType.COMMENT) {
-//                post.incrementCommentCount();
-//            }
-//
-//            postRepository.save(post);
-//
-//        } catch (DeadlockLoserDataAccessException e) {
-//            throw new RuntimeException(e);
-//        }
-//
+    @EventListener
+    @Async("taskExecutor")
+    @Transactional
+    public void searchRankObserver(PostResponse.PostEventDto event) {
+        Long postId = event.postId();
+
+        Post post = postRepository.findByIdLock(postId).orElseThrow();
+
+        try {
+            if (event.type() == EventType.LIKE) {
+                if (event.result()) {
+                    post.incrementLikeCount();
+                } else {
+                    post.decrementLikeCount();
+                }
+            } else if (event.type() == EventType.BOOK_MARK) {
+                if (event.result()) {
+                    post.incrementBookmarkCount();
+                } else {
+                    post.decrementBookmarkCount();
+                }
+            } else if (event.type() == EventType.COMMENT) {
+                post.incrementCommentCount();
+            }
+
+            postRepository.save(post);
+
+        } catch (DeadlockLoserDataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
 //        updateRedisCache(post, event, post.getLikeCount());
-//    }
+    }
 
     private void updateRedisCache(Post post, PostResponse.PostEventDto event, Long likeCount) {
 
