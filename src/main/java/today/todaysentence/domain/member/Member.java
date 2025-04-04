@@ -35,7 +35,7 @@ public class Member extends Timestamped {
     private Long todayPostId;
 
     @Builder.Default
-    private String profileImg = "basicProfileUrl";
+    private String profileImg ="https://one-sentence.s3.ap-northeast-2.amazonaws.com/other_user.png";
 
     @Column
     @Builder.Default
