@@ -16,6 +16,9 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true, exclude = "id")
 public class Member extends Timestamped {
 
+    public static final String DEFAULT_PROFILE_IMG_URL =
+            "https://one-sentence.s3.ap-northeast-2.amazonaws.com/other_user.png";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,7 +38,7 @@ public class Member extends Timestamped {
     private Long todayPostId;
 
     @Builder.Default
-    private String profileImg ="https://one-sentence.s3.ap-northeast-2.amazonaws.com/other_user.png";
+    private String profileImg =DEFAULT_PROFILE_IMG_URL;
 
     @Column
     @Builder.Default
@@ -81,7 +84,7 @@ public class Member extends Timestamped {
 
 
     public boolean isDefaultProfile() {
-        return "basicProfileUrl".equals(profileImg);
+        return DEFAULT_PROFILE_IMG_URL.equals(profileImg);
     }
 
 
