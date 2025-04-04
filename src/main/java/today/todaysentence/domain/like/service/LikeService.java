@@ -36,7 +36,7 @@ public class LikeService {
 
         likeRepository.save(like);
 
-        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.LIKE,like.getIsLiked()));
+//        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.LIKE,like.getIsLiked()));
 
         return CommonResponse.ok(like.getIsLiked());
     }

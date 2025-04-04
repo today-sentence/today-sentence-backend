@@ -184,20 +184,28 @@ public class PostService {
 
         }
 
-        //step4 캐싱값 확인 CacheHit >> 바로반환  CacheMiss >>  DATABASE 조회후 캐싱후 반환
-        return Optional.ofNullable((PostResponseDTO)redisTemplate.opsForValue().get(POST_CACHE_KEY+ randomPostId))
-                .map(post -> new PostResponse.PostResult(post, memberService.checkInteraction(randomPostId, member.getId())))
-                .or(() -> {
-                    String query = "p.id = " + randomPostId;
-                    PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
-                    InteractionResponseDTO interaction = memberService.checkInteraction(randomPostId, member.getId());
+//        //step4 캐싱값 확인 CacheHit >> 바로반환  CacheMiss >>  DATABASE 조회후 캐싱후 반환
+//        return Optional.ofNullable((PostResponseDTO)redisTemplate.opsForValue().get(POST_CACHE_KEY+ randomPostId))
+//                .map(post -> new PostResponse.PostResult(post, memberService.checkInteraction(randomPostId, member.getId())))
+//                .or(() -> {
+//                    String query = "p.id = " + randomPostId;
+//                    PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
+//                    InteractionResponseDTO interaction = memberService.checkInteraction(randomPostId, member.getId());
+//
+//                    redisTemplate.opsForValue().set(POST_CACHE_KEY+ randomPostId, result, 15, TimeUnit.MINUTES);
+//
+//                    return Optional.of(new PostResponse.PostResult(result, interaction));
+//                })
+//                .map(CommonResponse::ok)
+//                .orElseThrow(() -> new BaseException(ExceptionCode.POST_NOT_FOUND));
+//        //step4 캐싱값 확인 CacheHit >> 바로반환  CacheMiss >>  DATABASE 조회후 캐싱후 반환
+        String query = "p.id = " + randomPostId;
+        PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
+        InteractionResponseDTO interaction = memberService.checkInteraction(randomPostId, member.getId());
 
-                    redisTemplate.opsForValue().set(POST_CACHE_KEY+ randomPostId, result, 15, TimeUnit.MINUTES);
+        return CommonResponse.ok(new PostResponse.PostResult(result, interaction));
 
-                    return Optional.of(new PostResponse.PostResult(result, interaction));
-                })
-                .map(CommonResponse::ok)
-                .orElseThrow(() -> new BaseException(ExceptionCode.POST_NOT_FOUND));
+
     }
 
     private Map<Category, Long> memberInterestRank(Member member) {

@@ -53,7 +53,11 @@ public class PostRepositoryCustom {
     public PostResponseDTO findPostByDynamicQuery(String query) {
         String sql = "SELECT " +
                 "b.title, b.author, b.cover, b.publisher, b.publishing_year, " +
-                "p.id,m.profile_img, m.nickname, p.content, p.category, " +
+                "p.id," +
+                "m.profile_img," +
+                "m.nickname," +
+                "p.content, " +
+                "p.category, " +
                 "GROUP_CONCAT(DISTINCT h.name), " +
                 "CAST(p.create_at AS CHAR) AS create_at, " +
                 "p.like_count, " +

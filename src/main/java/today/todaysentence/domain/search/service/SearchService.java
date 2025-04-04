@@ -75,23 +75,25 @@ public class SearchService {
         //캐시먼저검사 (look aside)
         List<PostResponseDTO> posts;
 
-        if(!sortField.equals("create_at") && type.equals("category") && page<5){
-            String key = type+"_"+search;
-
-            //캐시검사
-            posts = getCachePosts(key,type, search, size, page);
-
-            if(posts==null){
-
-                posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery,size,page);
-
-                for (PostResponseDTO p : posts) {
-                    redisTemplate.opsForZSet().add(key,p,p.getLikesCount());
-                }
-            }
-        }else{
-            posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery, size, page);
-        }
+//
+//        if(!sortField.equals("create_at") && type.equals("category") && page<5){
+//            String key = type+"_"+search;
+//
+//            //캐시검사
+//            posts = getCachePosts(key,type, search, size, page);
+//
+//            if(posts==null){
+//
+//                posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery,size,page);
+//
+//                for (PostResponseDTO p : posts) {
+//                    redisTemplate.opsForZSet().add(key,p,p.getLikesCount());
+//                }
+//            }
+//        }else{
+//            posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery, size, page);
+//        }
+        posts = postRepositoryCustom.findPostsByDynamicQuery(search, query, orderByQuery, size, page);
 
         if (posts.isEmpty()) {
             return CommonResponse.ok("검색 결과가 없습니다.");

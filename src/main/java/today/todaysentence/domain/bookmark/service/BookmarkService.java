@@ -31,7 +31,7 @@ public class BookmarkService {
 
         bookmark.toggle();
 
-        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.BOOK_MARK,bookmark.getIsSaved()));
+//        eventPublisher.publishEvent(new PostResponse.PostEventDto(postId, EventType.BOOK_MARK,bookmark.getIsSaved()));
 
         if (bookmark.getIsSaved()) {
             return BookmarkResponse.SavedStatus.saved(bookmark.getBookmarkedYear(), bookmark.getBookmarkedMonth());
