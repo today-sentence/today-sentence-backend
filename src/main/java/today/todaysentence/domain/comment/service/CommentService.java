@@ -64,6 +64,18 @@ public class CommentService {
         comment.update(request.content());
     }
 
+    @Transactional
+    public void delete(Member member, Long postId, Long commentId) {
+        postService.isValidPost(postId);
+        Comment comment = findComment(commentId);
+
+        if (!comment.isWrittenBy(member)) {
+            throw new CommentException(ExceptionCode.COMMENT_NOT_MATCHED_WRITER);
+        }
+
+        comment.delete();
+    }
+
     private Comment findComment(Long commentId) {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(ExceptionCode.COMMENT_NOT_FOUND));

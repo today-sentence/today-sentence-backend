@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.global.timeStamped.Timestamped;
 
+import java.time.LocalDateTime;
+
 @Table(indexes = @Index(name = "idx_comment_post_id_create_at", columnList = "postId, createAt"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,5 +46,9 @@ public class Comment extends Timestamped {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

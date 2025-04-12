@@ -113,4 +113,10 @@ public interface CommentApiSpec {
                                     Long postId,
                                     Long commentId,
                                     CommentRequest.Save request);
+
+    @Operation(summary = "댓글 삭제")
+    @ApiResponse(responseCode = "200", description = "댓글 삭제 성공")
+    CommonResponse<?> deleteComment(CustomUserDetails userDetails,
+                                    Long postId,
+                                    Long commentId);
 }
