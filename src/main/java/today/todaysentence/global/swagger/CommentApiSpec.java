@@ -58,7 +58,7 @@ public interface CommentApiSpec {
                                                     )
                                             )
                                     )
-                                    CommentRequest.Create request);
+                                    CommentRequest.Save request);
 
 
     @Operation(summary = "댓글 목록 조회", description = "생성된 시간 순으로 댓글들을 조회시킴, offset은 0부터 시작")

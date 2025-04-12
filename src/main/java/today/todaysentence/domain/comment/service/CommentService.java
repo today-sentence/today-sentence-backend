@@ -23,7 +23,7 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void create(Member member, Long postId, CommentRequest.Create request) {
+    public void create(Member member, Long postId, CommentRequest.Save request) {
         postService.isValidPost(postId);
 
         commentRepository.save(new Comment(member, postId, request.content()));

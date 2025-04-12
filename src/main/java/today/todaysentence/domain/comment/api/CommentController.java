@@ -30,7 +30,7 @@ public class CommentController implements CommentApiSpec {
     @PostMapping("/posts/{post_id}/comments")
     public CommonResponse<?> createComment(@AuthenticationPrincipal CustomUserDetails userDetails,
                                            @PathVariable(name = "post_id") Long postId,
-                                           @Valid @RequestBody CommentRequest.Create request) {
+                                           @Valid @RequestBody CommentRequest.Save request) {
         Member member = userDetails.member();
         commentService.create(member, postId, request);
 
