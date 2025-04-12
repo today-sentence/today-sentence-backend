@@ -37,4 +37,12 @@ public class Comment extends Timestamped {
         this.postId = postId;
         this.content = content;
     }
+
+    public boolean isWrittenBy(Member member) {
+        return this.member.isSame(member);
+    }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

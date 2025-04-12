@@ -27,6 +27,10 @@ public enum ExceptionCode {
     POST_NOT_FOUND("게시된 명언 글을 찾을 수 없습니다.", NOT_FOUND),
     POST_NOT_MATCHED_WRITER("글을 작성한 본인이 아닙니다.", FORBIDDEN),
 
+    // comment
+    COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다.", NOT_FOUND),
+    COMMENT_NOT_MATCHED_WRITER("댓글을 수정/삭제할 권한이 없습니다", FORBIDDEN),
+
     //
     PARAMETER_VALIDATION_FAIL("파라미터가 올바르지 않습니다.", BAD_REQUEST),
 

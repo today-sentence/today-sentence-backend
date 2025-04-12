@@ -17,8 +17,6 @@ import today.todaysentence.domain.comment.dto.CommentResponse;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
 
-import java.util.List;
-
 @Tag(name = "댓글 API")
 public interface CommentApiSpec {
 
@@ -108,4 +106,11 @@ public interface CommentApiSpec {
     )})
     CommonResponse<CommentResponse.CommentInfos> getComments(@Parameter(name = "post_id", in = ParameterIn.PATH) Long postId,
                                                              @Parameter(hidden = true) Pageable pageable);
+
+    @Operation(summary = "댓글 수정")
+    @ApiResponse(responseCode = "200", description = "댓글 수정 성공")
+    CommonResponse<?> modifyComment(CustomUserDetails userDetails,
+                                    Long postId,
+                                    Long commentId,
+                                    CommentRequest.Save request);
 }
