@@ -64,8 +64,22 @@ public class Post extends Timestamped {
                 .toList();
     }
 
-    public void deleted(){
-        this.deletedAt= LocalDateTime.now();
+    public boolean isWrittenBy(Member member) {
+        return this.writer.equals(member);
+    }
+
+    public void update(Book book,
+                       Category category,
+                       List<Hashtag> hashtags,
+                       String content) {
+        this.book = book;
+        this.category = category;
+        this.hashtags = hashtags;
+        this.content = content;
+    }
+
+    public void delete(){
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void incrementLikeCount(){this.likeCount++;}

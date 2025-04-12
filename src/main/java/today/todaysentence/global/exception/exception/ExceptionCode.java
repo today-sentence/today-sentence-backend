@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -24,6 +25,7 @@ public enum ExceptionCode {
 
     // post
     POST_NOT_FOUND("게시된 명언 글을 찾을 수 없습니다.", NOT_FOUND),
+    POST_NOT_MATCHED_WRITER("글을 작성한 본인이 아닙니다.", FORBIDDEN),
 
     //
     PARAMETER_VALIDATION_FAIL("파라미터가 올바르지 않습니다.", BAD_REQUEST),
