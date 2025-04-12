@@ -102,7 +102,6 @@ public interface PostApiSpec {
                                                                                 int month,
                                                                                 int year);
 
-
     @Operation(summary = "명언 글 상세조회하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
@@ -140,6 +139,11 @@ public interface PostApiSpec {
     CommonResponse<?> modifyPost(CustomUserDetails userDetails,
                                  Long postId,
                                  PostRequest.Record request);
+
+    @Operation(summary = "명언 글 삭제")
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    CommonResponse<?> deletePost(CustomUserDetails userDetails,
+                                 Long postId);
 
     @Operation(summary = "통계 조회")
     @ApiResponses({

@@ -16,22 +16,22 @@ import java.util.Set;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("SELECT p FROM Post p WHERE p.writer = :member AND p.createAt BETWEEN :startDate AND :endDate")
+    @Query("SELECT p FROM Post p WHERE p.deletedAt IS NULL AND p.writer = :member AND p.createAt BETWEEN :startDate AND :endDate")
     List<Post> findMyPostsByDate(@Param("member")Member member,
                                  @Param("startDate") LocalDateTime startDate,
                                  @Param("endDate") LocalDateTime endDate);
 
-    Optional<Post> findById(@NonNull Long id);
+    Optional<Post> findByIdAndDeletedAtIsNull(@NonNull Long id);
 
-    List<Post> findByWriter(Member member);
+    List<Post> findByWriterAndDeletedAtIsNull(Member member);
 
-    boolean existsById(@NonNull Long id);
+    boolean existsByIdAndDeletedAtIsNull(@NonNull Long id);
 
     @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
             "p.category, COUNT(*)" +
             ")  " +
             "FROM Post p " +
-            "WHERE p.writer.id = :memberId " +
+            "WHERE p.writer.id = :memberId AND p.deletedAt Is NULL " +
             "GROUP BY p.category")
     List<PostResponse.CategoryCount> findByMemberRecordsStatistics(@Param("memberId") Long id);
 
@@ -43,6 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 "(SELECT b.postId " +
                 "FROM Bookmark b " +
                 "WHERE b.member.id = :memberId AND b.isSaved = true ) " +
+            "AND p.deletedAt IS NULL " +
             "GROUP BY p.category")
     List<PostResponse.CategoryCount> findByMemberBookmarksStatistics(@Param("memberId") Long id);
 
@@ -51,11 +52,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
       FROM post p
       WHERE p.category = :category
       AND p.id NOT IN :duplicatedIds
+      AND p.deletedAt IS NULL
       ORDER BY RAND()
       LIMIT :count
       """, nativeQuery = true)
     List<Post> findRandomPostsByCategoryAndNotInIds(String category, Set<Long> duplicatedIds, int count);
-
 
     @Query("SELECT new today.todaysentence.domain.post.dto.PostResponse$CategoryCount(" +
           "p.category,SUM(" +
@@ -71,9 +72,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
           "                 END)" +
           ")" +
           "FROM Post p " +
+            "WHERE p.deletedAt IS NULL " +
           "GROUP BY p.category")
     List<PostResponse.CategoryCount> findByMemberAllStatistics(@Param("memberId") Long memberId);
-
 
     @Modifying
     @Query("UPDATE Post p SET p.deletedAt = CURRENT_TIMESTAMP WHERE p.id IN :postIds")

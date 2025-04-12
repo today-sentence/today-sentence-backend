@@ -78,8 +78,8 @@ public class Post extends Timestamped {
         this.content = content;
     }
 
-    public void deleted(){
-        this.deletedAt= LocalDateTime.now();
+    public void delete(){
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void incrementLikeCount(){this.likeCount++;}

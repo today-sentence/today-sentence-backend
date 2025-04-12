@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -72,6 +73,14 @@ public class PostController implements PostApiSpec {
                                         @Valid @RequestBody PostRequest.Record request) {
         Member member = userDetails.member();
         postService.modify(request, member, postId);
+        return CommonResponse.success();
+    }
+
+    @DeleteMapping("/{post_id}")
+    public CommonResponse<?> deletePost(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                        @PathVariable("post_id") Long postId) {
+        Member member = userDetails.member();
+        postService.delete(member, postId);
         return CommonResponse.success();
     }
 
