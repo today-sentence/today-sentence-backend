@@ -167,7 +167,7 @@ public class MemberService {
 
         String originEmail = member.getEmail();
 
-        List<Post> wMemberPosts =postRepository.findByWriter(member);
+        List<Post> wMemberPosts =postRepository.findByWriterAndDeletedAtIsNull(member);
         List<Long> postIds = wMemberPosts.stream()
                 .map(Post::getId)
                 .toList();

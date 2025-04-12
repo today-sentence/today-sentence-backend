@@ -56,7 +56,7 @@ public interface PostApiSpec {
                                                                          "bookPublishingYear": 2007,
                                                                          "bookCover": "http://coverurl.com/bookurl",
                                                                          "isbn": "1234567890abc",
-                                                                         "category": "시/소설/에세이",
+                                                                         "category": "POEM_NOVEL_ESSAY",
                                                                          "hashtags": [
                                                                               "우주", "통일의법칙", "신기"
                                                                          ],
@@ -102,7 +102,6 @@ public interface PostApiSpec {
                                                                                 int month,
                                                                                 int year);
 
-
     @Operation(summary = "명언 글 상세조회하기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
@@ -135,7 +134,16 @@ public interface PostApiSpec {
     })
     CommonResponse<PostResponse.Detail> getPostDetail(Long post_id);
 
+    @Operation(summary = "명언 글 수정")
+    @ApiResponse(responseCode = "204", description = "수정 성공")
+    CommonResponse<?> modifyPost(CustomUserDetails userDetails,
+                                 Long postId,
+                                 PostRequest.Record request);
 
+    @Operation(summary = "명언 글 삭제")
+    @ApiResponse(responseCode = "200", description = "삭제 성공")
+    CommonResponse<?> deletePost(CustomUserDetails userDetails,
+                                 Long postId);
 
     @Operation(summary = "통계 조회")
     @ApiResponses({

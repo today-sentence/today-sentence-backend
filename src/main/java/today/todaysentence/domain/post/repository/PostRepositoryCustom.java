@@ -93,7 +93,7 @@ public class PostRepositoryCustom {
                 "INNER JOIN book b ON b.isbn = p.book_isbn " +
                 "INNER JOIN post_hashtag ph ON ph.post_id = p.id " +
                 "LEFT JOIN hashtag h ON h.id = ph.hashtag_id " +
-                "WHERE " + query + " " +
+                "WHERE " + query + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY like_count DESC " +
                 "limit 1";
@@ -114,7 +114,7 @@ public class PostRepositoryCustom {
                 "FROM post p " +
                 "LEFT JOIN likes l ON l.post_id = p.id AND l.member_id = :memberId " +
                 "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.member_id = :memberId " +
-                "WHERE p.id IN :postIds " +
+                "WHERE p.id IN :postIds " + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id " +
                 "ORDER BY FIELD(p.id, " + postIdsString + ")";
 
@@ -132,7 +132,7 @@ public class PostRepositoryCustom {
                 "FROM post p " +
                 "LEFT JOIN likes l ON l.post_id = p.id AND l.member_id = :memberId " +
                 "LEFT JOIN bookmark bm ON bm.post_id = p.id AND bm.member_id = :memberId " +
-                "WHERE p.id = :postId " +
+                "WHERE p.id = :postId " + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id";
 
         Query nativeQuery = entityManager.createNativeQuery(sql, InteractionResponseDTO.class);
@@ -153,8 +153,6 @@ public class PostRepositoryCustom {
         countNativeQuery.setParameter("search",search);
 
         return  (Long) countNativeQuery.getSingleResult();
-
-
     }
 
     public PostCategoryLikeCountDTO findPostCategoryAndLikeCount(Long postId) {
@@ -162,7 +160,7 @@ public class PostRepositoryCustom {
                 "p.category, " +
                 "p.like_count " +
                 "FROM post p " +
-                "WHERE p.id = :postId " +
+                "WHERE p.id = :postId " + " AND p.deleted_at IS NULL " +
                 "GROUP BY p.id ";
 
         Query nativeQuery = entityManager.createNativeQuery(query, PostCategoryLikeCountDTO.class);

@@ -21,7 +21,6 @@ import today.todaysentence.domain.post.dto.ScheduledPosts;
 import today.todaysentence.domain.post.repository.PostQueryRepository;
 import today.todaysentence.domain.post.repository.PostRepository;
 import today.todaysentence.domain.post.repository.PostRepositoryCustom;
-import today.todaysentence.global.exception.exception.BaseException;
 import today.todaysentence.global.exception.exception.ExceptionCode;
 import today.todaysentence.global.exception.exception.PostException;
 import today.todaysentence.global.response.CommonResponse;
@@ -31,7 +30,6 @@ import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -96,18 +94,42 @@ public class PostService {
     }
 
     private Post findPost(Long postId) {
-        return postRepository.findById(postId)
+        return postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
 
     public void isValidPost(Long postId) {
-        if (postRepository.existsById(postId)) {
+        if (postRepository.existsByIdAndDeletedAtIsNull(postId)) {
             return;
         }
 
         throw new PostException(ExceptionCode.POST_NOT_FOUND);
     }
 
+    @Transactional
+    public void modify(PostRequest.Record request, Member member, Long postId) {
+        Post post = findPost(postId);
+
+        if (!post.isWrittenBy(member)) {
+            throw new PostException(ExceptionCode.POST_NOT_MATCHED_WRITER);
+        }
+
+        Book book = bookService.findOrCreate(PostMapper.toBook(request));
+        List<Hashtag> hashtags = hashtagService.findOrCreate(request.hashtags());
+
+        post.update(book, request.category(), hashtags, request.content());
+    }
+
+    @Transactional
+    public void delete(Member member, Long postId) {
+        Post post = findPost(postId);
+
+        if (!post.isWrittenBy(member)) {
+            throw new PostException(ExceptionCode.POST_NOT_MATCHED_WRITER);
+        }
+
+        post.delete();
+    }
 
     @Transactional(readOnly = true)
     public CommonResponse<PostResponse.Statistics> getStatistics(JwtUserDetails userDetails) {
