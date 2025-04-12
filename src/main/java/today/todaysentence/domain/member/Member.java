@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import today.todaysentence.global.timeStamped.Timestamped;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -82,11 +81,9 @@ public class Member extends Timestamped {
         return this.isSocialMember;
     }
 
-
     public boolean isDefaultProfile() {
         return DEFAULT_PROFILE_IMG_URL.equals(profileImg);
     }
-
 
     public void changeProfile(String profileUrl) {
         this.profileImg = profileUrl;

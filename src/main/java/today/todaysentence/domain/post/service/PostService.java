@@ -108,6 +108,19 @@ public class PostService {
         throw new PostException(ExceptionCode.POST_NOT_FOUND);
     }
 
+    @Transactional
+    public void modify(PostRequest.Record request, Member member, Long postId) {
+        Post post = findPost(postId);
+
+        if (!post.isWrittenBy(member)) {
+            throw new PostException(ExceptionCode.POST_NOT_MATCHED_WRITER);
+        }
+
+        Book book = bookService.findOrCreate(PostMapper.toBook(request));
+        List<Hashtag> hashtags = hashtagService.findOrCreate(request.hashtags());
+
+        post.update(book, request.category(), hashtags, request.content());
+    }
 
     @Transactional(readOnly = true)
     public CommonResponse<PostResponse.Statistics> getStatistics(JwtUserDetails userDetails) {
