@@ -65,7 +65,7 @@ public class Post extends Timestamped {
     }
 
     public boolean isWrittenBy(Member member) {
-        return this.writer.equals(member);
+        return this.writer.isSame(member);
     }
 
     public void update(Book book,

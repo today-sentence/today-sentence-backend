@@ -14,6 +14,8 @@ import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.EventType;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.service.PostService;
+import today.todaysentence.global.exception.exception.CommentException;
+import today.todaysentence.global.exception.exception.ExceptionCode;
 
 @RequiredArgsConstructor
 @Service
@@ -23,7 +25,7 @@ public class CommentService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void create(Member member, Long postId, CommentRequest.Create request) {
+    public void create(Member member, Long postId, CommentRequest.Save request) {
         postService.isValidPost(postId);
 
         commentRepository.save(new Comment(member, postId, request.content()));
@@ -48,6 +50,34 @@ public class CommentService {
                 comments.getNumberOfElements(),
                 comments.hasNext()
         );
+    }
 
+    @Transactional
+    public void modify(Member member, Long postId, Long commentId, CommentRequest.Save request) {
+        postService.isValidPost(postId);
+        Comment comment = findComment(commentId);
+
+        if (!comment.isWrittenBy(member)) {
+            throw new CommentException(ExceptionCode.COMMENT_NOT_MATCHED_WRITER);
+        }
+
+        comment.update(request.content());
+    }
+
+    @Transactional
+    public void delete(Member member, Long postId, Long commentId) {
+        postService.isValidPost(postId);
+        Comment comment = findComment(commentId);
+
+        if (!comment.isWrittenBy(member)) {
+            throw new CommentException(ExceptionCode.COMMENT_NOT_MATCHED_WRITER);
+        }
+
+        comment.delete();
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ExceptionCode.COMMENT_NOT_FOUND));
     }
 }

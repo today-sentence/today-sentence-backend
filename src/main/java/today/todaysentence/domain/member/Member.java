@@ -88,4 +88,8 @@ public class Member extends Timestamped {
     public void changeProfile(String profileUrl) {
         this.profileImg = profileUrl;
     }
+
+    public boolean isSame(Member other) {
+        return this.id.equals(other.id);
+    }
 }
