@@ -40,6 +40,7 @@ public class CommentService {
         return new CommentResponse.CommentInfos(
                 comments.stream()
                         .map(comment -> new CommentResponse.CommentInfo(
+                                comment.getId(),
                                 comment.getMember().getNickname(),
                                 comment.getContent(),
                                 comment.getMember().getProfileImg(),

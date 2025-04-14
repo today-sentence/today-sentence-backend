@@ -14,6 +14,7 @@ public class CommentResponse {
     }
 
     public record CommentInfo(
+            Long id,
             String nickname,
             String content,
             String profileImage,
