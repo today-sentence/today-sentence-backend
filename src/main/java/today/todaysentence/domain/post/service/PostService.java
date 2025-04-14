@@ -93,7 +93,7 @@ public class PostService {
         return PostMapper.toDetail(post, bookInfo);
     }
 
-    private Post findPost(Long postId) {
+    public Post findPost(Long postId) {
         return postRepository.findByIdAndDeletedAtIsNull(postId)
                 .orElseThrow(() -> new PostException(ExceptionCode.POST_NOT_FOUND));
     }
@@ -128,7 +128,7 @@ public class PostService {
             throw new PostException(ExceptionCode.POST_NOT_MATCHED_WRITER);
         }
 
-        post.decrementCommentCount();
+
         post.delete();
     }
 

@@ -12,6 +12,7 @@ import today.todaysentence.domain.comment.dto.CommentResponse;
 import today.todaysentence.domain.comment.repository.CommentRepository;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.post.EventType;
+import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.service.PostService;
 import today.todaysentence.global.exception.exception.CommentException;
@@ -67,13 +68,14 @@ public class CommentService {
 
     @Transactional
     public void delete(Member member, Long postId, Long commentId) {
-        postService.isValidPost(postId);
+        Post post = postService.findPost(postId);
         Comment comment = findComment(commentId);
 
         if (!comment.isWrittenBy(member)) {
             throw new CommentException(ExceptionCode.COMMENT_NOT_MATCHED_WRITER);
         }
-
+        
+        post.decrementCommentCount();
         comment.delete();
     }
 
