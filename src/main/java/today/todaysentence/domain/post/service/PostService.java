@@ -128,6 +128,7 @@ public class PostService {
             throw new PostException(ExceptionCode.POST_NOT_MATCHED_WRITER);
         }
 
+        post.decrementCommentCount();
         post.delete();
     }
 

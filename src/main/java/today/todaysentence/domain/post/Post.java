@@ -84,8 +84,10 @@ public class Post extends Timestamped {
 
     public void incrementLikeCount(){this.likeCount++;}
     public void incrementCommentCount(){this.CommentCount++;}
+
     public void incrementBookmarkCount(){this.bookmarkCount++;}
 
     public void decrementLikeCount(){this.likeCount--;}
     public void decrementBookmarkCount(){this.bookmarkCount--;}
+    public void decrementCommentCount(){this.CommentCount--;}
 }
