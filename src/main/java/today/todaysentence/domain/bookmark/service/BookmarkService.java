@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.todaysentence.domain.bookmark.Bookmark;
 import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
+import today.todaysentence.domain.bookmark.repository.BookmarkQueryRepository;
 import today.todaysentence.domain.bookmark.repository.BookmarkRepository;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.EventType;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.service.PostService;
@@ -20,6 +22,7 @@ public class BookmarkService {
 
     private final PostService postService;
     private final BookmarkRepository bookmarkRepository;
+    private final BookmarkQueryRepository bookmarkQueryRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -47,5 +50,10 @@ public class BookmarkService {
                 .map(Bookmark::getPostId)
                 .map(postService::toSummary)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public BookmarkResponse.CategoryStatistics getBookmarksByCategory(Member member, Category category) {
+        return bookmarkQueryRepository.findBookmarksByCategory(member, category);
     }
 }
