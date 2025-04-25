@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import today.todaysentence.domain.bookmark.dto.BookmarkRequest;
+import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
@@ -98,4 +100,44 @@ public interface BookmarkApiSpec {
     ResponseEntity<CommonResponse<List<PostResponse.Summary>>> getMyBookmarksByDate(CustomUserDetails userDetails,
                                                                                     int month,
                                                                                     int year);
+
+    @Operation(summary = "카테고리에 맞는 내가 저장한 명언글 목록 조회하기")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "카테고리 별 저장한 명언글 목록 조회 성공", value = """
+                            {
+                                "data":[
+                                    "totalBookmarkCount":2,
+                                    "statistics":[
+                                        {
+                                            "postId":2,
+                                            "bookTitle":"테스트2책",
+                                            "bookAuthor":"저자2",
+                                            "bookmarkMonth":4,
+                                            "bookmarkDay:21
+                                        },
+                                        {
+                                            "postId":6,
+                                            "bookTitle":"테스트6책",
+                                            "bookAuthor":"저자6",
+                                            "bookmarkMonth":2,
+                                            "bookmarkDay:13
+                                    ]
+                                ]
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "카테고리에 맞는 저장한 글이 없음", value = """
+                            {
+                                "data":[
+                                    "totalBookmarkCount":0,
+                                    "statistics":[]
+                                ]
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<BookmarkResponse.CategoryStatistics> getBookmarksByCategory(CustomUserDetails userDetails,
+                                                                               Category category);
 }
