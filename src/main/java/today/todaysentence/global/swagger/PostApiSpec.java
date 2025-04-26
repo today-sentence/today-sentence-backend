@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
@@ -212,4 +213,43 @@ public interface PostApiSpec {
             }))
     })
     CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails);
+
+    @Operation(summary = "카테고리에 맞는 나의 기록 목록 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "카테고리 별 기록한 명언글 목록 조회 성공", value = """
+                            {
+                                "data":[
+                                    "totalRecordCount":2,
+                                    "statistics":[
+                                        {
+                                            "postId":2,
+                                            "bookTitle":"테스트2책",
+                                            "bookAuthor":"저자2",
+                                            "bookmarkMonth":4,
+                                            "bookmarkDay:21
+                                        },
+                                        {
+                                            "postId":6,
+                                            "bookTitle":"테스트6책",
+                                            "bookAuthor":"저자6",
+                                            "bookmarkMonth":2,
+                                            "bookmarkDay:13
+                                    ]
+                                ]
+                            }
+                            """)
+            })),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+                    @ExampleObject(name = "카테고리에 맞는 기록 글이 없음", value = """
+                            {
+                                "data":[
+                                    "totalRecordCount":0,
+                                    "statistics":[]
+                                ]
+                            }
+                            """)
+            }))
+    })
+    CommonResponse<PostResponse.CategoryStatistics> getRecordsByCategory(CustomUserDetails userDetails, Category category);
 }
