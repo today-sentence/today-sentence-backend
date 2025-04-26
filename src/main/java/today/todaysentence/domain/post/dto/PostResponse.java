@@ -1,6 +1,7 @@
 package today.todaysentence.domain.post.dto;
 
 import lombok.Builder;
+import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
 import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.member.dto.InteractionResponseDTO;
 import today.todaysentence.domain.post.EventType;
@@ -71,4 +72,18 @@ public class PostResponse {
     ){
     }
 
+    public record CategoryStatistic(
+            Long postId,
+            String bookTitle,
+            String bookAuthor,
+            Integer recordMonth,
+            Integer recordDay
+    ) {
+    }
+
+    public record CategoryStatistics(
+            Long totalRecordCount,
+            List<PostResponse.CategoryStatistic> statistics
+    ) {
+    }
 }
