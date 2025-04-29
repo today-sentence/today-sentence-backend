@@ -2,6 +2,8 @@ package today.todaysentence.domain.bookmark.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+
 public class BookmarkResponse {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,5 +16,20 @@ public class BookmarkResponse {
         public static SavedStatus cancel() {
             return new SavedStatus(false, null, null);
         }
+    }
+
+    public record CategoryStatistic(
+            Long postId,
+            String bookTitle,
+            String bookAuthor,
+            Integer bookmarkMonth,
+            Integer bookmarkDay
+    ) {
+    }
+
+    public record CategoryStatistics(
+            Long totalBookmarkCount,
+            List<CategoryStatistic> statistics
+    ) {
     }
 }

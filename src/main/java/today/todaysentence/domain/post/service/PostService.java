@@ -275,6 +275,8 @@ public class PostService {
                 .collect(Collectors.toSet());
     }
 
-
+    public PostResponse.CategoryStatistics getRecordsByCategory(Member member, Category category) {
+        return postQueryRepository.findRecordsByCategory(member, category);
+    }
 
 }

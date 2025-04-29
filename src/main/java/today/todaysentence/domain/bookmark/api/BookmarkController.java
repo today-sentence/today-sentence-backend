@@ -15,9 +15,11 @@ import today.todaysentence.domain.bookmark.dto.BookmarkRequest;
 import today.todaysentence.domain.bookmark.dto.BookmarkResponse;
 import today.todaysentence.domain.bookmark.service.BookmarkService;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.global.response.CommonResponse;
 import today.todaysentence.global.security.userDetails.CustomUserDetails;
+import today.todaysentence.global.security.userDetails.JwtUserDetails;
 import today.todaysentence.global.swagger.BookmarkApiSpec;
 
 import java.util.List;
@@ -46,5 +48,12 @@ public class BookmarkController implements BookmarkApiSpec {
         }
 
         return ResponseEntity.ok(CommonResponse.ok(bookmarks));
+    }
+
+    @GetMapping("/api/posts/bookmarks/statistics")
+    public CommonResponse<BookmarkResponse.CategoryStatistics> getBookmarksByCategory(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @RequestParam("category")Category category) {
+        Member member = userDetails.member();
+        return CommonResponse.ok(bookmarkService.getBookmarksByCategory(member, category));
     }
 }

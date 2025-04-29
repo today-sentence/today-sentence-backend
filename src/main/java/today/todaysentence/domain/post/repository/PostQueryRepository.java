@@ -1,12 +1,16 @@
 package today.todaysentence.domain.post.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import today.todaysentence.domain.book.QBook;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.Post;
 import today.todaysentence.domain.post.QPost;
 import today.todaysentence.domain.member.Member;
+import today.todaysentence.domain.post.dto.PostResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,5 +72,43 @@ public class PostQueryRepository {
                 .fetchFirst();
 
         return Optional.ofNullable(fallbackPost);
+    }
+
+    public PostResponse.CategoryStatistics findRecordsByCategory(Member member, Category category) {
+        QPost post = QPost.post;
+        QBook book = QBook.book;
+
+        List<PostResponse.CategoryStatistic> statistics = queryFactory
+                .select(Projections.constructor(PostResponse.CategoryStatistic.class,
+                        post.id,
+                        book.title,
+                        book.author,
+                        post.modifiedAt.month(),
+                        post.modifiedAt.dayOfMonth()
+                ))
+                .from(post)
+                .join(post.book, book)
+                .where(
+                        post.category.eq(category),
+                        post.deletedAt.isNull(),
+                        post.writer.ne(member)
+                )
+                .orderBy(post.modifiedAt.desc())
+                .fetch();
+
+        Long totalCount = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(
+                        post.category.eq(category),
+                        post.deletedAt.isNull(),
+                        post.writer.ne(member)
+                )
+                .fetchOne();
+
+        return new PostResponse.CategoryStatistics(
+                totalCount,
+                statistics
+        );
     }
 }

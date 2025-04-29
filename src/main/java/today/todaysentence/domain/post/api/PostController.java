@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import today.todaysentence.domain.member.Member;
 import today.todaysentence.domain.member.service.MemberService;
+import today.todaysentence.domain.post.Category;
 import today.todaysentence.domain.post.dto.PostRequest;
 import today.todaysentence.domain.post.dto.PostResponse;
 import today.todaysentence.domain.post.dto.PostResponseDTO;
@@ -34,7 +35,7 @@ import java.util.List;
 @RestController
 public class PostController implements PostApiSpec {
     private final PostService postService;
-    
+
     //테스트용으로 실배포시 삭제
     private final PostRepositoryCustom postRepositoryCustom;
     private final MemberService memberService;
@@ -49,8 +50,8 @@ public class PostController implements PostApiSpec {
 
     @GetMapping("/records")
     public ResponseEntity<CommonResponse<List<PostResponse.Summary>>> getMyPostsByDate(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                                      @RequestParam("month") int month,
-                                                                                      @RequestParam("year") int year) {
+                                                                                       @RequestParam("month") int month,
+                                                                                       @RequestParam("year") int year) {
         Member member = userDetails.member();
         List<PostResponse.Summary> posts = postService.getMyPostsByDate(member, month, year);
 
@@ -86,24 +87,28 @@ public class PostController implements PostApiSpec {
 
     @GetMapping("/test/{post_id}")
     public CommonResponse<?> test(@AuthenticationPrincipal JwtUserDetails userDetails,
-            @PathVariable("post_id") Long postId) {
+                                  @PathVariable("post_id") Long postId) {
 
         String query = "p.id = " + postId;
         PostResponseDTO result = postRepositoryCustom.findPostByDynamicQuery(query);
-        PostResponse.PostResult testDto = new PostResponse.PostResult(result,memberService.checkInteraction(postId, userDetails.id()));
+        PostResponse.PostResult testDto = new PostResponse.PostResult(result, memberService.checkInteraction(postId, userDetails.id()));
         return CommonResponse.ok(testDto);
     }
 
     @GetMapping("/statistics")
-    public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal JwtUserDetails userDetails){
+    public CommonResponse<PostResponse.Statistics> getStatistics(@AuthenticationPrincipal JwtUserDetails userDetails) {
         return postService.getStatistics(userDetails);
     }
 
     @GetMapping("/today-sentence")
-    public CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public CommonResponse<PostResponse.PostResult> getTodaySentence(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return postService.getTodaySentence(userDetails);
     }
 
-
-
+    @GetMapping("/records/statistics")
+    public CommonResponse<PostResponse.CategoryStatistics> getRecordsByCategory(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                                @RequestParam("category") Category category) {
+        Member member = userDetails.member();
+        return CommonResponse.ok(postService.getRecordsByCategory(member, category));
+    }
 }
